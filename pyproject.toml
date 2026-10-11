@@ -31,7 +31,7 @@ classifiers = [
 # Each floor is the oldest release the unit tests pass against on Python 3.11, checked by CI's test-minimum-deps job.
 # Keep the list in sync with requirements.txt.
 dependencies = [
-    "pillow>=9.2",
+    "pillow>=10.1",
     "requests>=2.20",
     "websocket-client>=1.0",
     "pydantic>=2.1",

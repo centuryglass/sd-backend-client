@@ -50,15 +50,6 @@ class DiffusionRequestBody(DiffusionParams):
 
 
     ### Inpainting only:
-    mask_blur_x: Optional[int] = None
-    """Horizontal radius (in pixels) of the blur applied to mask edges."""
-
-    mask_blur_y: Optional[int] = None
-    """Vertical radius (in pixels) of the blur applied to mask edges."""
-
-    mask_blur: Optional[int] = None
-    """Radius (in pixels) of the blur applied to mask edges in both directions."""
-
     inpainting_fill: Optional[InpaintFillOption] = InpaintFillOption.ORIGINAL
     """Controls how source image data is processed before inpainting. ORIGINAL is almost always the right choice.
    """
