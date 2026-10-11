@@ -35,6 +35,8 @@ import threading
 import time
 from typing import Callable, Optional, TYPE_CHECKING
 
+from PIL import Image
+
 from sd_backend_client.api.comfyui_webservice import AsyncTaskStatus
 from sd_backend_client.api.shared_data.generation_handle import (GenerationHandle, GenerationProgress,
                                                               GenerationResult, GenerationStatus)
@@ -59,12 +61,27 @@ _STATUS_MAP: dict[AsyncTaskStatus, GenerationStatus] = {
 }
 
 
+def _composite_onto_source(image: Image.Image, source: Image.Image, mask: Image.Image) -> Image.Image:
+    """Return `image` where `mask` is white and `source` where it is black, blending the grey band between them.
+
+    `source` and `mask` are resized to `image`'s size when it differs.
+    """
+    source = source.convert('RGBA')
+    mask = mask.convert('L')
+    if source.size != image.size:
+        source = source.resize(image.size)
+    if mask.size != image.size:
+        mask = mask.resize(image.size)
+    return Image.composite(image.convert('RGBA'), source, mask)
+
+
 class ComfyGenerationHandle(GenerationHandle):
     """Handle to one ComfyUI ``/prompt`` job, identified by its ``prompt_id`` (+ queue ``number``)."""
 
     def __init__(self, service: 'ComfyUiWebservice', prompt_id: str, number: Optional[int] = None,
                  seed: Optional[int] = None, registration_grace: float = DEFAULT_REGISTRATION_GRACE,
-                 clock: Callable[[], float] = time.monotonic) -> None:
+                 clock: Callable[[], float] = time.monotonic,
+                 paste_back: Optional[tuple[Image.Image, Image.Image]] = None) -> None:
         """
         Parameters
         ----------
@@ -80,12 +97,16 @@ class ComfyGenerationHandle(GenerationHandle):
             Seconds after creation during which a job the server has never listed reads as PENDING, not NOT_FOUND.
         clock: Callable[[], float], default=time.monotonic
             Time source for registration_grace.
+        paste_back: tuple[Image.Image, Image.Image], optional
+            An inpainting job's source image and the blurred mask it was uploaded with. When set, each result image
+            is composited onto the source through the mask, as the WebUI does server-side.
         """
         super().__init__(prompt_id)
         self._service = service
         self._number = number
         self._seed = seed
         self._clock = clock
+        self._paste_back = paste_back
         self._registration_deadline = clock() + registration_grace
         self._lock = threading.Lock()
         self._cancel_requested = False
@@ -93,16 +114,17 @@ class ComfyGenerationHandle(GenerationHandle):
         self._outputs: Optional['PromptExecOutputs'] = None  # Cached from the FINISHED poll.
 
     @classmethod
-    def from_queue_response(cls, service: 'ComfyUiWebservice',
-                            response: 'QueueAdditionResponse') -> 'ComfyGenerationHandle':
-        """Build a handle from any of the service's queue responses.
+    def from_queue_response(cls, service: 'ComfyUiWebservice', response: 'QueueAdditionResponse',
+                            paste_back: Optional[tuple[Image.Image, Image.Image]] = None
+                            ) -> 'ComfyGenerationHandle':
+        """Build a handle from any of the service's queue responses. `paste_back` is passed to the constructor.
 
         Raises ``WorkflowValidationError`` if the response has no ``prompt_id``, which means the server rejected
         the workflow.
         """
         if response.prompt_id is None:
             raise WorkflowValidationError(response.error, response.node_errors)
-        return cls(service, response.prompt_id, response.number, seed=response.seed)
+        return cls(service, response.prompt_id, response.number, seed=response.seed, paste_back=paste_back)
 
     # --- GenerationHandle surface -----------------------------------------------------------------
 
@@ -171,6 +193,9 @@ class ComfyGenerationHandle(GenerationHandle):
             outputs = self._service.check_queue_entry(self._task_id, self._number).outputs
         image_refs = outputs.images if (outputs is not None and outputs.images is not None) else []
         images = self._service.download_images(image_refs)
+        if self._paste_back is not None:
+            source, mask = self._paste_back
+            images = [_composite_onto_source(image, source, mask) for image in images]
         # A ComfyUI batch samples every image from one seed, so each image reports the job's seed.
         seeds = [] if self._seed is None else [self._seed] * len(images)
         return GenerationResult(images=images, seeds=seeds, seed=self._seed, task_id=self._task_id, raw_info=outputs)

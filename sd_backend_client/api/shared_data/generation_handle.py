@@ -80,7 +80,9 @@ class GenerationResult:
     Attributes
     ----------
     images: list[Image.Image]
-        The images the job generated, in order. Never includes ControlNet detect maps or a WebUI batch grid.
+        The images the job generated, in order. Never includes ControlNet detect maps or a WebUI batch grid. Inpainting
+        results are full-size and already composited onto the source image through the blurred mask on both backends,
+        so callers must not composite them through the mask again.
     seeds: list[int]
         The seed each image was generated with, parallel to `images`, or empty when the job used no seed (basic
         upscaling, preprocessor previews) or the backend did not report one per image. A WebUI batch uses
