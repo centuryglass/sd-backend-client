@@ -115,11 +115,24 @@ class DiffusionParams(BaseModel):
     """
 
     mask_blur: Optional[int] = Field(default=None, ge=0)
-    """Blur applied to the inpainting mask's edges, as a Gaussian standard deviation in pixels (0 disables it).
+    """Blur applied to the inpainting mask's edges in both directions, as a Gaussian standard deviation in pixels
+    (0 disables it).
 
-    The blurred edge extends about 2.5 times this value from the original boundary. None selects
-    `MASK_BLUR_DEFAULT` on ComfyUI and the server default (also 4) on WebUI. On ComfyUI the client blurs the mask
-    before upload and returns the blurred mask as `GenerationResult.mask`.
+    The blurred edge extends about 2.5 times this value from the original boundary. When set, `mask_blur_x` and
+    `mask_blur_y` are ignored. When all three are None, both backends use `MASK_BLUR_DEFAULT`. On ComfyUI the client
+    blurs the mask before upload and returns the blurred mask as `GenerationResult.mask`.
+    """
+
+    mask_blur_x: Optional[int] = Field(default=None, ge=0)
+    """Horizontal standard deviation (in pixels) of the mask edge blur. Ignored when `mask_blur` is set.
+
+    When only one of `mask_blur_x` and `mask_blur_y` is set, the other axis uses `MASK_BLUR_DEFAULT`.
+    """
+
+    mask_blur_y: Optional[int] = Field(default=None, ge=0)
+    """Vertical standard deviation (in pixels) of the mask edge blur. Ignored when `mask_blur` is set.
+
+    When only one of `mask_blur_x` and `mask_blur_y` is set, the other axis uses `MASK_BLUR_DEFAULT`.
     """
 
     controlnet_units: list[ControlNetUnit] = []

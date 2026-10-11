@@ -6,7 +6,7 @@ needs to encode images for upload and decode them from responses.
 import base64
 import hashlib
 import io
-from typing import TypeAlias, Union
+from typing import Optional, TypeAlias, Union
 
 from PIL import Image, ImageChops, ImageFilter
 
@@ -75,16 +75,18 @@ def mask_to_grayscale(mask: Image.Image) -> Image.Image:
     return alpha
 
 
-def blur_mask(mask: Image.Image, blur: float) -> Image.Image:
+def blur_mask(mask: Image.Image, blur_x: float, blur_y: Optional[float] = None) -> Image.Image:
     """Return `mask` as an `L`-mode grayscale mask (white = change) with its edges feathered by a Gaussian blur.
 
-    `blur` is the Gaussian standard deviation in pixels, the same meaning as the WebUI's `mask_blur`. The feathered
-    edge extends roughly 2.5 times `blur` from the original boundary. A `blur` of 0 only converts the mask.
+    `blur_x` and `blur_y` are the horizontal and vertical Gaussian standard deviations in pixels, the same meaning as
+    the WebUI's `mask_blur_x` and `mask_blur_y`; `blur_y` defaults to `blur_x`. The feathered edge extends roughly
+    2.5 times the blur from the original boundary. A blur of 0 on both axes only converts the mask.
     """
     gray = mask_to_grayscale(mask)
-    if blur <= 0:
+    blur_y = blur_x if blur_y is None else blur_y
+    if blur_x <= 0 and blur_y <= 0:
         return gray.copy()
-    return gray.filter(ImageFilter.GaussianBlur(blur))
+    return gray.filter(ImageFilter.GaussianBlur((max(blur_x, 0), max(blur_y, 0))))
 
 
 ImageKey: TypeAlias = tuple[str, tuple[int, int], bytes]

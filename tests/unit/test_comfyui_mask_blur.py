@@ -87,13 +87,44 @@ def test_comfyui_zero_blur_uploads_a_hard_edge():
     assert capture.uploaded.getpixel((31, 0)) == 255 and capture.uploaded.getpixel((32, 0)) == 0
 
 
-def test_mask_blur_rejects_negative_values():
+def test_comfyui_mask_blur_wins_over_x_and_y():
+    """`mask_blur` overrides `mask_blur_x` and `mask_blur_y`, as on the WebUI."""
+    capture = _Capture(_params(mask_blur=6, mask_blur_x=0, mask_blur_y=0))
+    assert capture.uploaded is not None
+    assert capture.uploaded.tobytes() == blur_mask(_half_mask(), 6).tobytes()
+
+
+def test_comfyui_blurs_each_axis_separately():
+    """With only x and y set, a vertical-only blur leaves a vertical edge sharp, and a horizontal blur softens it."""
+    vertical_only = _Capture(_params(mask_blur_x=0, mask_blur_y=6)).uploaded
+    horizontal_only = _Capture(_params(mask_blur_x=6, mask_blur_y=0)).uploaded
+    assert vertical_only is not None and horizontal_only is not None
+    assert vertical_only.getpixel((31, 32)) == 255 and vertical_only.getpixel((32, 32)) == 0
+    assert 0 < horizontal_only.getpixel((31, 32)) < 255
+
+
+def test_comfyui_unset_axis_uses_the_default():
+    """When only one axis is set, the other uses MASK_BLUR_DEFAULT."""
+    capture = _Capture(_params(mask_blur_x=0))
+    assert capture.uploaded is not None
+    assert capture.uploaded.tobytes() == blur_mask(_half_mask(), 0, MASK_BLUR_DEFAULT).tobytes()
+
+
+@pytest.mark.parametrize('field', ['mask_blur', 'mask_blur_x', 'mask_blur_y'])
+def test_mask_blur_rejects_negative_values(field):
     """A negative blur is invalid."""
     with pytest.raises(ValueError):
-        DiffusionParams(mask_blur=-1)
+        DiffusionParams(**{field: -1})
 
 
 def test_webui_body_sends_mask_blur_unchanged():
     """The WebUI wire format keeps `mask_blur`, and omits it when unset."""
     assert DiffusionRequestBody(mask_blur=7).to_dict()['mask_blur'] == 7
     assert 'mask_blur' not in DiffusionRequestBody().to_dict()
+
+
+def test_webui_body_sends_x_and_y_unchanged():
+    """The WebUI wire format keeps `mask_blur_x` and `mask_blur_y`."""
+    data = DiffusionRequestBody(mask_blur_x=2, mask_blur_y=5).to_dict()
+    assert data['mask_blur_x'] == 2 and data['mask_blur_y'] == 5
+    assert 'mask_blur' not in data

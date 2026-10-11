@@ -562,8 +562,8 @@ class ComfyUiWebservice(WebService, Backend):
             image_reference = self.upload_image(image)
             workflow_builder.set_source_image_from_reference(image_reference)
             if diffusion_params.mask is not None:
-                blur = MASK_BLUR_DEFAULT if diffusion_params.mask_blur is None else diffusion_params.mask_blur
-                blurred_mask = blur_mask(diffusion_params.mask, blur)
+                blur_x, blur_y = _mask_blur_extents(diffusion_params)
+                blurred_mask = blur_mask(diffusion_params.mask, blur_x, blur_y)
                 mask_reference = self.upload_mask(blurred_mask, image_reference)
                 workflow_builder.set_mask_from_reference(mask_reference)
         if diffusion_params.controlnet_units is not None:
@@ -850,6 +850,18 @@ class ComfyUiWebservice(WebService, Backend):
         """Clear cached data to free GPU memory."""
         body = FreeMemoryRequest(unload_models=True, free_memory=True)
         self.post(ComfyEndpoints.FREE, body.model_dump())
+
+
+def _mask_blur_extents(diffusion_params: DiffusionParams) -> tuple[int, int]:
+    """Resolve the (horizontal, vertical) mask blur the way the WebUI does.
+
+    `mask_blur` wins over `mask_blur_x` and `mask_blur_y` when set. Otherwise each unset axis uses `MASK_BLUR_DEFAULT`.
+    """
+    if diffusion_params.mask_blur is not None:
+        return diffusion_params.mask_blur, diffusion_params.mask_blur
+    blur_x = MASK_BLUR_DEFAULT if diffusion_params.mask_blur_x is None else diffusion_params.mask_blur_x
+    blur_y = MASK_BLUR_DEFAULT if diffusion_params.mask_blur_y is None else diffusion_params.mask_blur_y
+    return blur_x, blur_y
 
 
 def _describe_failure(entry_history: PromptHistory) -> Optional[str]:

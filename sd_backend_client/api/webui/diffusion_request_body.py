@@ -50,12 +50,6 @@ class DiffusionRequestBody(DiffusionParams):
 
 
     ### Inpainting only:
-    mask_blur_x: Optional[int] = None
-    """Horizontal standard deviation (in pixels) of the blur applied to mask edges. WebUI only."""
-
-    mask_blur_y: Optional[int] = None
-    """Vertical standard deviation (in pixels) of the blur applied to mask edges. WebUI only."""
-
     inpainting_fill: Optional[InpaintFillOption] = InpaintFillOption.ORIGINAL
     """Controls how source image data is processed before inpainting. ORIGINAL is almost always the right choice.
    """
