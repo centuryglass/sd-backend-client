@@ -20,7 +20,7 @@ def _resize_mode_parameter() -> ParameterDef:
        preprocessors."""
     return ParameterDef(key=RESIZE_MODE_PARAM_KEY,
                         default_value=RESIZE_MODE_DEFAULT,
-                        description=RESIZE_MODE_LABEL,
+                        display_name=RESIZE_MODE_LABEL,
                         required=True,
                         option_list=list(RESIZE_MODE_OPTIONS))
 
@@ -38,7 +38,7 @@ def get_all_preprocessors(preprocessor_names: list[str],
         if preprocessor_name not in PREPROCESSOR_NO_CONTROL_MODE:
             control_type_param = ParameterDef(key=CONTROL_MODE_PARAM_KEY,
                                               default_value=CONTROL_MODE_DEFAULT,
-                                              description=CONTROL_MODE_LABEL,
+                                              display_name=CONTROL_MODE_LABEL,
                                               required=True,
                                               option_list=list(CONTROL_MODE_OPTIONS))
             parameters.append(control_type_param)
@@ -56,7 +56,7 @@ def get_all_preprocessors(preprocessor_names: list[str],
                 if name.lower() == PREPROCESSOR_RES_PARAM_NAME.lower():
                     parameters.insert(resize_insert_index, _resize_mode_parameter())
                     res_param = ParameterDef(key=PREPROCESSOR_RES_PARAM_KEY,
-                                             description=PREPROCESSOR_RES_LABEL,
+                                             display_name=PREPROCESSOR_RES_LABEL,
                                              default_value=parameter_definition.value,
                                              required=True,
                                              min_val=parameter_definition.min,
@@ -72,7 +72,7 @@ def get_all_preprocessors(preprocessor_names: list[str],
                     else:
                         next_threshold_key = None
                     parameter = ParameterDef(key=key,
-                                             description=name,
+                                             display_name=name,
                                              default_value=parameter_definition.value,
                                              required=True,
                                              min_val=parameter_definition.min,
@@ -86,7 +86,7 @@ def get_all_preprocessors(preprocessor_names: list[str],
                 resolution_default = PREPROCESSOR_RES_DEFAULT if preprocessor_name not in PREPROCESSOR_RES_DEFAULTS \
                     else PREPROCESSOR_RES_DEFAULTS[preprocessor_name]
                 parameters.append(ParameterDef(key=PREPROCESSOR_RES_PARAM_KEY,
-                                               description=PREPROCESSOR_RES_LABEL,
+                                               display_name=PREPROCESSOR_RES_LABEL,
                                                default_value=resolution_default,
                                                required=True,
                                                min_val=PREPROCESSOR_RES_MIN,
@@ -98,7 +98,7 @@ def get_all_preprocessors(preprocessor_names: list[str],
                     break  # "threshold_b" will never be used if "threshold_a" isn't
                 threshold_def = preset_list[preprocessor_name]
                 parameters.append(ParameterDef(key=param_key,
-                                               description=threshold_def.name,
+                                               display_name=threshold_def.name,
                                                default_value=threshold_def.default,
                                                required=True,
                                                min_val=threshold_def.min,

@@ -150,7 +150,7 @@ def test_webui_preset_parameters_without_module_details():
     canny = preprocessors['canny']
     assert [param.key for param in canny.parameters] == \
         ['control_mode', 'resize_mode', 'processor_res', 'threshold_a', 'threshold_b']
-    assert canny.parameters[3].description == 'Low Threshold'
+    assert canny.parameters[3].display_name == 'Low Threshold'
     assert canny.model_free is False
     assert [param.key for param in preprocessors['inpaint_only'].parameters] == ['control_mode']
     assert preprocessors['depth_marigold'].parameters[2].default_value == 768
@@ -169,7 +169,7 @@ def test_webui_module_details_map_resolution_and_thresholds():
     params = {param.key: param for param in canny.parameters}
     assert list(params) == ['control_mode', 'resize_mode', 'processor_res', 'threshold_a', 'threshold_b']
     assert (params['processor_res'].min_val, params['processor_res'].max_val) == (64, 2048)
-    assert params['threshold_a'].description == 'Low Threshold'
+    assert params['threshold_a'].display_name == 'Low Threshold'
     assert params['threshold_b'].default_value == 200
 
 
@@ -191,12 +191,12 @@ def test_webui_reads_a1111_module_list_response():
     mlsd = {param.key: param for param in preprocessors['mlsd'].parameters}
     assert list(mlsd) == ['control_mode', 'resize_mode', 'processor_res', 'threshold_a', 'threshold_b']
     assert (mlsd['processor_res'].default_value, mlsd['processor_res'].step_val) == (512, 8)
-    assert mlsd['threshold_a'].description == 'MLSD Value Threshold'
+    assert mlsd['threshold_a'].display_name == 'MLSD Value Threshold'
     assert (mlsd['threshold_b'].default_value, mlsd['threshold_b'].max_val) == (0.1, 20.0)
 
     # The preset table names this slider 'Style Fidelity', so the label shows the API definition was used.
     reference = preprocessors['reference_only']
-    assert reference.parameters[-1].description == 'Style Fidelity (only for Balanced mode)'
+    assert reference.parameters[-1].display_name == 'Style Fidelity (only for Balanced mode)'
     assert reference.model_free is True
     assert [param.key for param in preprocessors['inpaint_only'].parameters] == ['control_mode']
 
