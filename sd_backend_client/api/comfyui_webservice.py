@@ -47,9 +47,10 @@ from sd_backend_client.api.shared_data.sampler_names import SAMPLER_WEBUI_NAMES
 from sd_backend_client.api.webservice import WebService, MULTIPART_FORM_DATA_TYPE, DEFAULT_REQUEST_TIMEOUT
 from sd_backend_client.errors import BackendConnectionError, BackendTimeoutError, ServerError, \
     UnexpectedResponseError, WorkflowValidationError
+from sd_backend_client.util.api_defaults import MASK_BLUR_DEFAULT
 from sd_backend_client.util.geometry import Size
 from sd_backend_client.util.visual.image_utils import image_to_png_bytes, image_from_bytes, image_from_base64, \
-    mask_to_grayscale
+    mask_to_grayscale, blur_mask
 
 if TYPE_CHECKING:
     from sd_backend_client.api.comfyui.comfyui_generation_handle import ComfyGenerationHandle
@@ -555,17 +556,21 @@ class ComfyUiWebservice(WebService, Backend):
 
     def _generate(self, diffusion_params: DiffusionParams) -> QueueAdditionResponse:
         workflow_builder = self._build_diffusion_body(diffusion_params)
+        blurred_mask: Optional[Image.Image] = None
         if diffusion_params.init_images is not None and len(diffusion_params.init_images) > 0:
             image: Image.Image = diffusion_params.init_images[0]
             image_reference = self.upload_image(image)
             workflow_builder.set_source_image_from_reference(image_reference)
             if diffusion_params.mask is not None:
-                mask_reference = self.upload_mask(diffusion_params.mask, image_reference)
+                blur = MASK_BLUR_DEFAULT if diffusion_params.mask_blur is None else diffusion_params.mask_blur
+                blurred_mask = blur_mask(diffusion_params.mask, blur)
+                mask_reference = self.upload_mask(blurred_mask, image_reference)
                 workflow_builder.set_mask_from_reference(mask_reference)
         if diffusion_params.controlnet_units is not None:
             self._prepare_controlnet_data(workflow_builder, diffusion_params.controlnet_units)
         res = self._queue_prompt(workflow_builder.build_workflow().get_workflow_dict())
         res.seed = workflow_builder.seed
+        res.mask = blurred_mask
         return res
 
     def img2img(self, diffusion_params: DiffusionParams) -> QueueAdditionResponse:

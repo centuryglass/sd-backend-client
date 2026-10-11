@@ -114,6 +114,14 @@ class DiffusionParams(BaseModel):
     its own wire format, so callers never invert the mask for ComfyUI.
     """
 
+    mask_blur: Optional[int] = Field(default=None, ge=0)
+    """Blur applied to the inpainting mask's edges, as a Gaussian standard deviation in pixels (0 disables it).
+
+    The blurred edge extends about 2.5 times this value from the original boundary. None selects
+    `MASK_BLUR_DEFAULT` on ComfyUI and the server default (also 4) on WebUI. On ComfyUI the client blurs the mask
+    before upload and returns the blurred mask as `GenerationResult.mask`.
+    """
+
     controlnet_units: list[ControlNetUnit] = []
 
     def to_dict(self) -> dict[str, Any]:

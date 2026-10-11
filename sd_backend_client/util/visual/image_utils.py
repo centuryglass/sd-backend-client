@@ -8,7 +8,7 @@ import hashlib
 import io
 from typing import TypeAlias, Union
 
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageFilter
 
 BASE_64_PREFIX = 'data:image/png;base64,'
 
@@ -73,6 +73,18 @@ def mask_to_grayscale(mask: Image.Image) -> Image.Image:
     if is_opaque and is_grayscale:
         return red
     return alpha
+
+
+def blur_mask(mask: Image.Image, blur: float) -> Image.Image:
+    """Return `mask` as an `L`-mode grayscale mask (white = change) with its edges feathered by a Gaussian blur.
+
+    `blur` is the Gaussian standard deviation in pixels, the same meaning as the WebUI's `mask_blur`. The feathered
+    edge extends roughly 2.5 times `blur` from the original boundary. A `blur` of 0 only converts the mask.
+    """
+    gray = mask_to_grayscale(mask)
+    if blur <= 0:
+        return gray.copy()
+    return gray.filter(ImageFilter.GaussianBlur(blur))
 
 
 ImageKey: TypeAlias = tuple[str, tuple[int, int], bytes]
