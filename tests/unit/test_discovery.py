@@ -144,6 +144,14 @@ def test_controlnet_models_are_controlnet_model_instances(backend: Backend):
     assert model.full_model_name.startswith('control_v11p_sd15_canny')
 
 
+def test_comfyui_model_configs_list_the_values_sd_model_config_accepts():
+    """`list_model_configs` lists the config files ComfyUI reports, by file name."""
+    service, session = _comfyui()
+    session.routes[('GET', f'{ComfyEndpoints.MODELS}/configs')] = ['v1-inference.yaml', 'v2-inference.yaml']
+    assert service.list_model_configs() == [BackendOption(name='v1-inference.yaml'),
+                                            BackendOption(name='v2-inference.yaml')]
+
+
 def test_full_server_reports_every_optional_generation_feature(backend: Backend):
     """A server with ControlNet, Ultimate SD Upscale and schedulers reports all three."""
     capabilities = backend.get_capabilities()
