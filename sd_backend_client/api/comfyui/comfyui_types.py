@@ -1,8 +1,7 @@
 """Typedefs for ComfyUI API data."""
 from typing import TypeAlias, Literal, Optional, Any
 
-from PIL import Image
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 
 # Misc. types used within multiple request/response objects:
 FileType: TypeAlias = Literal['input', 'temp', 'output']
@@ -219,8 +218,6 @@ class QueueAdditionResponse(BaseModel):
 
     # Set by ComfyUiWebservice, not by ComfyUI: the seed the queued workflow used.
     seed: Optional[int] = None
-    mask: Optional[Image.Image] = Field(default=None, exclude=True)  # The blurred inpainting mask the workflow used.
-    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class QueueDeletionRequest(BaseModel):

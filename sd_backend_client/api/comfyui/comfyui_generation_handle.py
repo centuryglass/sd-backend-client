@@ -35,8 +35,6 @@ import threading
 import time
 from typing import Callable, Optional, TYPE_CHECKING
 
-from PIL import Image
-
 from sd_backend_client.api.comfyui_webservice import AsyncTaskStatus
 from sd_backend_client.api.shared_data.generation_handle import (GenerationHandle, GenerationProgress,
                                                               GenerationResult, GenerationStatus)
@@ -65,8 +63,7 @@ class ComfyGenerationHandle(GenerationHandle):
     """Handle to one ComfyUI ``/prompt`` job, identified by its ``prompt_id`` (+ queue ``number``)."""
 
     def __init__(self, service: 'ComfyUiWebservice', prompt_id: str, number: Optional[int] = None,
-                 seed: Optional[int] = None, mask: Optional[Image.Image] = None,
-                 registration_grace: float = DEFAULT_REGISTRATION_GRACE,
+                 seed: Optional[int] = None, registration_grace: float = DEFAULT_REGISTRATION_GRACE,
                  clock: Callable[[], float] = time.monotonic) -> None:
         """
         Parameters
@@ -79,8 +76,6 @@ class ComfyGenerationHandle(GenerationHandle):
             The job's queue number from the queue response. Kept for reference; jobs are found by prompt_id.
         seed: int, optional
             The seed the queued workflow used, copied into the result.
-        mask: Image, optional
-            The blurred inpainting mask the workflow used, copied into the result.
         registration_grace: float, default=DEFAULT_REGISTRATION_GRACE
             Seconds after creation during which a job the server has never listed reads as PENDING, not NOT_FOUND.
         clock: Callable[[], float], default=time.monotonic
@@ -90,7 +85,6 @@ class ComfyGenerationHandle(GenerationHandle):
         self._service = service
         self._number = number
         self._seed = seed
-        self._mask = mask
         self._clock = clock
         self._registration_deadline = clock() + registration_grace
         self._lock = threading.Lock()
@@ -108,7 +102,7 @@ class ComfyGenerationHandle(GenerationHandle):
         """
         if response.prompt_id is None:
             raise WorkflowValidationError(response.error, response.node_errors)
-        return cls(service, response.prompt_id, response.number, seed=response.seed, mask=response.mask)
+        return cls(service, response.prompt_id, response.number, seed=response.seed)
 
     # --- GenerationHandle surface -----------------------------------------------------------------
 
@@ -179,8 +173,7 @@ class ComfyGenerationHandle(GenerationHandle):
         images = self._service.download_images(image_refs)
         # A ComfyUI batch samples every image from one seed, so each image reports the job's seed.
         seeds = [] if self._seed is None else [self._seed] * len(images)
-        return GenerationResult(images=images, seeds=seeds, seed=self._seed, mask=self._mask, task_id=self._task_id,
-                                raw_info=outputs)
+        return GenerationResult(images=images, seeds=seeds, seed=self._seed, task_id=self._task_id, raw_info=outputs)
 
     def cancel(self) -> bool:
         """Cancel the job: drop it from the queue if still PENDING, else interrupt the running job.

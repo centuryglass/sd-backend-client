@@ -91,10 +91,6 @@ class GenerationResult:
         "do not append detectmap" setting is off.
     seed: int, optional
         The job's base seed: the first entry of `seeds`, or the seed used when no images came back.
-    mask: Image.Image, optional
-        The inpainting mask the job used after blurring (`DiffusionParams.mask_blur`), as an `L`-mode image where white
-        marks the region to change, for compositing the result back. Only ComfyUI sets it, and only for jobs with a
-        mask.
     task_id: str, optional
         The server-side id of the job.
     raw_info: object, optional
@@ -107,7 +103,6 @@ class GenerationResult:
     seeds: list[int] = field(default_factory=list)
     control_maps: list[Image.Image] = field(default_factory=list)
     seed: Optional[int] = None
-    mask: Optional[Image.Image] = None
     task_id: Optional[str] = None
     raw_info: Optional[object] = None
     extra: dict = field(default_factory=dict)
