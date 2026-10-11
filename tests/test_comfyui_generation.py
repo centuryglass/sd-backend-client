@@ -102,6 +102,50 @@ def test_inpaint_respects_mask(comfy_service, comfy_checkpoint, output_dir):
     )
 
 
+def _submit_inpaint(comfy_service, comfy_checkpoint, **overrides):
+    """Run `submit_inpaint` on the standard textured source with a white center square, returning (source, image)."""
+    params = build_comfy_params(comfy_checkpoint, prompt='a photograph of a flower')
+    params.denoising_strength = 1.0
+    params.seed = 7
+    params.init_images = [make_structured_image(COMFY_SIZE, COMFY_SIZE)]
+    params.mask = make_comfy_mask((COMFY_SIZE // 4, COMFY_SIZE // 4, COMFY_SIZE * 3 // 4, COMFY_SIZE * 3 // 4))
+    for name, value in overrides.items():
+        setattr(params, name, value)
+    result = comfy_service.submit_inpaint(params).wait(timeout=240)
+    return params.init_images[0], result.images[0]
+
+
+def test_submit_inpaint_pastes_the_result_onto_the_source(comfy_service, comfy_checkpoint, output_dir):
+    """`submit_inpaint` returns the source unchanged away from the mask, unlike raw `inpaint()`.
+
+    Raw `inpaint()` output has been through the VAE, so even preserved pixels drift. `submit_inpaint` composites the
+    result onto the source, so a crisp-mask run must match the source outside the mask.
+    """
+    source, result = _submit_inpaint(comfy_service, comfy_checkpoint, mask_blur=0)
+    save_output(output_dir, 'comfy_submit_inpaint_source', source)
+    save_output(output_dir, 'comfy_submit_inpaint_result', result)
+    _assert_valid_image(result)
+    border_box = (0, 0, COMFY_SIZE, COMFY_SIZE // 8)
+    center_box = (COMFY_SIZE // 4 + 8, COMFY_SIZE // 4 + 8, COMFY_SIZE * 3 // 4 - 8, COMFY_SIZE * 3 // 4 - 8)
+    assert region_mean_diff(source, result, border_box) <= 1.0, 'the preserved region was not pasted back unchanged'
+    assert region_mean_diff(source, result, center_box) >= 20.0, 'the masked region barely changed'
+
+
+def test_mask_blur_feathers_the_inpainting_boundary(comfy_service, comfy_checkpoint, output_dir):
+    """A large `mask_blur` blends generated pixels into the source just outside the mask; `mask_blur=0` does not."""
+    source, crisp = _submit_inpaint(comfy_service, comfy_checkpoint, mask_blur=0)
+    _, feathered = _submit_inpaint(comfy_service, comfy_checkpoint, mask_blur=12)
+    save_output(output_dir, 'comfy_mask_blur_0', crisp)
+    save_output(output_dir, 'comfy_mask_blur_12', feathered)
+    # A strip just outside the mask's left edge (x=64), clear of the corners.
+    strip = (COMFY_SIZE // 4 - 8, COMFY_SIZE * 3 // 8, COMFY_SIZE // 4 - 1, COMFY_SIZE * 5 // 8)
+    crisp_diff = region_mean_diff(source, crisp, strip)
+    feathered_diff = region_mean_diff(source, feathered, strip)
+    assert crisp_diff <= 1.0, f'a crisp mask changed pixels outside it (diff {crisp_diff:.2f})'
+    assert feathered_diff >= 2.0 and feathered_diff > crisp_diff, \
+        f'mask_blur=12 left the area outside the mask unblended (diff {feathered_diff:.2f})'
+
+
 def test_upscale(comfy_service, output_dir):
     upscale_models = comfy_service.get_models(ComfyModelType.UPSCALING)
     if not upscale_models:

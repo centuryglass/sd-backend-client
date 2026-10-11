@@ -199,8 +199,14 @@ are 256x256 at 8 steps.
 - [ ] `comfy_inpaint_result.png`: flower-like content replaces the center square that `comfy_inpaint_mask.png`
   marks white.
 - [ ] Outside the center square of `comfy_inpaint_result.png`, the gradient and white square outline survive. Slight
-  softening is normal, because ComfyUI passes the whole image through the VAE. An edited border around an untouched
-  center means `ComfyUiWebservice.upload_mask` converted the mask polarity wrong.
+  softening is normal here, because this test calls raw `inpaint()` and ComfyUI passes the whole image through the
+  VAE. An edited border around an untouched center means `ComfyUiWebservice.upload_mask` converted the mask polarity
+  wrong.
+- [ ] `comfy_submit_inpaint_result.png`: a flower in the center square of `comfy_submit_inpaint_source.png`. Unlike
+  the raw result above, everything outside the square matches the source pixel for pixel, with a crisp boundary
+  (`mask_blur=0`), because `submit_inpaint` composites the result onto the source.
+- [ ] `comfy_mask_blur_0.png` and `comfy_mask_blur_12.png`: the same flower. The first has a hard edge around the
+  square. In the second the flower fades into the gradient over roughly 30 px beyond the original edge.
 - [ ] `comfyui_full_res_whole.png`, `comfyui_full_res_full_res.png` and `comfyui_full_res_far_point.png`: the same
   three checks as the WebUI images above. Outside the patch the pixels match the source, because the client
   composites the result through the mask.
@@ -247,7 +253,7 @@ generates "a photograph of a city street, detailed" with seed 42, once without C
 | All generated images | RGBA, size within 8 px of target | Prompt adherence; black, noise or color-swap output |
 | img2img | Mean difference from source >= 10/255 | Style matches the prompt |
 | `inpaint_full_res` | Pixels outside the patch match the source; the patch changed; the full-res patch has more edge energy than the whole-image patch; a far crop point makes it coarser | Whether the finer patch looks right and the seam is clean |
-| Inpainting | Center changes >= 20/255. WebUI border <= 5/255; ComfyUI center change >= 3x border change | Seam quality; the fill is a flower |
+| Inpainting | Center changes >= 20/255. WebUI border <= 5/255; ComfyUI center change >= 3x border change. ComfyUI `submit_inpaint` border <= 1/255; `mask_blur=12` blends pixels just outside the mask, `mask_blur=0` does not | Seam quality; the fill is a flower |
 | Upscale | At least 200 px on each side | No added content or artifacts |
 | ControlNet pair | Mean difference >= 2/255 | The edge structure shapes the image |
 | Preprocessor preview | Not a single flat color | Edges match the input shapes |
