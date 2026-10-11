@@ -58,6 +58,6 @@ Pass `live_progress=False` to the constructor to skip the websocket. Handles the
 
 ## Beyond the shared interface
 
-`ComfyUiWebservice` also has ComfyUI-only methods, such as `free_memory`, `get_queue_info`, `is_node_available`, and
+`ComfyUiWebservice` also has ComfyUI-only methods, such as `free_memory`, `list_model_configs` (the valid values for `sd_model_config`), `get_queue_info`, `is_node_available`, and
 `txt2img` and friends that return the raw queue response. Their return types are ComfyUI's own formats, which are
 internal and may change. See [Clients](../reference/clients.md#sd_backend_client.ComfyUiWebservice).
