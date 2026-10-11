@@ -306,6 +306,14 @@ class ComfyUiWebservice(WebService, Backend):
         """List upscaling models by file name, implementing `Backend.list_upscalers`."""
         return [BackendOption(name=name) for name in self.get_models(ComfyModelType.UPSCALING)]
 
+    def list_model_configs(self) -> list[BackendOption]:
+        """List the model config files by file name.
+
+        The names are the valid values for `ComfyUIDiffusionParams.sd_model_config`. ComfyUI-only: `Backend` has no
+        equivalent, since WebUI has no such field.
+        """
+        return [BackendOption(name=name) for name in self.get_models(ComfyModelType.CONFIG)]
+
     def list_controlnet_models(self) -> list[ControlNetModel]:
         """List ControlNet models by file name, implementing `Backend.list_controlnet_models`."""
         return [ControlNetModel(name) for name in self.get_controlnet_models()]
