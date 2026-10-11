@@ -17,4 +17,4 @@ pylint==4.1.2
 # `mypy` is the CI type-check gate; its settings are in pyproject.toml's [tool.mypy]. types-requests supplies the
 # stubs requests doesn't ship.
 mypy==2.4.0
-types-requests==2.33.0.20260906
+types-requests==2.33.0.20261006
