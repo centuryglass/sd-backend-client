@@ -24,7 +24,10 @@ class ParameterDef(BaseModel):
     default_value: str|int|float|bool
     """Default for the parameter, sent whenever the caller leaves it unset (see `required`). Every parameter carries
        one so there's always a type to validate provided values against, too."""
+    display_name: str = ''
+    """Short label for the parameter in a UI. Empty when the backend provides none (ComfyUI); fall back to `key`."""
     description: str = ''
+    """Tooltip-style explanation of the parameter. Empty when the backend provides none (WebUI)."""
     required: bool = False
     """Whether the backend's schema marks this parameter as required rather than optional.
 
