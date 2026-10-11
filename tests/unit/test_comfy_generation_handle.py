@@ -294,3 +294,28 @@ def test_wait_timeout_raises_backend_timeout_error():
     with pytest.raises(BackendTimeoutError) as error:
         handle.wait(timeout=0, poll_interval=0.0)
     assert isinstance(error.value, TimeoutError)
+
+
+# --------------------------------------------------------------------------- #
+# Inpainting paste-back
+# --------------------------------------------------------------------------- #
+
+def test_inpaint_result_is_composited_onto_the_source():
+    """Outside the mask the result is the source, inside it is the generated image, and grey blends."""
+    source = Image.new('RGBA', (4, 4), (200, 0, 0, 255))
+    mask = Image.new('L', (4, 4), 0)
+    mask.paste(255, (0, 0, 2, 4))      # left half white
+    mask.putpixel((2, 0), 128)
+    service = FakeComfyService([AsyncTaskProgress(status=AsyncTaskStatus.FINISHED, outputs=_outputs())])
+    handle = ComfyGenerationHandle(service, 'p', paste_back=(source, mask))
+    result = handle.wait()
+    image = result.images[0]
+    assert image.getpixel((0, 0)) == (0, 0, 0, 255)         # generated image (fake output is all zeros)
+    assert image.getpixel((3, 3)) == (200, 0, 0, 255)       # source
+    assert 0 < image.getpixel((2, 0))[0] < 200              # blended
+
+
+def test_result_is_untouched_without_paste_back():
+    """Jobs without a mask return the downloaded images as they are."""
+    service = FakeComfyService([AsyncTaskProgress(status=AsyncTaskStatus.FINISHED, outputs=_outputs())])
+    assert ComfyGenerationHandle(service, 'p').wait().images[0].getpixel((0, 0)) == (0, 0, 0, 255)

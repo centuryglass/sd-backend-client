@@ -778,10 +778,11 @@ class ComfyUiWebservice(WebService, Backend):
         queue_removal_body = QueueDeletionRequest(delete=[task_id])
         self.post(ComfyEndpoints.QUEUE, body=queue_removal_body.model_dump())
 
-    def _handle(self, response: QueueAdditionResponse) -> 'ComfyGenerationHandle':
+    def _handle(self, response: QueueAdditionResponse,
+                paste_back: Optional[tuple[Image.Image, Image.Image]] = None) -> 'ComfyGenerationHandle':
         """Wrap a queue response from this service in a generation handle."""
         from sd_backend_client.api.comfyui.comfyui_generation_handle import ComfyGenerationHandle
-        return ComfyGenerationHandle.from_queue_response(self, response)
+        return ComfyGenerationHandle.from_queue_response(self, response, paste_back)
 
     def submit_txt2img(self, diffusion_params: DiffusionParams) -> 'ComfyGenerationHandle':
         """Queue a txt2img job and return its handle, implementing `Backend.submit_txt2img`."""
@@ -792,8 +793,15 @@ class ComfyUiWebservice(WebService, Backend):
         return self._handle(self.img2img(diffusion_params))
 
     def submit_inpaint(self, diffusion_params: DiffusionParams) -> 'ComfyGenerationHandle':
-        """Queue an inpaint job and return its handle, implementing `Backend.submit_inpaint`."""
-        return self._handle(self.inpaint(diffusion_params))
+        """Queue an inpaint job and return its handle, implementing `Backend.submit_inpaint`.
+
+        The handle's result images are composited onto the source image through the blurred mask, as the WebUI does.
+        """
+        response = self.inpaint(diffusion_params)
+        assert diffusion_params.init_images and diffusion_params.mask is not None  # checked by inpaint()
+        blur_x, blur_y = _mask_blur_extents(diffusion_params)
+        blurred_mask = blur_mask(diffusion_params.mask, blur_x, blur_y)
+        return self._handle(response, (diffusion_params.init_images[0], blurred_mask))
 
     def submit_upscale(self, image: Image.Image, width: int, height: int,
                        upscale_params: Optional[DiffusionUpscalingParams] = None) -> 'ComfyGenerationHandle':
