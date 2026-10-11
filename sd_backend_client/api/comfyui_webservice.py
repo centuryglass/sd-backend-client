@@ -47,8 +47,9 @@ from sd_backend_client.api.shared_data.sampler_names import SAMPLER_WEBUI_NAMES
 from sd_backend_client.api.webservice import WebService, MULTIPART_FORM_DATA_TYPE, DEFAULT_REQUEST_TIMEOUT
 from sd_backend_client.errors import BackendConnectionError, BackendTimeoutError, ServerError, \
     UnexpectedResponseError, WorkflowValidationError
-from sd_backend_client.util.api_defaults import MASK_BLUR_DEFAULT
+from sd_backend_client.util.api_defaults import INPAINT_FULL_RES_PADDING_DEFAULT
 from sd_backend_client.util.geometry import Size
+from sd_backend_client.util.visual.inpaint_crop import PasteBack, compute_crop_region, crop_to_region
 from sd_backend_client.util.visual.image_utils import image_to_png_bytes, image_from_bytes, image_from_base64, \
     mask_to_grayscale, blur_mask
 
@@ -554,21 +555,42 @@ class ComfyUiWebservice(WebService, Backend):
         res.seed = workflow_builder.seed
         return res
 
-    def _generate(self, diffusion_params: DiffusionParams) -> QueueAdditionResponse:
+    def _generate(self, diffusion_params: DiffusionParams) -> tuple[QueueAdditionResponse, Optional[PasteBack]]:
+        """Queue an img2img or inpainting job, returning the response and what the results need to be pasted back.
+
+        The paste-back is None unless the params hold a mask.
+        """
         workflow_builder = self._build_diffusion_body(diffusion_params)
+        paste_back: Optional[PasteBack] = None
         if diffusion_params.init_images is not None and len(diffusion_params.init_images) > 0:
-            image: Image.Image = diffusion_params.init_images[0]
-            image_reference = self.upload_image(image)
-            workflow_builder.set_source_image_from_reference(image_reference)
+            source: Image.Image = diffusion_params.init_images[0]
+            upload_image = source
+            upload_mask: Optional[Image.Image] = None
             if diffusion_params.mask is not None:
-                blur_x, blur_y = _mask_blur_extents(diffusion_params)
-                mask_reference = self.upload_mask(blur_mask(diffusion_params.mask, blur_x, blur_y), image_reference)
+                blur_x, blur_y = diffusion_params.mask_blur_extents()
+                blurred_mask = blur_mask(diffusion_params.mask, blur_x, blur_y)
+                upload_mask = blurred_mask
+                region = None
+                if diffusion_params.inpaint_full_res:
+                    padding = diffusion_params.inpaint_full_res_padding
+                    region = compute_crop_region(
+                        blurred_mask, INPAINT_FULL_RES_PADDING_DEFAULT if padding is None else padding,
+                        (diffusion_params.width, diffusion_params.height), diffusion_params.inpaint_crop_points)
+                if region is not None:
+                    output_size = (diffusion_params.width, diffusion_params.height)
+                    upload_image = crop_to_region(source, region, output_size)
+                    upload_mask = crop_to_region(blurred_mask, region, output_size)
+                paste_back = PasteBack(source, blurred_mask, region)
+            image_reference = self.upload_image(upload_image)
+            workflow_builder.set_source_image_from_reference(image_reference)
+            if upload_mask is not None:
+                mask_reference = self.upload_mask(upload_mask, image_reference)
                 workflow_builder.set_mask_from_reference(mask_reference)
         if diffusion_params.controlnet_units is not None:
             self._prepare_controlnet_data(workflow_builder, diffusion_params.controlnet_units)
         res = self._queue_prompt(workflow_builder.build_workflow().get_workflow_dict())
         res.seed = workflow_builder.seed
-        return res
+        return res, paste_back
 
     def img2img(self, diffusion_params: DiffusionParams) -> QueueAdditionResponse:
         """Queues an async image-to-image job with the ComfyUI server.
@@ -583,10 +605,13 @@ class ComfyUiWebservice(WebService, Backend):
             Information needed to track the async task and download the resulting images once it finishes.
         """
         require_init_image(diffusion_params, 'img2img')
-        return self._generate(diffusion_params)
+        return self._generate(diffusion_params)[0]
 
     def inpaint(self,  diffusion_params: DiffusionParams) -> QueueAdditionResponse:
         """Queues an async inpainting job with the ComfyUI server.
+
+        With `inpaint_full_res`, the uploaded images are the crop around the mask, and the job's output is that crop.
+        `submit_inpaint` pastes the crop back into the source.
 
         Parameters:
         -----------
@@ -599,7 +624,7 @@ class ComfyUiWebservice(WebService, Backend):
         """
         require_init_image(diffusion_params, 'inpainting')
         require_mask(diffusion_params, 'inpainting')
-        return self._generate(diffusion_params)
+        return self._generate(diffusion_params)[0]
 
 
     def controlnet_preprocessor_preview(self, image: Image.Image, mask: Optional[Image.Image],
@@ -779,7 +804,7 @@ class ComfyUiWebservice(WebService, Backend):
         self.post(ComfyEndpoints.QUEUE, body=queue_removal_body.model_dump())
 
     def _handle(self, response: QueueAdditionResponse,
-                paste_back: Optional[tuple[Image.Image, Image.Image]] = None) -> 'ComfyGenerationHandle':
+                paste_back: Optional[PasteBack] = None) -> 'ComfyGenerationHandle':
         """Wrap a queue response from this service in a generation handle."""
         from sd_backend_client.api.comfyui.comfyui_generation_handle import ComfyGenerationHandle
         return ComfyGenerationHandle.from_queue_response(self, response, paste_back)
@@ -796,12 +821,12 @@ class ComfyUiWebservice(WebService, Backend):
         """Queue an inpaint job and return its handle, implementing `Backend.submit_inpaint`.
 
         The handle's result images are composited onto the source image through the blurred mask, as the WebUI does.
+        With `inpaint_full_res`, the generated crop is first resized and pasted into the source at the crop region.
         """
-        response = self.inpaint(diffusion_params)
-        assert diffusion_params.init_images and diffusion_params.mask is not None  # checked by inpaint()
-        blur_x, blur_y = _mask_blur_extents(diffusion_params)
-        blurred_mask = blur_mask(diffusion_params.mask, blur_x, blur_y)
-        return self._handle(response, (diffusion_params.init_images[0], blurred_mask))
+        require_init_image(diffusion_params, 'inpainting')
+        require_mask(diffusion_params, 'inpainting')
+        response, paste_back = self._generate(diffusion_params)
+        return self._handle(response, paste_back)
 
     def submit_upscale(self, image: Image.Image, width: int, height: int,
                        upscale_params: Optional[DiffusionUpscalingParams] = None) -> 'ComfyGenerationHandle':
@@ -855,18 +880,6 @@ class ComfyUiWebservice(WebService, Backend):
         """Clear cached data to free GPU memory."""
         body = FreeMemoryRequest(unload_models=True, free_memory=True)
         self.post(ComfyEndpoints.FREE, body.model_dump())
-
-
-def _mask_blur_extents(diffusion_params: DiffusionParams) -> tuple[int, int]:
-    """Resolve the (horizontal, vertical) mask blur the way the WebUI does.
-
-    `mask_blur` wins over `mask_blur_x` and `mask_blur_y` when set. Otherwise each unset axis uses `MASK_BLUR_DEFAULT`.
-    """
-    if diffusion_params.mask_blur is not None:
-        return diffusion_params.mask_blur, diffusion_params.mask_blur
-    blur_x = MASK_BLUR_DEFAULT if diffusion_params.mask_blur_x is None else diffusion_params.mask_blur_x
-    blur_y = MASK_BLUR_DEFAULT if diffusion_params.mask_blur_y is None else diffusion_params.mask_blur_y
-    return blur_x, blur_y
 
 
 def _describe_failure(entry_history: PromptHistory) -> Optional[str]:

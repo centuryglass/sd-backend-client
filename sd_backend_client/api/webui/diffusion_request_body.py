@@ -54,12 +54,6 @@ class DiffusionRequestBody(DiffusionParams):
     """Controls how source image data is processed before inpainting. ORIGINAL is almost always the right choice.
    """
 
-    inpaint_full_res: Optional[bool] = None
-    """Whether inpainting renders only the masked region at full resolution instead of the whole image"""
-
-    inpaint_full_res_padding: Optional[int] = None
-    """Padding (in pixels) added around the masked region when inpaint_full_res is enabled."""
-
     inpainting_mask_invert: Optional[int] = None  # 0=don't invert, 1=invert
     """Whether to invert the inpainting mask (0=don't invert, 1=invert)."""
 
@@ -244,6 +238,7 @@ class DiffusionRequestBody(DiffusionParams):
         if self.init_images and self.denoising_strength is None:
             data['denoising_strength'] = DEFAULT_DENOISING_STRENGTH
         # The WebUI request schema has no sd_model_name field; the checkpoint is selected through override_settings.
+        data.pop('inpaint_crop_points', None)  # client-side only; WebUI has no such field
         sd_model_name = data.pop('sd_model_name', '')
         if sd_model_name:
             data.setdefault('override_settings', {}).setdefault('sd_model_checkpoint', sd_model_name)

@@ -41,6 +41,7 @@ from sd_backend_client.api.shared_data.generation_handle import (GenerationError
 from sd_backend_client.api.webui.response_formats import GenerationInfoData
 from sd_backend_client.errors import BackendTimeoutError
 from sd_backend_client.util.visual.image_utils import image_from_base64
+from sd_backend_client.util.visual.inpaint_crop import PasteBack
 
 if TYPE_CHECKING:
     from sd_backend_client.api.a1111_webservice import ImageResponse
@@ -108,8 +109,10 @@ class WebUIGenerationHandle(GenerationHandle):
     """
 
     def __init__(self, dispatcher: 'WebUIDispatcher', run: GenerationCall, task_id: str,
-                 interruptible: bool = True) -> None:
+                 interruptible: bool = True, paste_back: Optional[PasteBack] = None) -> None:
+        """Create a handle for `run`. When `paste_back` is set, each generated image is pasted into it."""
         super().__init__(task_id)
+        self._paste_back = paste_back
         self._dispatcher = dispatcher
         self._run = run
         self._interruptible = interruptible
@@ -139,7 +142,10 @@ class WebUIGenerationHandle(GenerationHandle):
         with self._lock:
             result = self._result
         assert result is not None, '_build_result called before job reached FINISHED'
-        return build_webui_result(list(result['images']), result.get('info'), self._task_id)
+        built = build_webui_result(list(result['images']), result.get('info'), self._task_id)
+        if self._paste_back is not None:
+            built.images = [self._paste_back.apply(image) for image in built.images]
+        return built
 
     def cancel(self) -> bool:
         """Cancel the job. Clean while ``PENDING`` (never dispatched); interrupt-based while ``ACTIVE``.
@@ -272,13 +278,15 @@ class WebUIDispatcher:
         self._not_empty = threading.Condition(self._lock)
         self._worker: Optional[threading.Thread] = None
 
-    def submit(self, run: GenerationCall, task_id: str, interruptible: bool = True) -> WebUIGenerationHandle:
+    def submit(self, run: GenerationCall, task_id: str, interruptible: bool = True,
+               paste_back: Optional[PasteBack] = None) -> WebUIGenerationHandle:
         """Enqueue a blocking generation call and return its handle immediately (job starts PENDING).
 
         Pass ``interruptible=False`` for a call that ``/sdapi/v1/interrupt`` is not known to stop, such as basic
         upscaling or a ControlNet preprocessor preview. Its handle then refuses to cancel once dispatched.
+        `paste_back` is passed to the handle.
         """
-        handle = WebUIGenerationHandle(self, run, task_id, interruptible)
+        handle = WebUIGenerationHandle(self, run, task_id, interruptible, paste_back)
         with self._lock:
             self._queue.append(handle)
             self._ensure_worker_locked()

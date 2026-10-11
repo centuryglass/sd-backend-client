@@ -35,12 +35,11 @@ import threading
 import time
 from typing import Callable, Optional, TYPE_CHECKING
 
-from PIL import Image
-
 from sd_backend_client.api.comfyui_webservice import AsyncTaskStatus
 from sd_backend_client.api.shared_data.generation_handle import (GenerationHandle, GenerationProgress,
                                                               GenerationResult, GenerationStatus)
 from sd_backend_client.errors import WorkflowValidationError
+from sd_backend_client.util.visual.inpaint_crop import PasteBack
 
 if TYPE_CHECKING:
     from sd_backend_client.api.comfyui.comfyui_types import PromptExecOutputs, QueueAdditionResponse
@@ -61,27 +60,13 @@ _STATUS_MAP: dict[AsyncTaskStatus, GenerationStatus] = {
 }
 
 
-def _composite_onto_source(image: Image.Image, source: Image.Image, mask: Image.Image) -> Image.Image:
-    """Return `image` where `mask` is white and `source` where it is black, blending the grey band between them.
-
-    `source` and `mask` are resized to `image`'s size when it differs.
-    """
-    source = source.convert('RGBA')
-    mask = mask.convert('L')
-    if source.size != image.size:
-        source = source.resize(image.size)
-    if mask.size != image.size:
-        mask = mask.resize(image.size)
-    return Image.composite(image.convert('RGBA'), source, mask)
-
-
 class ComfyGenerationHandle(GenerationHandle):
     """Handle to one ComfyUI ``/prompt`` job, identified by its ``prompt_id`` (+ queue ``number``)."""
 
     def __init__(self, service: 'ComfyUiWebservice', prompt_id: str, number: Optional[int] = None,
                  seed: Optional[int] = None, registration_grace: float = DEFAULT_REGISTRATION_GRACE,
                  clock: Callable[[], float] = time.monotonic,
-                 paste_back: Optional[tuple[Image.Image, Image.Image]] = None) -> None:
+                 paste_back: Optional[PasteBack] = None) -> None:
         """
         Parameters
         ----------
@@ -97,9 +82,9 @@ class ComfyGenerationHandle(GenerationHandle):
             Seconds after creation during which a job the server has never listed reads as PENDING, not NOT_FOUND.
         clock: Callable[[], float], default=time.monotonic
             Time source for registration_grace.
-        paste_back: tuple[Image.Image, Image.Image], optional
-            An inpainting job's source image and the blurred mask it was uploaded with. When set, each result image
-            is composited onto the source through the mask, as the WebUI does server-side.
+        paste_back: PasteBack, optional
+            An inpainting job's source image, blurred mask and crop region. When set, each result image is composited
+            onto the source through the mask, as the WebUI does server-side.
         """
         super().__init__(prompt_id)
         self._service = service
@@ -115,7 +100,7 @@ class ComfyGenerationHandle(GenerationHandle):
 
     @classmethod
     def from_queue_response(cls, service: 'ComfyUiWebservice', response: 'QueueAdditionResponse',
-                            paste_back: Optional[tuple[Image.Image, Image.Image]] = None
+                            paste_back: Optional[PasteBack] = None
                             ) -> 'ComfyGenerationHandle':
         """Build a handle from any of the service's queue responses. `paste_back` is passed to the constructor.
 
@@ -194,8 +179,7 @@ class ComfyGenerationHandle(GenerationHandle):
         image_refs = outputs.images if (outputs is not None and outputs.images is not None) else []
         images = self._service.download_images(image_refs)
         if self._paste_back is not None:
-            source, mask = self._paste_back
-            images = [_composite_onto_source(image, source, mask) for image in images]
+            images = [self._paste_back.apply(image) for image in images]
         # A ComfyUI batch samples every image from one seed, so each image reports the job's seed.
         seeds = [] if self._seed is None else [self._seed] * len(images)
         return GenerationResult(images=images, seeds=seeds, seed=self._seed, task_id=self._task_id, raw_info=outputs)
