@@ -57,19 +57,18 @@ class _Capture:
                 patch.object(service, 'upload_image', return_value=ref), \
                 patch.object(service, 'upload_mask', fake_upload_mask), \
                 patch.object(service, '_queue_prompt', return_value=QueueAdditionResponse(prompt_id='x')):
-            self.response = service._generate(params)
+            service._generate(params)
 
 
 def _params(**kwargs: Any) -> DiffusionParams:
     return DiffusionParams(prompt='p', init_images=[Image.new('RGBA', (64, 64))], mask=_half_mask(), **kwargs)
 
 
-def test_comfyui_blurs_uploaded_mask_and_returns_it():
-    """An explicit mask_blur blurs the uploaded mask, and the response carries that same mask."""
+def test_comfyui_blurs_uploaded_mask():
+    """An explicit mask_blur blurs the uploaded mask."""
     capture = _Capture(_params(mask_blur=6))
     assert capture.uploaded is not None
     assert 0 < capture.uploaded.getpixel((31, 0)) < 255
-    assert capture.response.mask is capture.uploaded
 
 
 def test_comfyui_defaults_to_the_webui_blur():

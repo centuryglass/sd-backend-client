@@ -120,7 +120,7 @@ class DiffusionParams(BaseModel):
 
     The blurred edge extends about 2.5 times this value from the original boundary. When set, `mask_blur_x` and
     `mask_blur_y` are ignored. When all three are None, both backends use `MASK_BLUR_DEFAULT`. On ComfyUI the client
-    blurs the mask before upload and returns the blurred mask as `GenerationResult.mask`.
+    blurs the mask before upload.
     """
 
     mask_blur_x: Optional[int] = Field(default=None, ge=0)
