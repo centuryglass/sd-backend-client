@@ -581,6 +581,9 @@ class ComfyUiWebservice(WebService, Backend):
                     upload_image = crop_to_region(source, region, output_size)
                     upload_mask = crop_to_region(blurred_mask, region, output_size)
                 paste_back = PasteBack(source, blurred_mask, region)
+                # The sampler's noise mask is the rounded blurred mask, as with the WebUI's `mask_round`. A soft noise
+                # mask leaves a half-denoised, blurry band along the edge; the blur only feathers the paste-back.
+                upload_mask = upload_mask.point([0] * 128 + [255] * 128)
             image_reference = self.upload_image(upload_image)
             workflow_builder.set_source_image_from_reference(image_reference)
             if upload_mask is not None:

@@ -42,7 +42,7 @@ def test_blur_mask_feathers_the_edge_within_about_2_5_sigma():
 
 
 class _Capture:
-    """Records the mask `_generate` uploads, with the network calls stubbed out."""
+    """Records the mask `_generate` uploads and the mask it pastes back through, with the network calls stubbed out."""
 
     def __init__(self, params: DiffusionParams) -> None:
         self.uploaded: Optional[Image.Image] = None
@@ -57,47 +57,54 @@ class _Capture:
                 patch.object(service, 'upload_image', return_value=ref), \
                 patch.object(service, 'upload_mask', fake_upload_mask), \
                 patch.object(service, '_queue_prompt', return_value=QueueAdditionResponse(prompt_id='x')):
-            service._generate(params)
+            paste_back = service._generate(params)[1]
+        assert paste_back is not None
+        self.blurred = paste_back.mask
 
 
 def _params(**kwargs: Any) -> DiffusionParams:
     return DiffusionParams(prompt='p', init_images=[Image.new('RGBA', (64, 64))], mask=_half_mask(), **kwargs)
 
 
-def test_comfyui_blurs_uploaded_mask():
-    """An explicit mask_blur blurs the uploaded mask."""
+def test_comfyui_pastes_back_through_the_blurred_mask():
+    """An explicit mask_blur blurs the mask the result is composited through."""
+    capture = _Capture(_params(mask_blur=6))
+    assert 0 < capture.blurred.getpixel((31, 0)) < 255
+
+
+def test_comfyui_uploads_the_rounded_blurred_mask():
+    """The uploaded noise mask is the blurred mask thresholded at half, so it holds only 0 and 255."""
     capture = _Capture(_params(mask_blur=6))
     assert capture.uploaded is not None
-    assert 0 < capture.uploaded.getpixel((31, 0)) < 255
+    assert {value for _, value in capture.uploaded.getcolors() or []} == {0, 255}
+    for x in range(64):
+        assert capture.uploaded.getpixel((x, 0)) == (255 if capture.blurred.getpixel((x, 0)) >= 128 else 0)
 
 
 def test_comfyui_defaults_to_the_webui_blur():
     """An unset mask_blur uses MASK_BLUR_DEFAULT."""
     capture = _Capture(_params())
-    expected = blur_mask(_half_mask(), MASK_BLUR_DEFAULT)
-    assert capture.uploaded is not None
-    assert capture.uploaded.tobytes() == expected.tobytes()
+    assert capture.blurred.tobytes() == blur_mask(_half_mask(), MASK_BLUR_DEFAULT).tobytes()
 
 
 def test_comfyui_zero_blur_uploads_a_hard_edge():
-    """mask_blur=0 uploads the mask unblurred."""
+    """mask_blur=0 uploads and pastes back through the mask unblurred."""
     capture = _Capture(_params(mask_blur=0))
     assert capture.uploaded is not None
-    assert capture.uploaded.getpixel((31, 0)) == 255 and capture.uploaded.getpixel((32, 0)) == 0
+    for mask in (capture.uploaded, capture.blurred):
+        assert mask.getpixel((31, 0)) == 255 and mask.getpixel((32, 0)) == 0
 
 
 def test_comfyui_mask_blur_wins_over_x_and_y():
     """`mask_blur` overrides `mask_blur_x` and `mask_blur_y`, as on the WebUI."""
     capture = _Capture(_params(mask_blur=6, mask_blur_x=0, mask_blur_y=0))
-    assert capture.uploaded is not None
-    assert capture.uploaded.tobytes() == blur_mask(_half_mask(), 6).tobytes()
+    assert capture.blurred.tobytes() == blur_mask(_half_mask(), 6).tobytes()
 
 
 def test_comfyui_blurs_each_axis_separately():
     """With only x and y set, a vertical-only blur leaves a vertical edge sharp, and a horizontal blur softens it."""
-    vertical_only = _Capture(_params(mask_blur_x=0, mask_blur_y=6)).uploaded
-    horizontal_only = _Capture(_params(mask_blur_x=6, mask_blur_y=0)).uploaded
-    assert vertical_only is not None and horizontal_only is not None
+    vertical_only = _Capture(_params(mask_blur_x=0, mask_blur_y=6)).blurred
+    horizontal_only = _Capture(_params(mask_blur_x=6, mask_blur_y=0)).blurred
     assert vertical_only.getpixel((31, 32)) == 255 and vertical_only.getpixel((32, 32)) == 0
     assert 0 < horizontal_only.getpixel((31, 32)) < 255
 
@@ -105,8 +112,7 @@ def test_comfyui_blurs_each_axis_separately():
 def test_comfyui_unset_axis_uses_the_default():
     """When only one axis is set, the other uses MASK_BLUR_DEFAULT."""
     capture = _Capture(_params(mask_blur_x=0))
-    assert capture.uploaded is not None
-    assert capture.uploaded.tobytes() == blur_mask(_half_mask(), 0, MASK_BLUR_DEFAULT).tobytes()
+    assert capture.blurred.tobytes() == blur_mask(_half_mask(), 0, MASK_BLUR_DEFAULT).tobytes()
 
 
 @pytest.mark.parametrize('field', ['mask_blur', 'mask_blur_x', 'mask_blur_y'])
