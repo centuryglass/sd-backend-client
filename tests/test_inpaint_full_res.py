@@ -5,7 +5,7 @@ whole image and once with `inpaint_full_res`. The full-res run crops a 160x160 r
 at 512x512, so the patch gets about 3x the pixels on each side and should come out visibly finer. The assertions check
 only what is deterministic: pixels outside the mask are untouched, the patch changed, and the full-res and crop-point
 runs differ from the runs they are compared with. Whether the patch is finer is left to the saved PNGs (see
-`tests/README.md`), because how much detail a patch shows depends more on what the seed draws than on resolution.
+`tests/review.html`), because how much detail a patch shows depends more on what the seed draws than on resolution.
 """
 import pytest
 from PIL import Image

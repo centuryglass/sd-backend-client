@@ -24,7 +24,7 @@ whichever backend is up — the other backend's tests skip themselves automatica
 | `SD_PASS`        | —                        | A1111 password, if the server uses `--api-auth`.|
 | `COMFYUI_API_URL`| `http://127.0.0.1:8188`  | ComfyUI base URL (overrides host+port).        |
 | `COMFYUI_API_PORT`| `8188`                  | ComfyUI port only, when `COMFYUI_API_URL` unset.|
-| `SD_TEST_OUTPUT_DIR` | `tests/output/`      | Where generation tests save PNGs for inspection.|
+| `SD_TEST_OUTPUT_DIR` | `tests/output/`      | Where tests save PNGs and `results.js` for `review.html`.|
 
 (ComfyUI has no authentication, so there is no ComfyUI equivalent of `SD_UNAME`/`SD_PASS`.)
 
@@ -140,134 +140,27 @@ workflow builders read from.
 
 ## Reviewing saved outputs
 
-The generation tests save their images to the output dir (default `tests/output/`, git-ignored). No test checks
-that an image matches its prompt, so after a `--run-generation` run, review the images against this checklist.
+No test checks that an image matches its prompt. After a `--run-generation` run, open
+[`review.html`](review.html) in a browser, straight from disk, and work through it. For each test that saves images,
+it shows:
 
-- Each test overwrites its own files. A file older than the rest came from a skipped test or from a test that no
-  longer exists.
-- Files with the `comfy_` prefix come from ComfyUI. All others come from WebUI.
-- Generated images are small and use few steps, so soft, low-detail output is expected. Judge whether each image
-  follows its prompt and inputs, not its quality.
-- Inputs (`*_source`, `*_mask`, `*_input`) are drawn by `helpers.py` and are the same on every run. A change in one
-  points to the test helpers, not the backend.
+- the images, which zoom on click
+- the test's result on each backend, with failure details or the skip reason
+- what each image should show, as a checklist
+- what the test already asserts automatically
 
-Every generated image:
+It also lists the results of the integration tests that save no images, and says when an image or a result is
+missing and why.
 
-- [ ] Is not solid black, solid gray or pure noise. Any of these points to a VAE, sampler or decode failure.
-- [ ] Has no transparent or checkerboard areas.
-- [ ] Has natural colors, not inverted or channel-swapped (for example, a red apple that comes out blue).
+The page reads two things from the output dir (default `tests/output/`, git-ignored):
 
-### WebUI
+- **Images.** The generation tests save them there as PNGs.
+- **`results.js`.** At the end of every pytest session that runs integration tests, `review_results.py` merges each
+  test's outcome into this file. A later skip doesn't erase an earlier result: the page shows the last run where the
+  test actually ran and notes the skip.
 
-From `test_a1111_generation.py`, `test_a1111_async.py` and `test_shared_params.py`. Except where noted, images are
-256x256 at 4 steps.
-
-- [ ] `txt2img.png`: a red apple on a wooden table.
-- [ ] `txt2img_batch_0.png`, `txt2img_batch_1.png`: two apple-on-table images that differ from each other. Two
-  identical images mean the batch reused one seed.
-- [ ] `img2img_result.png`: a landscape painting, clearly changed from `img2img_source.png` (a diagonal color
-  gradient with a white square outline and a black circle outline). Traces of the source's colors or framing may
-  remain at 0.75 denoise.
-- [ ] `inpaint_result.png`: a flower fills the center square, which `inpaint_mask.png` marks white.
-- [ ] Outside the center square of `inpaint_result.png`, the gradient and white square outline match
-  `inpaint_source.png` pixel for pixel, with a crisp boundary (`mask_blur=0`). A changed border around an untouched
-  center means the mask was inverted.
-- [ ] `webui_full_res_whole.png` and `webui_full_res_full_res.png` (512x512, 20 steps, 0.85 denoise): both repaint
-  the 96x96 patch near the top right of `webui_full_res_source.png` as clockwork gears and leave the rest of the
-  gradient untouched. The `full_res` patch is visibly finer, with sharper gears and screws.
-  `webui_full_res_far_point.png` is coarser than `full_res` again, because the far point at the bottom left widened
-  the crop. Seeds vary in how much detail they draw, so judge the rendering scale rather than the amount of content.
-- [ ] `upscale_sd_source.png`: a 512x512 txt2img render of an ivy-covered stone cottage, generated once per session
-  as the source for every WebUI upscale test. `upscale_source.png` is the same image shrunk to 128x128.
-- [ ] `upscale_result.png`: `upscale_source.png` at 512x512 through the first model upscaler (ESRGAN, DAT, ...),
-  with the same composition and no added content. Leaves, flowers and window frames are crisper than a plain resize.
-  Missing when the server has no model upscaler.
-- [ ] `upscale_sd_result.png`: `upscale_sd_source.png` at 2048x2048, refined by a tiled Ultimate SD Upscale pass
-  (visibly sharper than a plain resize, same composition). Missing when the server has no Ultimate SD Upscale
-  script.
-- [ ] `async_upscale_sd.png` (2048x2048): the async-handle counterpart of `upscale_sd_result.png`.
-- [ ] `async_txt2img.png` (512x512, 20 steps, as are the other `async_*` images): a red apple on a wooden table.
-- [ ] `async_img2img.png`: an oil-painting look in blue-dominant colors, from a flat blue source.
-- [ ] `async_serialize_1.png` is a blue teapot and `async_serialize_2.png` is a green frog. Swapped or identical
-  subjects mean the two queued jobs' results were mixed up.
-- [ ] `async_idle_wait.png`: a small red cube. A fantasy landscape here is the other client's job, not ours.
-- [ ] `shared_params_webui_img2img.png`: a 256x320 portrait watercolor from a 192x128 landscape source, filling the
-  frame without stretching or letterbox bars.
-
-### ComfyUI
-
-From `test_comfyui_generation.py`, `test_comfyui_async.py` and `test_shared_params.py`. Except where noted, images
-are 256x256 at 8 steps.
-
-- [ ] `comfy_txt2img.png`: a red apple on a wooden table.
-- [ ] `comfy_img2img_result.png`: a vivid landscape painting, clearly changed from `comfy_img2img_source.png`.
-- [ ] `comfy_inpaint_result.png`: flower-like content replaces the center square that `comfy_inpaint_mask.png`
-  marks white.
-- [ ] Outside the center square of `comfy_inpaint_result.png`, the gradient and white square outline survive. Slight
-  softening is normal here, because this test calls raw `inpaint()` and ComfyUI passes the whole image through the
-  VAE. An edited border around an untouched center means `ComfyUiWebservice.upload_mask` converted the mask polarity
-  wrong.
-- [ ] `comfy_submit_inpaint_result.png`: a flower in the center square of `comfy_submit_inpaint_source.png`. Unlike
-  the raw result above, everything outside the square matches the source pixel for pixel, with a crisp boundary
-  (`mask_blur=0`), because `submit_inpaint` composites the result onto the source.
-- [ ] `comfy_mask_blur_0.png` and `comfy_mask_blur_12.png`: the same flower. The first has a hard edge around the
-  square. In the second the flower fades into the gradient over roughly 30 px beyond the original edge.
-- [ ] `comfyui_full_res_whole.png`, `comfyui_full_res_full_res.png` and `comfyui_full_res_far_point.png`: the same
-  three checks as the WebUI images above. Outside the patch the pixels match the source, because the client
-  composites the result through the mask. The generated content reaches the patch edge; a blurry, half-generated band
-  just inside the edge means the sampler got a soft noise mask instead of the rounded one.
-- [ ] `comfy_upscale_sd_source.png`: a 512x512 txt2img render of an ivy-covered stone cottage, generated once per
-  session as the source for every ComfyUI upscale test. `comfy_upscale_source.png` is the same image shrunk to
-  128x128.
-- [ ] `comfy_upscale_result.png`: `comfy_upscale_source.png` at 512x512, sharper than a plain resize, with no new
-  content. It is missing when the server has no upscale model installed.
-- [ ] `comfy_upscale_sd_result.png`: `comfy_upscale_sd_source.png` at 2048x2048, refined by Ultimate SD Upscale
-  (visibly sharper, same composition). Missing when the server has no Ultimate SD Upscale node.
-- [ ] `comfy_upscale_fallback_result.png`: the same 2048x2048 upscale via the tiled VAE encode/decode fallback
-  (`use_ultimate_upscale_script=False`), run regardless of whether the node is installed.
-- [ ] `comfy_async_upscale_sd.png` (2048x2048): the async-handle counterpart of `comfy_upscale_sd_result.png`.
-- [ ] `comfy_async_txt2img.png`: identical to `comfy_txt2img.png`, since both use the same prompt, seed, size and
-  steps. A visible difference means the async path builds a different workflow.
-- [ ] `comfy_async_img2img.png`: an oil-painting look in blue-dominant colors, from a flat blue source.
-- [ ] `comfy_async_queue_1.png` is a blue teapot and `comfy_async_queue_2.png` is a green frog. Swapped or identical
-  subjects mean a handle downloaded another prompt's outputs.
-- [ ] `comfy_async_running_survived_cancel.png`: a fully rendered 512x512 fantasy landscape. A half-finished, noisy
-  or missing image means cancelling the queued job interrupted the running one. A red cube is the cancelled job.
-- [ ] `comfy_async_targeted_interrupt.png`: a fully rendered 512x512 fantasy landscape. A half-finished or noisy
-  image means the server ignored the prompt id in `/interrupt` and stopped the wrong job.
-- [ ] `shared_params_comfyui_img2img.png`: a 256x320 portrait watercolor filling the frame without stretching.
-  Expect a similar style to the WebUI version, not the same image.
-
-### ControlNet
-
-ControlNet can fail silently: the server returns a normal image and ignores the control unit. Each backend's suite
-generates "a photograph of a city street, detailed" with seed 42, once without ControlNet and once with Canny.
-
-- [ ] `controlnet_input.png` and `comfy_controlnet_input.png`: identical black lines on white, a square outline, a
-  centered circle and both corner-to-corner diagonals.
-- [ ] `controlnet_preview_canny.png` and `comfy_controlnet_preview_CannyEdgePreprocessor.png`: thin white edge lines
-  on black tracing the same shapes, with each thick input line doubled. They are 512x512, the preprocessors'
-  default resolution, though the input is 256x256.
-- [ ] `controlnet_baseline_no_cn.png` and `comfy_controlnet_baseline_no_cn.png`: a loose street scene with no
-  visible square or circle structure.
-- [ ] `controlnet_with_canny.png` and `comfy_controlnet_with_CannyEdgePreprocessor.png`: the composition follows
-  the edge map, with the square frame, central circle and diagonals plainly visible, typically as a corridor or
-  room seen head-on. The test only asserts a mean difference of 2/255 from the baseline, which a weak or partly
-  applied unit can pass.
-
-### What the tests already assert
-
-| Image group | Asserted automatically | Left to the reviewer |
-|-------------|------------------------|----------------------|
-| All generated images | RGBA, size within 8 px of target | Prompt adherence; black, noise or color-swap output |
-| img2img | Mean difference from source >= 10/255 | Style matches the prompt |
-| `inpaint_full_res` | Pixels outside the patch match the source; the patch changed; full-res and far-crop-point results differ from the results they are compared with | The full-res patch is finer and the far-point patch coarser; the seam is clean |
-| Inpainting | Center changes >= 20/255. WebUI border <= 5/255; ComfyUI center change >= 3x border change. ComfyUI `submit_inpaint` border <= 1/255; `mask_blur=12` blends pixels just outside the mask, `mask_blur=0` does not | Seam quality; the fill is a flower |
-| Upscale | Within 8 px of the requested size | Sharper than a plain resize; no added content or artifacts |
-| ControlNet pair | Mean difference >= 2/255 | The edge structure shapes the image |
-| Preprocessor preview | Not a single flat color | Edges match the input shapes |
-| Async queue and cancel | Status sequence; both images returned | Each image matches its own prompt |
-| Shared params img2img | 256x320 size; WebUI reports DPM++ 2M with Karras | No stretching or distortion |
+When `SD_TEST_OUTPUT_DIR` points elsewhere, open `review.html?output=<that directory>/`. A test that saves a new
+image, or a renamed one, needs a matching entry in the `GROUPS` list in `review.html`.
 
 ## Graceful degradation
 

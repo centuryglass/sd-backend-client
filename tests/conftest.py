@@ -33,6 +33,7 @@ from sd_backend_client.errors import AuthError, SDBackendError
 
 from .comfy_helpers import build_comfy_params
 from .helpers import UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, fast_request_body
+from .review_results import ResultsRecorder
 
 DEFAULT_PORT = 7860
 COMFY_DEFAULT_PORT = 8188
@@ -51,6 +52,13 @@ def pytest_configure(config):
     config.addinivalue_line('markers', 'integration: talks to a live WebUI instance.')
     config.addinivalue_line('markers', 'generation: invokes real diffusion; slow, needs a loaded checkpoint.')
     config.addinivalue_line('markers', 'controlnet: requires the ControlNet extension to be installed.')
+    generation_enabled = bool(config.getoption('--run-generation') or os.environ.get('RUN_SD_GENERATION'))
+    config.pluginmanager.register(ResultsRecorder(_output_dir_path(), generation_enabled), 'sd-review-results')
+
+
+def _output_dir_path() -> str:
+    """The ``output_dir`` fixture's directory, without creating it."""
+    return os.environ.get('SD_TEST_OUTPUT_DIR') or os.path.join(os.path.dirname(__file__), 'output')
 
 
 def pytest_collection_modifyitems(config, items):
@@ -169,11 +177,11 @@ def controlnet_pairing(controlnet_available):
 
 @pytest.fixture(scope='session')
 def output_dir() -> str:
-    """Directory where generation tests save PNGs for visual fidelity inspection.
+    """Directory where generation tests save PNGs for review in ``tests/review.html``.
 
     Defaults to ``tests/output/`` next to this file; override with ``SD_TEST_OUTPUT_DIR``.
     """
-    path = os.environ.get('SD_TEST_OUTPUT_DIR') or os.path.join(os.path.dirname(__file__), 'output')
+    path = _output_dir_path()
     os.makedirs(path, exist_ok=True)
     return path
 

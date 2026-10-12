@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integration Output Review</title>
+<!--
+  Visual review page for the live integration tests (tests/README.md, "Reviewing saved outputs").
+  Open it straight from disk. It reads, relative to this file:
+    output/results.js  test outcomes, written by tests/review_results.py at the end of each pytest session
+    output/*.png       images the generation tests save through helpers.save_output
+  Add ?output=<dir>/ to the URL to read another directory, for a run with SD_TEST_OUTPUT_DIR set.
+  Each section in GROUPS names the images a test saves: renaming a save_output call or a test means updating it here.
+-->
+<style>
+  :root {
+    --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eef0f3; --border: #d9dde3;
+    --text: #1d2330; --muted: #5f6878; --accent: #3a63d8; --code-bg: #e8ebf0;
+    --pass: #1f8a4c; --pass-bg: #dcf3e5; --fail: #c62f3b; --fail-bg: #fbe1e3;
+    --skip: #9a6a00; --skip-bg: #fbefd2; --none: #6b7280; --none-bg: #e7e9ed;
+    --shadow: 0 1px 2px rgba(20, 25, 40, .06), 0 2px 8px rgba(20, 25, 40, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15171c; --surface: #1d2027; --surface-2: #252932; --border: #333845;
+      --text: #e3e6ec; --muted: #9aa2b1; --accent: #7aa2ff; --code-bg: #2b303b;
+      --pass: #4cc97f; --pass-bg: #173726; --fail: #ff6b76; --fail-bg: #43191e;
+      --skip: #f0b84a; --skip-bg: #3d2f12; --none: #9aa2b1; --none-bg: #2b2f39;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 2px 10px rgba(0, 0, 0, .25);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text); line-height: 1.5;
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .86em; }
+  code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 16px 4rem; }
+
+  header.page { padding: 2rem 0 1rem; }
+  header.page h1 { margin: 0 0 .25rem; font-size: 1.7rem; letter-spacing: -.01em; }
+  header.page .sub { color: var(--muted); margin: 0; }
+  .runinfo { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-top: .9rem; color: var(--muted); font-size: .9rem; }
+  .runinfo b { color: var(--text); font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: .35em; padding: .1em .6em; border-radius: 999px;
+    font-size: .78rem; font-weight: 600; white-space: nowrap; border: 1px solid transparent;
+  }
+  .badge::before { content: ""; width: .55em; height: .55em; border-radius: 50%; background: currentColor; }
+  .s-passed { color: var(--pass); background: var(--pass-bg); }
+  .s-failed, .s-error { color: var(--fail); background: var(--fail-bg); }
+  .s-skipped { color: var(--skip); background: var(--skip-bg); }
+  .s-none { color: var(--none); background: var(--none-bg); }
+  .chips .badge { font-size: .85rem; padding: .25em .8em; }
+
+  .banner {
+    border-radius: 10px; padding: .85rem 1.1rem; margin: 1rem 0; border: 1px solid var(--border);
+    background: var(--surface); box-shadow: var(--shadow); border-left: 5px solid var(--none);
+  }
+  .banner.warn { border-left-color: var(--skip); }
+  .banner.bad { border-left-color: var(--fail); }
+  .banner h2 { margin: 0 0 .3rem; font-size: 1rem; }
+  .banner p { margin: .25rem 0; }
+  .banner ul { margin: .4rem 0 0; padding-left: 1.2rem; }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow);
+    padding: 1.1rem 1.3rem; margin: 1.25rem 0;
+  }
+  .panel h2 { margin: 0 0 .6rem; font-size: 1.15rem; }
+  .panel h3 { margin: 1rem 0 .3rem; font-size: .95rem; }
+  .cols2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0 2rem; }
+
+  nav.toc { columns: 3 260px; column-gap: 2rem; }
+  nav.toc .group { break-inside: avoid; margin-bottom: .9rem; }
+  nav.toc .group > b { display: block; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); margin-bottom: .2rem; }
+  nav.toc a { display: flex; gap: .5rem; align-items: baseline; text-decoration: none; color: var(--text);
+    padding: .1rem 0; font-size: .92rem; }
+  nav.toc a:hover { color: var(--accent); }
+  .dot { flex: none; width: .6rem; height: .6rem; border-radius: 50%; background: currentColor; transform: translateY(-.05rem); }
+
+  h2.group-title { margin: 2.5rem 0 .3rem; font-size: 1.35rem; }
+  .group-intro { color: var(--muted); margin: 0 0 1rem; max-width: 80ch; }
+
+  section.test {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow);
+    margin: 1rem 0 1.5rem; overflow: hidden; border-top: 4px solid var(--none);
+  }
+  section.test.st-passed { border-top-color: var(--pass); }
+  section.test.st-failed, section.test.st-error { border-top-color: var(--fail); }
+  section.test.st-skipped { border-top-color: var(--skip); }
+  .test-head { padding: 1rem 1.3rem .2rem; }
+  .test-head h3 { margin: 0; font-size: 1.12rem; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .test-head h3 a.anchor { color: var(--muted); text-decoration: none; font-weight: 400; }
+  .purpose { margin: .35rem 0 0; color: var(--muted); max-width: 95ch; }
+  .backends { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1rem; padding: 1rem 1.3rem; }
+  .backend { background: var(--surface-2); border-radius: 10px; padding: .8rem .9rem; min-width: 0; }
+  .backend h4 { margin: 0 0 .1rem; font-size: .95rem; display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap; }
+  .backend .settings { color: var(--muted); font-weight: 400; font-size: .82rem; }
+
+  .result { margin: .45rem 0; font-size: .85rem; }
+  .result .name { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+  .result .name code { background: transparent; padding: 0; color: var(--muted); }
+  .result .when { color: var(--muted); font-size: .8rem; }
+  .result details { margin-top: .3rem; }
+  .result summary { cursor: pointer; color: var(--muted); font-size: .82rem; }
+  .result pre {
+    margin: .35rem 0 0; padding: .6rem .7rem; max-height: 22rem; overflow: auto; white-space: pre-wrap;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px; font-size: .78rem;
+  }
+  .result.bad pre { border-color: var(--fail); }
+  .note-skip { color: var(--skip); font-size: .82rem; margin-top: .2rem; }
+
+  .shots { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .6rem; }
+  figure.shot { margin: 0; width: 200px; }
+  figure.shot .frame {
+    position: relative; width: 200px; height: 200px; border-radius: 8px; overflow: hidden; cursor: zoom-in;
+    border: 1px solid var(--border);
+    background: repeating-conic-gradient(var(--surface) 0 25%, var(--surface-2) 0 50%) 0 0 / 16px 16px;
+  }
+  figure.shot .frame:hover { outline: 2px solid var(--accent); outline-offset: 1px; }
+  figure.shot img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  figure.shot figcaption { font-size: .78rem; margin-top: .3rem; color: var(--muted); overflow-wrap: anywhere; }
+  figure.shot figcaption b { color: var(--text); font-weight: 600; }
+  figure.shot .dims { float: right; margin-left: .4rem; }
+  figure.shot .stale { color: var(--skip); display: block; }
+  figure.shot.missing .frame {
+    cursor: default; background: var(--surface); border: 2px dashed var(--border); display: flex;
+    align-items: center; justify-content: center; text-align: center; padding: .8rem; color: var(--muted);
+    font-size: .8rem;
+  }
+  figure.shot.missing .frame:hover { outline: none; }
+  figure.shot.missing .frame strong { display: block; color: var(--text); margin-bottom: .3rem; font-size: .85rem; }
+
+  .checks { padding: 0 1.3rem 1rem; }
+  .backend .checks { padding: 0; margin-top: .6rem; }
+  .checks h5 { margin: .3rem 0 .3rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .checks ul { list-style: none; margin: 0; padding: 0; }
+  .checks li { display: flex; gap: .55rem; align-items: flex-start; padding: .18rem 0; }
+  .checks input { margin-top: .3rem; flex: none; accent-color: var(--pass); width: 1rem; height: 1rem; }
+  .checks label { cursor: pointer; }
+  .checks li:has(input:checked) label { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--border); }
+  .asserted { margin: 0 1.3rem 1rem; padding: .55rem .8rem; border-radius: 8px; background: var(--surface-2); font-size: .86rem; }
+  .asserted b { color: var(--muted); font-weight: 600; }
+
+  table.others { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  table.others th, table.others td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.others th { color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
+  table.others td.mod { color: var(--muted); white-space: nowrap; }
+  table.others .result { margin: 0; }
+  .table-scroll { overflow-x: auto; }
+
+  /* Zoom overlay */
+  #zoom { position: fixed; inset: 0; z-index: 10; display: none; flex-direction: column; background: rgba(8, 10, 14, .97); color: #e8eaef; backdrop-filter: blur(6px); }
+  #zoom.open { display: flex; }
+  #zoom .bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding: .6rem 1rem; background: rgba(0, 0, 0, .4); }
+  #zoom .title { font-weight: 600; overflow-wrap: anywhere; }
+  #zoom .meta { color: #a7adba; font-size: .85rem; }
+  #zoom .spacer { flex: 1; }
+  #zoom button {
+    font: inherit; font-size: .85rem; color: inherit; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .15);
+    border-radius: 6px; padding: .25rem .65rem; cursor: pointer;
+  }
+  #zoom button:hover { background: rgba(255, 255, 255, .16); }
+  #zoom button.on { background: #3a63d8; border-color: #3a63d8; }
+  #zoom .stage { flex: 1; overflow: auto; display: grid; place-items: center; }
+  #zoom .stage img { display: block; cursor: zoom-in; max-width: none;
+    background: repeating-conic-gradient(#2a2d35 0 25%, #1f2128 0 50%) 0 0 / 16px 16px; }
+  #zoom .stage img.zoomed { cursor: zoom-out; }
+  #zoom .stage img.pixelated { image-rendering: pixelated; }
+  #zoom .hint { color: #8a91a0; font-size: .78rem; padding: .35rem 1rem .6rem; text-align: center; }
+
+  @media (max-width: 600px) {
+    .backends { grid-template-columns: 1fr; padding: .8rem; }
+    figure.shot, figure.shot .frame { width: 140px; }
+    figure.shot .frame { height: 140px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <h1>Integration test output review</h1>
+    <p class="sub">The images the live generation tests saved, next to what each one should show and how its test
+      went. No test checks that an image matches its prompt: that part is yours.</p>
+    <div class="runinfo" id="runinfo"></div>
+    <div class="chips" id="chips"></div>
+  </header>
+  <div id="banners"></div>
+
+  <div class="panel">
+    <h2>How to review</h2>
+    <div class="cols2">
+      <div>
+        <ul>
+          <li>Run <code>pytest tests/ --run-generation</code> with a backend up, then reload this page.</li>
+          <li>Each test overwrites only its own files, and its result here. An image marked as older than its test's
+            run was left by an earlier run, because the latest run skipped or failed before saving it.</li>
+          <li>Generated images are small and use few steps, so soft, low-detail output is expected. Judge whether
+            each image follows its prompt and inputs, not its quality.</li>
+          <li>Inputs (<code>*_source</code>, <code>*_mask</code>, <code>*_input</code>) are drawn by
+            <code>tests/helpers.py</code> and are the same on every run. A change in one points to the test helpers,
+            not the backend.</li>
+          <li>Click any image to zoom. In the overlay, click to zoom in at a point, use the arrow keys to step through images
+            and <kbd>Esc</kbd> to close.</li>
+        </ul>
+      </div>
+      <div class="checks" style="padding:0">
+        <h5>Every generated image</h5>
+        <ul data-checks="global">
+          <li><input type="checkbox" id="g1"><label for="g1">Is not solid black, solid gray or pure noise. Any of
+            these points to a VAE, sampler or decode failure.</label></li>
+          <li><input type="checkbox" id="g2"><label for="g2">Has no transparent or checkerboard areas.</label></li>
+          <li><input type="checkbox" id="g3"><label for="g3">Has natural colors, not inverted or channel-swapped
+            (for example, a red apple that comes out blue).</label></li>
+        </ul>
+        <p class="asserted" style="margin:.8rem 0 0"><b>Asserted for every generated image:</b> RGBA, size within 8 px
+          of the target.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Contents</h2>
+    <nav class="toc" id="toc"></nav>
+  </div>
+
+  <main id="sections"></main>
+
+  <h2 class="group-title" id="other-tests">Other integration tests</h2>
+  <p class="group-intro">Recorded integration tests that save no images, such as the metadata, auth and cancellation
+    tests.</p>
+  <div class="panel" id="others"></div>
+</div>
+
+<div id="zoom" role="dialog" aria-modal="true" aria-label="Zoomed image">
+  <div class="bar">
+    <span class="title" id="zoom-title"></span>
+    <span class="meta" id="zoom-meta"></span>
+    <span class="spacer"></span>
+    <button data-zoom="fit">Fit</button>
+    <button data-zoom="1">1:1</button>
+    <button data-zoom="2">2x</button>
+    <button data-zoom="4">4x</button>
+    <button id="zoom-smooth" title="Toggle smooth/pixelated scaling (S)">Smooth</button>
+    <button id="zoom-prev" title="Previous image (Left arrow)">&larr;</button>
+    <button id="zoom-next" title="Next image (Right arrow)">&rarr;</button>
+    <button id="zoom-close" title="Close (Esc)">Close</button>
+  </div>
+  <div class="stage" id="zoom-stage"><img id="zoom-img" alt=""></div>
+  <div class="hint">Click the image to zoom in at that point, and again to fit. Keys: F fit, 1 / 2 / 4 zoom, S smoothing,
+    arrows step, Esc closes.</div>
+</div>
+
+<script>
+'use strict';
+
+const OUTPUT_DIR = (() => {
+  const dir = new URLSearchParams(location.search).get('output') || 'output/';
+  return dir.endsWith('/') ? dir : dir + '/';
+})();
+
+const A = 'test_a1111_generation.py::';
+const C = 'test_comfyui_generation.py::';
+const AA = 'test_a1111_async.py::';
+const CA = 'test_comfyui_async.py::';
+const ACN = 'test_a1111_controlnet_generation.py::';
+const CCN = 'test_comfyui_controlnet_generation.py::';
+const FR = 'test_inpaint_full_res.py::';
+const SP = 'test_shared_params.py::';
+
+const WEBUI = 'WebUI';
+const COMFY = 'ComfyUI';
+
+// Text in `backticks` renders as code. Each backend entry lists the result keys
+// (tests/review_results.py, result_key) of the tests that save its images. An image with
+// `missingNote` explains its absence; `optional` marks one whose absence is not a problem.
+const GROUPS = [
+  {
+    title: 'Generation',
+    sections: [
+      {
+        id: 'txt2img', title: 'txt2img',
+        purpose: 'A basic txt2img request returns an image.',
+        backends: {
+          [WEBUI]: {
+            settings: '256x256, 4 steps', tests: [A + 'test_txt2img_produces_image'],
+            images: [{ file: 'txt2img.png', label: 'result' }],
+            checks: ['`txt2img.png`: a red apple on a wooden table.'],
+          },
+          [COMFY]: {
+            settings: '256x256, 8 steps', tests: [C + 'test_txt2img_produces_image'],
+            images: [{ file: 'comfy_txt2img.png', label: 'result' }],
+            checks: ['`comfy_txt2img.png`: a red apple on a wooden table.'],
+          },
+        },
+      },
+      {
+        id: 'txt2img-batch', title: 'txt2img batch',
+        purpose: 'A batch of two returns two distinct images, not a grid.',
+        backends: {
+          [WEBUI]: {
+            settings: '256x256, 4 steps', tests: [A + 'test_txt2img_batch_returns_multiple_images'],
+            images: [{ file: 'txt2img_batch_0.png', label: 'image 0' }, { file: 'txt2img_batch_1.png', label: 'image 1' }],
+            checks: ['Two apple-on-table images that differ from each other. Two identical images mean the batch reused one seed.'],
+          },
+        },
+      },
+      {
+        id: 'img2img', title: 'img2img round trip',
+        purpose: 'img2img takes a source image and a denoising strength (0.75) and returns a modified image.',
+        asserted: 'Mean difference from the source >= 10/255.',
+        backends: {
+          [WEBUI]: {
+            settings: '256x256, 4 steps', tests: [A + 'test_img2img_round_trip'],
+            images: [{ file: 'img2img_source.png', label: 'source' }, { file: 'img2img_result.png', label: 'result' }],
+            checks: ['`img2img_result.png`: a landscape painting, clearly changed from `img2img_source.png` (a diagonal color gradient with a white square outline and a black circle outline). Traces of the source\'s colors or framing may remain at 0.75 denoise.'],
+          },
+          [COMFY]: {
+            settings: '256x256, 8 steps', tests: [C + 'test_img2img_round_trip'],
+            images: [{ file: 'comfy_img2img_source.png', label: 'source' }, { file: 'comfy_img2img_result.png', label: 'result' }],
+            checks: ['`comfy_img2img_result.png`: a vivid landscape painting, clearly changed from `comfy_img2img_source.png`.'],
+          },
+        },
+        checks: ['The style matches the prompt.'],
+      },
+      {
+        id: 'shared-params', title: 'Shared params: img2img resizes the source',
+        purpose: 'img2img driven through the shared `DiffusionParams` fields returns an image at the requested width x height (256x320) from a 192x128 landscape source.',
+        asserted: '256x320 size; WebUI reports DPM++ 2M with Karras.',
+        backends: {
+          [WEBUI]: {
+            tests: [SP + 'test_webui_img2img_resizes_source_and_applies_scheduler'],
+            images: [{ file: 'shared_params_webui_img2img.png', label: 'result' }],
+            checks: ['`shared_params_webui_img2img.png`: a 256x320 portrait watercolor from a 192x128 landscape source, filling the frame without stretching or letterbox bars.'],
+          },
+          [COMFY]: {
+            tests: [SP + 'test_comfyui_img2img_resizes_source'],
+            images: [{ file: 'shared_params_comfyui_img2img.png', label: 'result' }],
+            checks: ['`shared_params_comfyui_img2img.png`: a 256x320 portrait watercolor filling the frame without stretching. Expect a similar style to the WebUI version, not the same image.'],
+          },
+        },
+      },
+    ],
+  },
+  {
+    title: 'Inpainting',
+    intro: 'Every inpainting test uses a mask whose white area is the region to repaint.',
+    sections: [
+      {
+        id: 'inpaint', title: 'Inpainting respects the mask',
+        purpose: 'Inpainting changes the masked region and preserves the rest of the image.',
+        asserted: 'Center changes >= 20/255. WebUI border change <= 5/255; ComfyUI center change >= 3x its border change.',
+        backends: {
+          [WEBUI]: {
+            settings: '256x256, 4 steps, mask_blur=0', tests: [A + 'test_img2img_inpaint_respects_mask'],
+            images: [{ file: 'inpaint_source.png', label: 'source' }, { file: 'inpaint_mask.png', label: 'mask' },
+                     { file: 'inpaint_result.png', label: 'result' }],
+            checks: [
+              '`inpaint_result.png`: a flower fills the center square, which `inpaint_mask.png` marks white.',
+              'Outside the center square of `inpaint_result.png`, the gradient and white square outline match `inpaint_source.png` pixel for pixel, with a crisp boundary (`mask_blur=0`). A changed border around an untouched center means the mask was inverted.',
+            ],
+          },
+          [COMFY]: {
+            settings: '256x256, 8 steps', tests: [C + 'test_inpaint_respects_mask'],
+            images: [{ file: 'comfy_inpaint_source.png', label: 'source' }, { file: 'comfy_inpaint_mask.png', label: 'mask' },
+                     { file: 'comfy_inpaint_result.png', label: 'result' }],
+            checks: [
+              '`comfy_inpaint_result.png`: flower-like content replaces the center square that `comfy_inpaint_mask.png` marks white.',
+              'Outside the center square of `comfy_inpaint_result.png`, the gradient and white square outline survive. Slight softening is normal here, because this test calls raw `inpaint()` and ComfyUI passes the whole image through the VAE. An edited border around an untouched center means `ComfyUiWebservice.upload_mask` converted the mask polarity wrong.',
+            ],
+          },
+        },
+        checks: ['The seam at the mask edge is clean.'],
+      },
+      {
+        id: 'submit-inpaint', title: 'submit_inpaint pastes the result onto the source',
+        purpose: '`submit_inpaint` composites the generated patch onto the original source, unlike raw `inpaint()`, so areas away from the mask match the source.',
+        asserted: 'Border change <= 1/255.',
+        backends: {
+          [COMFY]: {
+            settings: '256x256, 8 steps, mask_blur=0', tests: [C + 'test_submit_inpaint_pastes_the_result_onto_the_source'],
+            images: [{ file: 'comfy_submit_inpaint_source.png', label: 'source' }, { file: 'comfy_submit_inpaint_result.png', label: 'result' }],
+            checks: ['`comfy_submit_inpaint_result.png`: a flower in the center square of `comfy_submit_inpaint_source.png`. Unlike the raw result above, everything outside the square matches the source pixel for pixel, with a crisp boundary (`mask_blur=0`), because `submit_inpaint` composites the result onto the source.'],
+          },
+        },
+      },
+      {
+        id: 'mask-blur', title: 'mask_blur feathers the inpainting boundary',
+        purpose: 'A large `mask_blur` blends generated pixels into the source just outside the mask; `mask_blur=0` does not.',
+        asserted: '`mask_blur=12` changes pixels just outside the mask; `mask_blur=0` does not.',
+        backends: {
+          [COMFY]: {
+            settings: '256x256, 8 steps', tests: [C + 'test_mask_blur_feathers_the_inpainting_boundary'],
+            images: [{ file: 'comfy_mask_blur_0.png', label: 'mask_blur=0' }, { file: 'comfy_mask_blur_12.png', label: 'mask_blur=12' }],
+            checks: ['`comfy_mask_blur_0.png` and `comfy_mask_blur_12.png`: the same flower. The first has a hard edge around the square. In the second the flower fades into the gradient over roughly 30 px beyond the original edge.'],
+          },
+        },
+      },
+      {
+        id: 'full-res', title: 'inpaint_full_res adds detail to a small patch',
+        purpose: 'Both runs repaint a 96x96 patch of a 512x512 source as clockwork gears, once over the whole image and once with "inpaint only masked" (`inpaint_full_res`), which renders a 160x160 crop around the patch at 512x512.',
+        asserted: 'Pixels outside the patch match the source; the patch changed; the full-res patch differs from the whole-image patch.',
+        backends: {
+          [WEBUI]: {
+            settings: '512x512, 20 steps, 0.85 denoise', tests: [FR + 'test_inpaint_full_res_adds_detail_to_a_small_patch[webui]'],
+            images: [{ file: 'webui_full_res_source.png', label: 'source' }, { file: 'webui_full_res_mask.png', label: 'mask' },
+                     { file: 'webui_full_res_whole.png', label: 'whole' }, { file: 'webui_full_res_full_res.png', label: 'full_res' }],
+          },
+          [COMFY]: {
+            settings: '512x512, 20 steps, 0.85 denoise', tests: [FR + 'test_inpaint_full_res_adds_detail_to_a_small_patch[comfyui]'],
+            images: [{ file: 'comfyui_full_res_source.png', label: 'source' }, { file: 'comfyui_full_res_mask.png', label: 'mask' },
+                     { file: 'comfyui_full_res_whole.png', label: 'whole' }, { file: 'comfyui_full_res_full_res.png', label: 'full_res' }],
+            checks: [
+              'Outside the patch the pixels match the source, because the client composites the result through the mask.',
+              'The generated content reaches the patch edge. A blurry, half-generated band just inside the edge means the sampler got a soft noise mask instead of the rounded one.',
+            ],
+          },
+        },
+        checks: [
+          '`*_whole` and `*_full_res` both repaint the patch near the top right of `*_source` as clockwork gears and leave the rest of the gradient untouched.',
+          'The `full_res` patch is visibly finer, with sharper gears and screws. Seeds vary in how much detail they draw, so judge the rendering scale rather than the amount of content.',
+          'The seam around the patch is clean.',
+        ],
+      },
+      {
+        id: 'far-point', title: 'inpaint_full_res crop points widen the crop',
+        purpose: 'A crop point far from the mask (bottom left) enlarges the crop region, so the patch gets fewer pixels, and the result still pastes back onto the source.',
+        asserted: 'Pixels outside the patch match the source; the far-point patch differs from the plain full-res patch.',
+        backends: {
+          [WEBUI]: {
+            settings: '512x512, 20 steps', tests: [FR + 'test_inpaint_full_res_crop_points_widen_the_crop[webui]'],
+            images: [{ file: 'webui_full_res_full_res.png', label: 'full_res (from the test above)' }, { file: 'webui_full_res_far_point.png', label: 'far_point' }],
+          },
+          [COMFY]: {
+            settings: '512x512, 20 steps', tests: [FR + 'test_inpaint_full_res_crop_points_widen_the_crop[comfyui]'],
+            images: [{ file: 'comfyui_full_res_full_res.png', label: 'full_res (from the test above)' }, { file: 'comfyui_full_res_far_point.png', label: 'far_point' }],
+          },
+        },
+        checks: ['`*_far_point` renders the patch coarser than `*_full_res`, because the far point widened the crop, while still compositing cleanly onto the source with no seam.'],
+      },
+    ],
+  },
+  {
+    title: 'Upscaling',
+    intro: 'Each backend renders one 512x512 source per session from the prompt "a weathered stone cottage covered in ivy beside a flower garden", and every upscale test on that backend starts from it.',
+    sections: [
+      {
+        id: 'upscale', title: 'Basic upscale',
+        purpose: 'A basic upscale of the source shrunk to 128x128 returns one image at 512x512.',
+        asserted: 'Within 8 px of the requested size.',
+        backends: {
+          [WEBUI]: {
+            tests: [A + 'test_upscale_basic'],
+            images: [{ file: 'upscale_source.png', label: 'source (128x128)' }, { file: 'upscale_result.png', label: 'result', missingNote: 'Missing when the server has no model upscaler.' }],
+            checks: ['`upscale_result.png`: `upscale_source.png` at 512x512 through the first model upscaler (ESRGAN, DAT, ...), with the same composition and no added content. Leaves, flowers and window frames are crisper than a plain resize.'],
+          },
+          [COMFY]: {
+            tests: [C + 'test_upscale'],
+            images: [{ file: 'comfy_upscale_source.png', label: 'source (128x128)' }, { file: 'comfy_upscale_result.png', label: 'result', missingNote: 'Missing when the server has no upscale model installed.' }],
+            checks: ['`comfy_upscale_result.png`: `comfy_upscale_source.png` at 512x512, sharper than a plain resize, with no new content.'],
+          },
+        },
+        checks: ['The source is the 512x512 ivy-covered cottage shrunk to 128x128.'],
+      },
+      {
+        id: 'usdu', title: 'Ultimate SD Upscale',
+        purpose: 'A tiled diffusion pass refines a 4x upscale (512x512 to 2048x2048), with a tile ControlNet unit when one is installed.',
+        asserted: 'Within 8 px of the requested size.',
+        backends: {
+          [WEBUI]: {
+            tests: [A + 'test_upscale_with_ultimate_sd_upscale'],
+            images: [{ file: 'upscale_sd_source.png', label: 'source' }, { file: 'upscale_sd_result.png', label: 'result', missingNote: 'Missing when the server has no Ultimate SD Upscale script.' }],
+          },
+          [COMFY]: {
+            tests: [C + 'test_upscale_with_ultimate_sd_upscale'],
+            images: [{ file: 'comfy_upscale_sd_source.png', label: 'source' }, { file: 'comfy_upscale_sd_result.png', label: 'result', missingNote: 'Missing when the server has no Ultimate SD Upscale node.' }],
+          },
+        },
+        checks: [
+          'The source is a 512x512 txt2img render of an ivy-covered stone cottage.',
+          'The result is the source at 2048x2048, visibly sharper than a plain resize, with the same composition and no added content or artifacts.',
+          'No tile seams are visible. Zoom to 1:1 to check.',
+        ],
+      },
+      {
+        id: 'usdu-fallback', title: 'Upscale fallback: tiled VAE',
+        purpose: 'With `use_ultimate_upscale_script=False`, the diffusion upscale runs through tiled VAE encode/decode. The test runs whether or not the Ultimate SD Upscale node is installed.',
+        asserted: 'Within 8 px of the requested size.',
+        backends: {
+          [COMFY]: {
+            tests: [C + 'test_upscale_fallback_tiled_vae'],
+            images: [{ file: 'comfy_upscale_sd_source.png', label: 'source' }, { file: 'comfy_upscale_fallback_result.png', label: 'result' }],
+            checks: ['`comfy_upscale_fallback_result.png`: the same 2048x2048 upscale of the cottage, coherent, with no tile-boundary artifacts from the VAE fallback.'],
+          },
+        },
+      },
+    ],
+  },
+  {
+    title: 'ControlNet',
+    intro: 'ControlNet can fail silently: the server returns a normal image and ignores the control unit. Each backend\'s suite generates "a photograph of a city street, detailed" with seed 42, once without ControlNet and once with Canny. WebUI file names use the module name the server reports for Canny (usually `canny`), so a server reporting another name saves different files.',
+    sections: [
+      {
+        id: 'cn-preview', title: 'ControlNet preprocessor preview',
+        purpose: 'The preprocessor preview path returns a processed control map, here a Canny edge map of the input.',
+        asserted: 'Not a single flat color.',
+        backends: {
+          [WEBUI]: {
+            tests: [ACN + 'test_controlnet_preprocessor_preview'],
+            images: [{ file: 'controlnet_input.png', label: 'input' }, { file: 'controlnet_preview_canny.png', label: 'preview' }],
+          },
+          [COMFY]: {
+            tests: [CCN + 'test_controlnet_preprocessor_preview'],
+            images: [{ file: 'comfy_controlnet_input.png', label: 'input' }, { file: 'comfy_controlnet_preview_CannyEdgePreprocessor.png', label: 'preview' }],
+          },
+        },
+        checks: [
+          'Both inputs are identical black lines on white: a square outline, a centered circle and both corner-to-corner diagonals.',
+          'Each preview shows thin white edge lines on black tracing the same shapes, with each thick input line doubled. Previews are 512x512, the preprocessors\' default resolution, though the input is 256x256.',
+        ],
+      },
+      {
+        id: 'cn-alters', title: 'ControlNet alters the output',
+        purpose: 'The same seed and prompt, with and without a Canny unit, must produce different images: the silent-failure detector for ControlNet serialization.',
+        asserted: 'Mean difference >= 2/255, which a weak or partly applied unit can pass.',
+        backends: {
+          [WEBUI]: {
+            tests: [ACN + 'test_controlnet_alters_output'],
+            images: [{ file: 'controlnet_input.png', label: 'control input' }, { file: 'controlnet_baseline_no_cn.png', label: 'without ControlNet' },
+                     { file: 'controlnet_with_canny.png', label: 'with Canny' }],
+          },
+          [COMFY]: {
+            tests: [CCN + 'test_controlnet_alters_output'],
+            images: [{ file: 'comfy_controlnet_input.png', label: 'control input' }, { file: 'comfy_controlnet_baseline_no_cn.png', label: 'without ControlNet' },
+                     { file: 'comfy_controlnet_with_CannyEdgePreprocessor.png', label: 'with Canny' }],
+          },
+        },
+        checks: [
+          'The baselines (`*_baseline_no_cn`) show a loose street scene with no visible square or circle structure.',
+          'The "with Canny" images follow the edge map, with the square frame, central circle and diagonals plainly visible, typically as a corridor or room seen head-on.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Async generation handles',
+    intro: 'The `submit_*` methods return a `GenerationHandle`. These tests drive each job type through it, along with queueing and cancellation.',
+    sections: [
+      {
+        id: 'async-txt2img', title: 'submit_txt2img lifecycle',
+        purpose: 'Submit returns before the job finishes; `wait()` drives the handle to a downloadable image.',
+        asserted: 'Status sequence ends FINISHED; WebUI observes ACTIVE.',
+        backends: {
+          [WEBUI]: {
+            settings: '512x512, 20 steps', tests: [AA + 'test_submit_txt2img_lifecycle'],
+            images: [{ file: 'async_txt2img.png', label: 'result' }],
+            checks: ['`async_txt2img.png`: a red apple on a wooden table.'],
+          },
+          [COMFY]: {
+            settings: '256x256, 8 steps', tests: [CA + 'test_submit_txt2img_lifecycle'],
+            images: [{ file: 'comfy_txt2img.png', label: 'sync comfy_txt2img (compare)' }, { file: 'comfy_async_txt2img.png', label: 'result' }],
+            checks: ['`comfy_async_txt2img.png`: identical to `comfy_txt2img.png`, since both use the same prompt, seed, size and steps. A visible difference means the async path builds a different workflow.'],
+          },
+        },
+      },
+      {
+        id: 'async-batch', title: 'Batch has one seed per image',
+        purpose: 'An async batch of two returns two images. WebUI reports consecutive seeds; ComfyUI reports the batch\'s shared seed for both.',
+        asserted: 'Two images; the seeds listed above.',
+        backends: {
+          [WEBUI]: {
+            settings: '256x256, 8 steps', tests: [AA + 'test_batch_result_has_one_seed_per_image'],
+            images: [{ file: 'async_batch_0.png', label: 'image 0' }, { file: 'async_batch_1.png', label: 'image 1' }],
+          },
+          [COMFY]: {
+            settings: '256x256, 8 steps', tests: [CA + 'test_batch_result_has_one_seed_per_image'],
+            images: [{ file: 'comfy_async_batch_0.png', label: 'image 0' }, { file: 'comfy_async_batch_1.png', label: 'image 1' }],
+          },
+        },
+        checks: ['Each image is a full apple-on-table generation, not a combined grid, and the two differ from each other.'],
+      },
+      {
+        id: 'async-img2img', title: 'submit_img2img lifecycle',
+        purpose: 'The img2img submit path round-trips a flat blue source (not saved) through the async handle at 0.75 denoise.',
+        backends: {
+          [WEBUI]: {
+            settings: '512x512, 20 steps', tests: [AA + 'test_submit_img2img_lifecycle'],
+            images: [{ file: 'async_img2img.png', label: 'result' }],
+          },
+          [COMFY]: {
+            settings: '256x256, 8 steps', tests: [CA + 'test_submit_img2img_lifecycle'],
+            images: [{ file: 'comfy_async_img2img.png', label: 'result' }],
+          },
+        },
+        checks: ['Each result has an oil-painting look in blue-dominant colors.'],
+      },
+      {
+        id: 'async-upscale', title: 'submit_upscale lifecycle',
+        purpose: 'A basic upscale of the 128x128 shrunk cottage source runs through the async handle and yields one 512x512 image.',
+        asserted: 'One image within 8 px of 512x512.',
+        backends: {
+          [WEBUI]: {
+            tests: [AA + 'test_submit_upscale_lifecycle'],
+            images: [{ file: 'upscale_source.png', label: 'source (128x128)' }, { file: 'async_upscale.png', label: 'result' }],
+          },
+          [COMFY]: {
+            tests: [CA + 'test_submit_upscale_lifecycle'],
+            images: [{ file: 'comfy_upscale_source.png', label: 'source (128x128)' }, { file: 'comfy_async_upscale.png', label: 'result', missingNote: 'Missing when the server has no upscale model installed.' }],
+          },
+        },
+        checks: ['Each result is a clean upscale of the cottage with the same composition and no added content.'],
+      },
+      {
+        id: 'async-usdu', title: 'submit_upscale with Ultimate SD Upscale',
+        purpose: 'Ultimate SD Upscale through the async handle: 512x512 to 2048x2048, with a tile ControlNet unit when one is installed.',
+        asserted: 'One image within 8 px of 2048x2048.',
+        backends: {
+          [WEBUI]: {
+            tests: [AA + 'test_submit_upscale_with_ultimate_sd_upscale_lifecycle'],
+            images: [{ file: 'upscale_sd_result.png', label: 'sync upscale_sd_result (compare)' }, { file: 'async_upscale_sd.png', label: 'result', missingNote: 'Missing when the server has no Ultimate SD Upscale script.' }],
+            checks: ['`async_upscale_sd.png`: the async-handle counterpart of `upscale_sd_result.png`.'],
+          },
+          [COMFY]: {
+            tests: [CA + 'test_submit_upscale_with_ultimate_sd_upscale_lifecycle'],
+            images: [{ file: 'comfy_upscale_sd_result.png', label: 'sync comfy_upscale_sd_result (compare)' }, { file: 'comfy_async_upscale_sd.png', label: 'result', missingNote: 'Missing when the server has no Ultimate SD Upscale node.' }],
+            checks: ['`comfy_async_upscale_sd.png`: the async-handle counterpart of `comfy_upscale_sd_result.png`.'],
+          },
+        },
+        checks: ['Each result is sharp and free of tile seams at 2048x2048.'],
+      },
+      {
+        id: 'async-preview', title: 'Preprocessor preview lifecycle',
+        purpose: 'A Canny preprocessor preview of the ControlNet test input runs through the async handle and yields one control image.',
+        asserted: 'Not a single flat color.',
+        backends: {
+          [WEBUI]: {
+            tests: [AA + 'test_submit_preprocessor_preview_lifecycle'],
+            images: [{ file: 'async_controlnet_preview_canny.png', label: 'preview' }],
+          },
+          [COMFY]: {
+            tests: [CA + 'test_submit_preprocessor_preview_lifecycle'],
+            images: [{ file: 'comfy_async_controlnet_preview_CannyEdgePreprocessor.png', label: 'preview' }],
+          },
+        },
+        checks: ['Each preview shows thin white Canny edges on black tracing the square, circle and diagonals.'],
+      },
+      {
+        id: 'async-detect-maps', title: 'ControlNet result keeps detect maps out of images',
+        purpose: 'A ControlNet generation returns only its generated image. A detect map the server appends is reported as a control map, not mixed into the images.',
+        asserted: 'Exactly one image and at most one control map.',
+        backends: {
+          [WEBUI]: {
+            settings: '256x256, 8 steps, seed 42', tests: [AA + 'test_controlnet_result_keeps_detect_maps_out_of_images'],
+            images: [{ file: 'async_controlnet_canny.png', label: 'result' },
+                     { file: 'async_controlnet_canny_map_0.png', label: 'control map', optional: true, missingNote: 'Present only when the ControlNet extension appends detect maps (its "do not append detectmap" setting is off).' }],
+            checks: [
+              '`async_controlnet_canny.png` is a generated apple-on-table image shaped by the edge map, not an edge map itself.',
+              'If present, `async_controlnet_canny_map_0.png` is the edge map.',
+            ],
+          },
+        },
+      },
+      {
+        id: 'async-serialize', title: 'Concurrent submits serialize to a single slot',
+        purpose: 'Two submissions never run at once: one is ACTIVE while the other stays PENDING, queued client-side.',
+        asserted: 'Status sequence; both images returned.',
+        backends: {
+          [WEBUI]: {
+            settings: '512x512, 25 steps', tests: [AA + 'test_concurrent_submits_serialize_single_slot'],
+            images: [{ file: 'async_serialize_1.png', label: 'job 1' }, { file: 'async_serialize_2.png', label: 'job 2' }],
+            checks: ['`async_serialize_1.png` is a blue teapot and `async_serialize_2.png` is a green frog. Swapped or identical subjects mean the two queued jobs\' results were mixed up.'],
+          },
+        },
+      },
+      {
+        id: 'async-busy', title: 'Dispatch deferred while the server is busy',
+        purpose: 'A submission is held PENDING while another client\'s job occupies the server, then runs once the server is free.',
+        asserted: 'Status sequence; the image is returned.',
+        backends: {
+          [WEBUI]: {
+            tests: [AA + 'test_dispatch_deferred_while_server_busy'],
+            images: [{ file: 'async_idle_wait.png', label: 'result' }],
+            checks: ['`async_idle_wait.png`: a small red cube. A fantasy landscape here is the other client\'s job, not ours.'],
+          },
+        },
+      },
+      {
+        id: 'async-queue', title: 'Two jobs queue on the server',
+        purpose: 'Two submissions both complete, and the second is observed PENDING behind the first.',
+        asserted: 'Status sequence; both images returned.',
+        backends: {
+          [COMFY]: {
+            settings: '256x256, 25 steps', tests: [CA + 'test_two_jobs_queue_on_server'],
+            images: [{ file: 'comfy_async_queue_1.png', label: 'job 1' }, { file: 'comfy_async_queue_2.png', label: 'job 2' }],
+            checks: ['`comfy_async_queue_1.png` is a blue teapot and `comfy_async_queue_2.png` is a green frog. Swapped or identical subjects mean a handle downloaded another prompt\'s outputs.'],
+          },
+        },
+      },
+      {
+        id: 'async-interrupt', title: 'Interrupting a finished job spares the running job',
+        purpose: '`interrupt(task_id)` for a job that already finished must not stop a different job that is still running.',
+        asserted: 'Status sequence; the running job\'s image is returned.',
+        backends: {
+          [COMFY]: {
+            tests: [CA + 'test_interrupting_a_finished_job_spares_the_running_job'],
+            images: [{ file: 'comfy_async_targeted_interrupt.png', label: 'running job' }],
+            checks: ['`comfy_async_targeted_interrupt.png`: a fully rendered 512x512 fantasy landscape. A half-finished or noisy image means the server ignored the prompt id in `/interrupt` and stopped the wrong job.'],
+          },
+        },
+      },
+      {
+        id: 'async-cancel', title: 'Cancelling a pending job leaves the running job untouched',
+        purpose: 'Cancelling a queued job removes it from the server queue without interrupting the job already running.',
+        asserted: 'Status sequence; the running job\'s image is returned.',
+        backends: {
+          [COMFY]: {
+            tests: [CA + 'test_cancel_pending_job_leaves_running_job_untouched'],
+            images: [{ file: 'comfy_async_running_survived_cancel.png', label: 'running job' }],
+            checks: ['`comfy_async_running_survived_cancel.png`: a fully rendered 512x512 fantasy landscape. A half-finished, noisy or missing image means cancelling the queued job interrupted the running one. A red cube is the cancelled job.'],
+          },
+        },
+      },
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Rendering helpers
+// ---------------------------------------------------------------------------
+
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs || {})) {
+    if (value === undefined || value === null || value === false) continue;
+    if (key === 'class') node.className = value;
+    else if (key.startsWith('on')) node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value === true ? '' : value);
+  }
+  for (const child of children.flat()) {
+    if (child === undefined || child === null || child === false) continue;
+    node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  }
+  return node;
+}
+
+/** Text with `backtick` spans rendered as code, built without innerHTML. */
+function rich(text) {
+  const frag = document.createDocumentFragment();
+  text.split(/(`[^`]+`)/).forEach(part => {
+    if (part.startsWith('`') && part.endsWith('`') && part.length > 1) frag.append(el('code', {}, part.slice(1, -1)));
+    else if (part) frag.append(part);
+  });
+  return frag;
+}
+
+function formatTime(iso) {
+  if (!iso) return 'unknown time';
+  const date = new Date(iso);
+  return isNaN(date) ? iso : date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+const STATUS_LABEL = { passed: 'passed', failed: 'failed', error: 'error', skipped: 'skipped', none: 'no result' };
+const STATUS_RANK = { failed: 4, error: 4, none: 2, skipped: 1, passed: 0 };
+
+function badge(status, text) {
+  return el('span', { class: `badge s-${status}` }, text || STATUS_LABEL[status]);
+}
+
+// ---------------------------------------------------------------------------
+// Results
+// ---------------------------------------------------------------------------
+
+// Set by boot() once results.js has loaded or failed to.
+let RESULTS = null;
+let TESTS = {};
+let IMAGE_TIMES = {};
+
+function statusOf(key) {
+  const entry = TESTS[key];
+  return entry ? entry.outcome : 'none';
+}
+
+function worst(statuses) {
+  return statuses.reduce((acc, s) => (STATUS_RANK[s] > STATUS_RANK[acc] ? s : acc), 'passed');
+}
+
+function testName(key) {
+  return key.split('::')[1] || key;
+}
+
+function renderResult(key, { showModule = false } = {}) {
+  const entry = TESTS[key];
+  const status = statusOf(key);
+  const bad = status === 'failed' || status === 'error';
+  const nameLine = el('div', { class: 'name' }, badge(status),
+    el('code', {}, showModule ? key : testName(key)),
+    entry && el('span', { class: 'when' }, `${formatTime(entry.time)} · ${entry.duration}s`));
+  const box = el('div', { class: 'result' + (bad ? ' bad' : '') }, nameLine);
+  if (!RESULTS) {
+    box.append(el('div', { class: 'when' }, 'No results file loaded.'));
+  } else if (!entry) {
+    box.append(el('div', { class: 'when' }, 'No recorded result. This test has not run since results recording ' +
+      'started, or was deselected.'));
+  } else if (entry.details) {
+    const summary = bad ? 'Failure details' : 'Skip reason';
+    if (status === 'skipped') box.append(el('div', { class: 'note-skip' }, entry.details));
+    else box.append(el('details', { open: bad }, el('summary', {}, summary), el('pre', {}, entry.details)));
+  }
+  if (entry && entry.skipped_later) {
+    box.append(el('div', { class: 'note-skip' },
+      `Skipped in a later run (${formatTime(entry.skipped_later.time)}): ${entry.skipped_later.reason}. ` +
+      'This is the most recent result where the test ran.'));
+  }
+  return box;
+}
+
+// ---------------------------------------------------------------------------
+// Images
+// ---------------------------------------------------------------------------
+
+const zoomables = [];
+
+function imageUrl(file) {
+  const stamp = IMAGE_TIMES[file];
+  return OUTPUT_DIR + encodeURIComponent(file) + (stamp ? '?v=' + encodeURIComponent(stamp) : '');
+}
+
+function isStale(file, testKeys) {
+  const saved = Date.parse(IMAGE_TIMES[file]);
+  if (isNaN(saved)) return false;
+  const runs = testKeys.map(k => TESTS[k] && Date.parse(TESTS[k].time)).filter(t => t && !isNaN(t));
+  // A test's time is taken when its setup finishes, before it saves anything; allow for clock rounding.
+  return runs.length > 0 && saved < Math.min(...runs) - 2000;
+}
+
+function renderShot(image, testKeys) {
+  const caption = el('figcaption', {}, el('span', { class: 'dims' }), el('b', {}, image.label), el('br'), image.file);
+  if (isStale(image.file, testKeys)) {
+    caption.append(el('span', { class: 'stale' }, `Older than this test's latest run: saved ${formatTime(IMAGE_TIMES[image.file])}.`));
+  }
+  const img = el('img', { alt: `${image.label}: ${image.file}`, loading: 'lazy' });
+  const frame = el('div', { class: 'frame', tabindex: '0', role: 'button', 'aria-label': `Zoom ${image.file}` }, img);
+  const fig = el('figure', { class: 'shot' }, frame, caption);
+  const entry = { file: image.file, label: image.label, src: imageUrl(image.file), fig };
+  img.addEventListener('load', () => {
+    caption.querySelector('.dims').textContent = `${img.naturalWidth}x${img.naturalHeight}`;
+    entry.loaded = true;
+  });
+  img.addEventListener('error', () => {
+    fig.classList.add('missing');
+    frame.removeAttribute('tabindex');
+    frame.removeAttribute('role');
+    const failing = testKeys.map(statusOf).find(s => s !== 'passed');
+    const why = image.missingNote || (failing === 'none' ? 'Its test has no recorded result.'
+      : failing ? `Its test ${failing === 'skipped' ? 'was skipped' : 'did not pass'}.`
+      : 'Its test passed, so the file may have been deleted or renamed.');
+    frame.replaceChildren(el('div', {}, el('strong', {}, image.optional ? 'Not saved (optional)' : 'Image not found'), why));
+  });
+  const open = () => { if (!fig.classList.contains('missing')) openZoom(zoomables.indexOf(entry)); };
+  frame.addEventListener('click', open);
+  frame.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  img.src = entry.src;
+  zoomables.push(entry);
+  return fig;
+}
+
+// ---------------------------------------------------------------------------
+// Checklists: checkbox state is kept per results update, so a new run starts unticked.
+// ---------------------------------------------------------------------------
+
+let CHECK_STORE = '';
+let checkState = {};
+
+function loadChecks() {
+  CHECK_STORE = 'sd-review-checks:' + (RESULTS ? RESULTS.updated : 'none');
+  try { checkState = JSON.parse(localStorage.getItem(CHECK_STORE) || '{}'); } catch (e) { checkState = {}; }
+}
+
+function saveChecks() {
+  try { localStorage.setItem(CHECK_STORE, JSON.stringify(checkState)); } catch (e) { /* storage unavailable */ }
+}
+
+function renderChecks(id, title, items) {
+  if (!items || !items.length) return null;
+  return el('div', { class: 'checks' }, el('h5', {}, title), el('ul', {}, items.map((text, i) => {
+    const boxId = `${id}-${i}`;
+    const input = el('input', { type: 'checkbox', id: boxId });
+    input.checked = !!checkState[boxId];
+    input.addEventListener('change', () => { checkState[boxId] = input.checked; saveChecks(); });
+    return el('li', {}, input, el('label', { for: boxId }, rich(text)));
+  })));
+}
+
+function wireStaticChecks() {
+  document.querySelectorAll('[data-checks="global"] input').forEach(input => {
+    input.checked = !!checkState[input.id];
+    input.addEventListener('change', () => { checkState[input.id] = input.checked; saveChecks(); });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+
+const referenced = new Set();
+
+function renderSection(section) {
+  const backendEntries = Object.entries(section.backends);
+  const keys = backendEntries.flatMap(([, b]) => b.tests);
+  keys.forEach(k => referenced.add(k));
+  const status = worst(keys.map(statusOf));
+  section.status = status;
+
+  const head = el('div', { class: 'test-head' },
+    el('h3', {}, el('a', { class: 'anchor', href: '#' + section.id }, '#'), section.title,
+      backendEntries.map(([name, b]) => badge(worst(b.tests.map(statusOf)), `${name}: ${STATUS_LABEL[worst(b.tests.map(statusOf))]}`))),
+    el('p', { class: 'purpose' }, rich(section.purpose)));
+
+  const backends = el('div', { class: 'backends' }, backendEntries.map(([name, b]) => el('div', { class: 'backend' },
+    el('h4', {}, name, b.settings && el('span', { class: 'settings' }, b.settings)),
+    b.tests.map(k => renderResult(k)),
+    el('div', { class: 'shots' }, b.images.map(img => renderShot(img, b.tests))),
+    renderChecks(`${section.id}-${name}`, 'Check', b.checks))));
+
+  return el('section', { class: `test st-${status}`, id: section.id }, head, backends,
+    renderChecks(section.id, backendEntries.length > 1 ? 'Check on both backends' : 'Check', section.checks),
+    section.asserted && el('p', { class: 'asserted' }, el('b', {}, 'Asserted automatically: '), rich(section.asserted)));
+}
+
+function renderPage() {
+  const main = document.getElementById('sections');
+  const toc = document.getElementById('toc');
+  for (const group of GROUPS) {
+    const groupId = 'group-' + group.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    main.append(el('h2', { class: 'group-title', id: groupId }, group.title));
+    if (group.intro) main.append(el('p', { class: 'group-intro' }, rich(group.intro)));
+    const links = [];
+    for (const section of group.sections) {
+      main.append(renderSection(section));
+      links.push(el('a', { href: '#' + section.id }, el('span', { class: `dot s-${section.status}`, style: 'background:currentColor' }), section.title));
+    }
+    toc.append(el('div', { class: 'group' }, el('b', {}, group.title), links));
+  }
+  toc.append(el('div', { class: 'group' }, el('b', {}, 'Other'), el('a', { href: '#other-tests' }, 'Other integration tests')));
+
+  renderOthers();
+  renderSummary();
+  wireStaticChecks();
+}
+
+function renderOthers() {
+  const host = document.getElementById('others');
+  const keys = Object.keys(TESTS).filter(k => !referenced.has(k)).sort();
+  if (!RESULTS) {
+    host.append(el('p', {}, 'No results file loaded, so there is nothing to list here.'));
+    return;
+  }
+  if (!keys.length) {
+    host.append(el('p', {}, 'No other integration tests have recorded results.'));
+    return;
+  }
+  const rows = keys.map(k => el('tr', {}, el('td', { class: 'mod' }, k.split('::')[0]), el('td', {}, renderResult(k))));
+  host.append(el('div', { class: 'table-scroll' }, el('table', { class: 'others' },
+    el('thead', {}, el('tr', {}, el('th', {}, 'Module'), el('th', {}, 'Test'))), el('tbody', {}, rows))));
+}
+
+function renderSummary() {
+  const banners = document.getElementById('banners');
+  const runinfo = document.getElementById('runinfo');
+  const chips = document.getElementById('chips');
+  runinfo.append(el('span', {}, 'Reading ', el('code', {}, OUTPUT_DIR)));
+
+  if (!RESULTS) {
+    banners.append(el('div', { class: 'banner warn' }, el('h2', {}, 'No test results found'),
+      el('p', {}, rich(`Could not load \`${OUTPUT_DIR}results.js\`. Pytest writes it at the end of any run that ` +
+        'includes integration tests: run `pytest tests/ --run-generation` and reload. Images are still shown below ' +
+        'where they exist, without pass/fail status.')),
+      el('p', {}, rich('If the tests wrote to another directory through `SD_TEST_OUTPUT_DIR`, open this page with ' +
+        '`?output=<that directory>/` added to the URL.'))));
+  } else {
+    runinfo.append(
+      el('span', {}, 'Results updated ', el('b', {}, formatTime(RESULTS.updated))),
+      el('span', {}, 'Generation tests in the latest run: ', el('b', {}, RESULTS.generation_enabled ? 'enabled' : 'disabled')));
+    if (!RESULTS.generation_enabled) {
+      banners.append(el('div', { class: 'banner warn' }, el('h2', {}, 'The latest run skipped the generation tests'),
+        el('p', {}, rich('Results shown for generation tests come from earlier runs where they ran, and are marked ' +
+          'as skipped later. Run `pytest tests/ --run-generation` for fresh images.'))));
+    }
+  }
+
+  const all = Object.keys(TESTS);
+  const keys = [...new Set([...referenced, ...all])];
+  const counts = { passed: 0, failed: 0, skipped: 0, none: 0 };
+  keys.forEach(k => {
+    const s = statusOf(k);
+    counts[s === 'error' ? 'failed' : s] += 1;
+  });
+  const chip = (status, text) => badge(counts[status] ? status : 'none', `${counts[status]} ${text}`);
+  chips.append(chip('passed', 'passed'), chip('failed', 'failed'), chip('skipped', 'skipped'), chip('none', 'with no result'));
+
+  const failing = keys.filter(k => ['failed', 'error'].includes(statusOf(k))).sort();
+  if (failing.length) {
+    const sectionOf = {};
+    GROUPS.forEach(g => g.sections.forEach(s => Object.values(s.backends).forEach(b => b.tests.forEach(k => { sectionOf[k] = s; }))));
+    banners.append(el('div', { class: 'banner bad' }, el('h2', {}, `${failing.length} failing test${failing.length > 1 ? 's' : ''}`),
+      el('ul', {}, failing.map(k => el('li', {},
+        el('a', { href: '#' + (sectionOf[k] ? sectionOf[k].id : 'other-tests') }, el('code', {}, k)),
+        ` (${statusOf(k)})`)))));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Zoom overlay
+// ---------------------------------------------------------------------------
+
+const zoom = {
+  root: document.getElementById('zoom'), stage: document.getElementById('zoom-stage'), img: document.getElementById('zoom-img'),
+  index: -1, level: 'fit', smooth: false, lastFocus: null,
+};
+
+function visibleZoomables() {
+  return zoomables.filter(z => !z.fig.classList.contains('missing'));
+}
+
+function openZoom(index) {
+  if (index < 0) return;
+  zoom.lastFocus = document.activeElement;
+  zoom.root.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  showZoom(index, 'fit');
+  document.getElementById('zoom-close').focus();
+}
+
+function closeZoom() {
+  zoom.root.classList.remove('open');
+  document.body.style.overflow = '';
+  if (zoom.lastFocus) zoom.lastFocus.focus();
+}
+
+function showZoom(index, level) {
+  const entry = zoomables[index];
+  zoom.index = index;
+  document.getElementById('zoom-title').textContent = `${entry.label}: ${entry.file}`;
+  document.getElementById('zoom-meta').textContent = '';
+  zoom.img.onload = () => { applyZoom(level); };
+  zoom.img.src = entry.src;
+  if (zoom.img.complete && zoom.img.naturalWidth) applyZoom(level);
+}
+
+function fitScale() {
+  const img = zoom.img;
+  return Math.min((zoom.stage.clientWidth - 32) / img.naturalWidth, (zoom.stage.clientHeight - 32) / img.naturalHeight);
+}
+
+function applyZoom(level, focus) {
+  const img = zoom.img;
+  const nw = img.naturalWidth, nh = img.naturalHeight;
+  if (!nw) return;
+  const before = img.getBoundingClientRect();
+  const fit = fitScale();
+  const scale = level === 'fit' ? fit : Number(level);
+  zoom.level = level;
+  img.style.width = Math.round(nw * scale) + 'px';
+  img.style.height = Math.round(nh * scale) + 'px';
+  img.classList.toggle('zoomed', level !== 'fit');
+  img.classList.toggle('pixelated', !zoom.smooth && scale > 1);
+  document.getElementById('zoom-meta').textContent = `${nw}x${nh} · ${Math.round(scale * 100)}%`;
+  document.querySelectorAll('#zoom [data-zoom]').forEach(b => b.classList.toggle('on', b.dataset.zoom === String(level)));
+  document.getElementById('zoom-smooth').classList.toggle('on', zoom.smooth);
+  if (focus) {
+    // Keep the clicked point under the pointer.
+    const fx = (focus.x - before.left) / before.width, fy = (focus.y - before.top) / before.height;
+    const after = img.getBoundingClientRect();
+    zoom.stage.scrollLeft += (after.left + fx * after.width) - focus.x;
+    zoom.stage.scrollTop += (after.top + fy * after.height) - focus.y;
+  }
+}
+
+function stepZoom(delta) {
+  const visible = visibleZoomables();
+  if (!visible.length) return;
+  const pos = visible.indexOf(zoomables[zoom.index]);
+  const next = visible[(pos + delta + visible.length) % visible.length];
+  showZoom(zoomables.indexOf(next), zoom.level);
+}
+
+zoom.img.addEventListener('click', e => {
+  e.stopPropagation();
+  // Zoom in to the first fixed level larger than the fit scale, so small images don't shrink.
+  const closer = ['1', '2', '4'].find(level => Number(level) > fitScale() * 1.05) || '8';
+  applyZoom(zoom.level === 'fit' ? closer : 'fit', { x: e.clientX, y: e.clientY });
+});
+zoom.stage.addEventListener('click', e => { if (e.target === zoom.stage) closeZoom(); });
+document.querySelectorAll('#zoom [data-zoom]').forEach(b => b.addEventListener('click', () => applyZoom(b.dataset.zoom)));
+document.getElementById('zoom-smooth').addEventListener('click', () => { zoom.smooth = !zoom.smooth; applyZoom(zoom.level); });
+document.getElementById('zoom-prev').addEventListener('click', () => stepZoom(-1));
+document.getElementById('zoom-next').addEventListener('click', () => stepZoom(1));
+document.getElementById('zoom-close').addEventListener('click', closeZoom);
+window.addEventListener('resize', () => { if (zoom.root.classList.contains('open') && zoom.level === 'fit') applyZoom('fit'); });
+document.addEventListener('keydown', e => {
+  if (!zoom.root.classList.contains('open')) return;
+  const actions = {
+    Escape: closeZoom, ArrowLeft: () => stepZoom(-1), ArrowRight: () => stepZoom(1),
+    f: () => applyZoom('fit'), 1: () => applyZoom('1'), 2: () => applyZoom('2'), 4: () => applyZoom('4'),
+    s: () => { zoom.smooth = !zoom.smooth; applyZoom(zoom.level); },
+  };
+  const action = actions[e.key];
+  if (action) { e.preventDefault(); action(); }
+});
+
+function boot() {
+  const loaded = window.SD_TEST_RESULTS;
+  if (loaded && typeof loaded === 'object' && loaded.tests) {
+    RESULTS = loaded;
+    TESTS = loaded.tests;
+    IMAGE_TIMES = loaded.images || {};
+  }
+  loadChecks();
+  renderPage();
+}
+
+// results.js is loaded here, not by a static tag, so ?output= can move it and the timestamp defeats caching.
+const resultsScript = document.createElement('script');
+resultsScript.src = OUTPUT_DIR + 'results.js?t=' + Date.now();
+resultsScript.onload = boot;
+resultsScript.onerror = boot;
+document.head.append(resultsScript);
+</script>
+</body>
+</html>
