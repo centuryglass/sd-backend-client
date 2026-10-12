@@ -1,8 +1,8 @@
 """Small shared helpers for the integration tests."""
 import os
-from typing import Optional
+from typing import Iterable, Optional
 
-from PIL import Image, ImageChops, ImageDraw
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageStat
 
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
 from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import (ControlNetPreprocessor,
@@ -19,6 +19,78 @@ UPSCALE_SOURCE_PROMPT = ('a weathered stone cottage covered in ivy beside a flow
 UPSCALE_SOURCE_SIZE = 512
 BASIC_UPSCALE_SOURCE_SIZE = 128
 """The basic upscale tests shrink the generated source to this size, then upscale it back to `UPSCALE_SOURCE_SIZE`."""
+SD_UPSCALE_SIZE = 2048
+"""Target size for the diffusion upscale tests: 4x the source, so the tiled pass spans many 512px tiles."""
+SD_UPSCALE_STEPS = 20
+SD_UPSCALE_DENOISE = 0.35
+"""Diffusion upscale step count and denoising strength, in the range real Ultimate SD Upscale runs use. The WebUI
+   runs about `steps * denoise` sampling steps per tile unless its `img2img_fix_steps` option is set."""
+MIN_UPSCALE_DETAIL_RATIO = 0.35
+"""`upscale_detail_ratio` floor for diffusion upscales. A blurred result scores below 0.1; a usable one above 0.45."""
+
+PREFERRED_CHECKPOINTS = ('deliberate_v3', 'cyberrealistic', 'dreamshaper', 'v1-5', 'sd15', 'sd-v1')
+"""Checkpoint name fragments `pick_test_checkpoint` prefers, in order. All are SD1.5 models."""
+
+_PREFERRED_UPSCALERS = ('ultrasharp', 'remacri', 'r-esrgan 4x+', 'esrgan_4x', 'dat x4', 'superscale')
+_RESAMPLER_UPSCALERS = ('none', 'lanczos', 'nearest')
+
+
+def pick_test_checkpoint(names: Iterable[str]) -> Optional[str]:
+    """The checkpoint generation tests use: the first `PREFERRED_CHECKPOINTS` match that isn't an inpainting model.
+
+    Falls back to the first non-inpainting checkpoint, then to the first checkpoint, or None if `names` is empty.
+    Inpainting checkpoints expect extra mask channels, so they distort img2img and upscale results.
+    """
+    names = list(names)
+    usable = [name for name in names if 'inpaint' not in name.lower()]
+    for hint in PREFERRED_CHECKPOINTS:
+        match = next((name for name in usable if hint in name.lower()), None)
+        if match:
+            return match
+    if usable:
+        return usable[0]
+    return names[0] if names else None
+
+
+def pick_upscaler_model(names: Iterable[str]) -> Optional[str]:
+    """A model-based 4x upscaler from `names` (ESRGAN family, DAT, ...), or None if there are only resamplers."""
+    models = [name for name in names if name.lower() not in _RESAMPLER_UPSCALERS]
+    for hint in _PREFERRED_UPSCALERS:
+        match = next((name for name in models if hint in name.lower()), None)
+        if match:
+            return match
+    return models[0] if models else None
+
+
+def _edge_energy(image: Image.Image, size: tuple[int, int]) -> float:
+    return ImageStat.Stat(image.convert('L').resize(size, Image.Resampling.LANCZOS)
+                          .filter(ImageFilter.FIND_EDGES)).mean[0]
+
+
+def upscale_detail_ratio(source: Image.Image, result: Image.Image) -> float:
+    """Edge energy of `result` scaled down to `source`'s size, relative to `source`'s own.
+
+    Scaling down first averages away fine noise and dithering, so a blurred upscale scores low even when its full-size
+    pixels are noisy.
+    """
+    return _edge_energy(result, source.size) / _edge_energy(source, source.size)
+
+
+def assert_valid_image(image: Image.Image, expected_size: int) -> None:
+    """Fail unless `image` is an RGBA PIL image within 8 px of `expected_size` on each side.
+
+    Results are normalized to RGBA, and servers may round dimensions to a multiple of 8.
+    """
+    assert isinstance(image, Image.Image)
+    assert image.mode == 'RGBA'
+    assert abs(image.width - expected_size) <= 8
+    assert abs(image.height - expected_size) <= 8
+
+
+def assert_upscale_kept_detail(source: Image.Image, result: Image.Image) -> None:
+    """Fail if a diffusion upscale's `upscale_detail_ratio` is below `MIN_UPSCALE_DETAIL_RATIO`."""
+    ratio = upscale_detail_ratio(source, result)
+    assert ratio >= MIN_UPSCALE_DETAIL_RATIO, f'the upscale lost most of the source detail (ratio {ratio:.2f})'
 
 
 def make_test_image(width: int = TEST_SIZE, height: int = TEST_SIZE,

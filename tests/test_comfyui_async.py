@@ -25,14 +25,14 @@ from sd_backend_client.api.comfyui.comfyui_generation_handle import ComfyGenerat
 from sd_backend_client.api.shared_data.generation_handle import GenerationError, GenerationStatus
 
 from sd_backend_client.api.comfyui_webservice import ComfyModelType
-from sd_backend_client.api.shared_data.api_datatypes import DiffusionUpscalingParams
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
 from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import PreprocessorParams
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 
-from .comfy_helpers import build_comfy_params, find_canny_preprocessor, find_tile_model, find_tile_preprocessor
-from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, make_edge_image,
-                      save_output, shrink)
+from .comfy_helpers import (build_comfy_params, comfy_sd_upscale_params, find_canny_preprocessor, find_tile_model,
+                            find_tile_preprocessor)
+from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, SD_UPSCALE_SIZE, UPSCALE_SOURCE_SIZE, assert_upscale_kept_detail,
+                      assert_valid_image, make_edge_image, save_output, shrink)
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
@@ -45,13 +45,6 @@ def _params(comfy_checkpoint, *, prompt='a red apple on a wooden table', steps=8
     params.height = size
     params.seed = seed
     return params
-
-
-def _assert_valid_image(image, expected_size):
-    assert isinstance(image, Image.Image)
-    assert image.mode == 'RGBA'
-    assert abs(image.width - expected_size) <= 8
-    assert abs(image.height - expected_size) <= 8
 
 
 def _wait_until(predicate, timeout, interval=0.05, message='condition'):
@@ -107,7 +100,7 @@ def test_submit_txt2img_lifecycle(comfy_service, comfy_checkpoint, output_dir):
     result = handle.wait(timeout=180, poll_interval=0.2, on_progress=lambda p: seen.append(p.status))
 
     assert len(result.images) >= 1
-    _assert_valid_image(result.images[0], expected_size=256)
+    assert_valid_image(result.images[0], expected_size=256)
     save_output(output_dir, 'comfy_async_txt2img', result.images[0])
     assert result.task_id == handle.task_id
     assert seen[-1] is GenerationStatus.FINISHED
@@ -122,7 +115,7 @@ def test_batch_result_has_one_seed_per_image(comfy_service, comfy_checkpoint, ou
     assert result.seeds == [500, 500] and result.seed == 500
     assert not result.control_maps
     for i, image in enumerate(result.images):
-        _assert_valid_image(image, expected_size=256)
+        assert_valid_image(image, expected_size=256)
         save_output(output_dir, f'comfy_async_batch_{i}', image)
 
 
@@ -134,7 +127,7 @@ def test_submit_img2img_lifecycle(comfy_service, comfy_checkpoint, output_dir):
     handle = comfy_service.submit_img2img(params)
     result = handle.wait(timeout=180)
     assert len(result.images) >= 1
-    _assert_valid_image(result.images[0], expected_size=256)
+    assert_valid_image(result.images[0], expected_size=256)
     save_output(output_dir, 'comfy_async_img2img', result.images[0])
 
 
@@ -145,13 +138,13 @@ def test_submit_upscale_lifecycle(comfy_service, comfy_upscale_source, output_di
     source = shrink(comfy_upscale_source, BASIC_UPSCALE_SOURCE_SIZE)
     result = comfy_service.submit_upscale(source, UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_SIZE).wait(timeout=180)
     assert len(result.images) == 1
-    _assert_valid_image(result.images[0], expected_size=UPSCALE_SOURCE_SIZE)
+    assert_valid_image(result.images[0], expected_size=UPSCALE_SOURCE_SIZE)
     save_output(output_dir, 'comfy_async_upscale', result.images[0])
 
 
 def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(comfy_service, comfy_checkpoint, comfy_upscale_source,
                                                            output_dir):
-    """Ultimate SD Upscale through the async handle: 512x512 -> 2048x2048 with an optional tile ControlNet unit."""
+    """Ultimate SD Upscale through the async handle: a 4x model upscale refined by a tiled diffusion pass."""
     if not comfy_service.get_capabilities().ultimate_upscale:
         pytest.skip('Ultimate SD Upscale is not available on this ComfyUI server.')
 
@@ -162,16 +155,14 @@ def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(comfy_service, comfy_
         tile_controlnet = ControlNetUnit(model=ControlNetModel(tile_model),
                                          preprocessor=PreprocessorParams(typedef=tile_preprocessor))
 
-    upscale_params = DiffusionUpscalingParams(use_stable_diffusion_upscaling=True,
-                                              use_ultimate_upscale_script=True,
-                                              diffusion_params=_params(comfy_checkpoint, prompt=UPSCALE_SOURCE_PROMPT),
-                                              step_count=8,
-                                              tile_controlnet=tile_controlnet)
+    upscale_params = comfy_sd_upscale_params(comfy_service, comfy_checkpoint, use_ultimate_upscale_script=True,
+                                             tile_controlnet=tile_controlnet)
     source = comfy_upscale_source
-    result = comfy_service.submit_upscale(source, 2048, 2048, upscale_params).wait(timeout=300)
+    result = comfy_service.submit_upscale(source, SD_UPSCALE_SIZE, SD_UPSCALE_SIZE, upscale_params).wait(timeout=600)
     assert len(result.images) == 1
-    _assert_valid_image(result.images[0], expected_size=2048)
+    assert_valid_image(result.images[0], expected_size=SD_UPSCALE_SIZE)
     save_output(output_dir, 'comfy_async_upscale_sd', result.images[0])
+    assert_upscale_kept_detail(source, result.images[0])
 
 
 @pytest.mark.controlnet

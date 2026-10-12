@@ -37,7 +37,9 @@ class DiffusionUpscalingParams(BaseModel):
     use_ultimate_upscale_script: bool = True
     """
     Whether to use the "Ultimate SD Upscale" script/node when use_stable_diffusion_upscaling=True. When False (or when
-    the script/node is unavailable), backends fall back to a plain tiled img2img upscale.
+    the script/node is unavailable), backends fall back to resizing the image and refining it with one img2img pass
+    at the full target size. That pass is not tiled, so it needs the VRAM for the whole image, and higher
+    `denoising_strength` values can make the model repeat content across the larger canvas.
     """
 
     diffusion_params: DiffusionParams = Field(default_factory=DiffusionParams)

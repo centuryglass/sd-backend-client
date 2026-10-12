@@ -99,21 +99,24 @@ def test_latent_workflow_without_ultimate_applies_upscale_model_then_resizes():
     assert source_class(workflow, apply_model['inputs']['upscale_model']) == 'UpscaleModelLoader'
     encode = single_node(workflow, 'VAEEncodeTiled')
     assert source_class(workflow, encode['inputs']['pixels']) == 'ImageScale'
-    latent_scale = single_node(workflow, 'LatentUpscale')
-    assert (latent_scale['inputs']['width'], latent_scale['inputs']['height']) == (1536, 1024)
+    assert source_class(workflow, single_node(workflow, 'KSampler')['inputs']['latent_image']) == 'VAEEncodeTiled'
+    assert not nodes_of_type(workflow, 'LatentUpscale')
 
 
-def test_latent_workflow_without_ultimate_or_model_scales_latent_only():
-    """With no upscale model, only latent scaling sets the size."""
+def test_latent_workflow_without_ultimate_or_model_resizes_pixels_before_encode():
+    """With no upscale model, the image is resized in pixel space; a latent resize decodes to a blurred image."""
     workflow = build_latent_workflow(False, None)
 
-    assert not nodes_of_type(workflow, 'ImageScale')
     assert not nodes_of_type(workflow, 'ImageUpscaleWithModel')
     assert not nodes_of_type(workflow, 'UpscaleModelLoader')
+    assert not nodes_of_type(workflow, 'LatentUpscale')
+    resize = single_node(workflow, 'ImageScale')
+    assert (resize['inputs']['width'], resize['inputs']['height']) == (1536, 1024)
+    assert resize['inputs']['upscale_method'] == 'lanczos'
+    assert source_class(workflow, resize['inputs']['image']) == 'LoadImage'
     encode = single_node(workflow, 'VAEEncodeTiled')
-    assert source_class(workflow, encode['inputs']['pixels']) == 'LoadImage'
-    latent_scale = single_node(workflow, 'LatentUpscale')
-    assert (latent_scale['inputs']['width'], latent_scale['inputs']['height']) == (1536, 1024)
+    assert source_class(workflow, encode['inputs']['pixels']) == 'ImageScale'
+    assert source_class(workflow, single_node(workflow, 'KSampler')['inputs']['latent_image']) == 'VAEEncodeTiled'
 
 
 def test_ultimate_workflow_with_model_wires_model_and_uses_multiplier():
