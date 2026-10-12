@@ -7,6 +7,7 @@
 
 * composite ComfyUI inpainting results onto the source image ([#119](https://github.com/centuryglass/sd-backend-client/issues/119))
 * apply mask_blur on ComfyUI and return the blurred mask ([#113](https://github.com/centuryglass/sd-backend-client/issues/113))
+* add ParameterDef.display_name, keep description for tooltips ([#114](https://github.com/centuryglass/sd-backend-client/issues/114)) ([94155bd](https://github.com/centuryglass/sd-backend-client/commit/94155bd0b3c3db6646146504a09189494608b8b0)), closes [#109](https://github.com/centuryglass/sd-backend-client/issues/109)
 
 ### Features
 
