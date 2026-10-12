@@ -65,10 +65,7 @@
   "tests/conftest.py": {
     "inconsistent-return-statements": 1,
     "missing-function-docstring": 3,
-    "redefined-outer-name": 7
-  },
-  "tests/helpers.py": {
-    "trailing-newlines": 1
+    "redefined-outer-name": 10
   },
   "tests/test_a1111_async.py": {
     "missing-function-docstring": 1

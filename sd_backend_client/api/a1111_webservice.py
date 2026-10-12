@@ -36,8 +36,10 @@ from sd_backend_client.api.webui.response_formats import GenerationInfoData, Pro
     InterrogateResponse, PromptStyleData, SamplerInfo, UpscalerInfo, ModelInfo, VaeInfo, LoraInfo
 from sd_backend_client.api.webui.script_info_types import ScriptResponseData, ScriptInfo
 from sd_backend_client.errors import AuthError, SDBackendError, ServerError, UnexpectedResponseError
+from sd_backend_client.util.api_defaults import INPAINT_FULL_RES_PADDING_DEFAULT
 from sd_backend_client.util.visual.image_utils import (image_to_base64, image_from_base64, image_from_bytes,
-                                                    mask_to_grayscale)
+                                                    mask_to_grayscale, blur_mask)
+from sd_backend_client.util.visual.inpaint_crop import PasteBack, compute_crop_region
 
 if TYPE_CHECKING:
     from sd_backend_client.api.webui.webui_generation_handle import WebUIDispatcher, WebUIGenerationHandle
@@ -58,6 +60,27 @@ MAX_LOGIN_ATTEMPTS = 3
 SETTINGS_UPDATE_TIMEOUT = 90
 # The " [hash]" suffix WebUI appends to a checkpoint's relative file name to form its title, once it has hashed it.
 CHECKPOINT_TITLE_HASH_PATTERN = r' \[[0-9a-fA-F]+\]$'
+
+
+def _crop_for_client_inpainting(body: DiffusionRequestBody) -> Optional[PasteBack]:
+    """Replace `body`'s image and mask with their crop when `inpaint_crop_points` changes the crop the server would use.
+
+    The server flag is turned off, since the crop is already made. Returns what the results need to be pasted back
+    into the source, or None and `body` unchanged when the server can crop alone or the mask is empty.
+    """
+    if not body.inpaint_full_res or not body.inpaint_crop_points or not body.init_images or body.mask is None:
+        return None
+    source = body.init_images[0]
+    blurred_mask = blur_mask(body.mask, *body.mask_blur_extents())
+    padding = body.inpaint_full_res_padding
+    region = compute_crop_region(blurred_mask, INPAINT_FULL_RES_PADDING_DEFAULT if padding is None else padding,
+                                 (body.width, body.height), body.inpaint_crop_points)
+    if region is None:
+        return None
+    body.init_images = [source.crop(region)] + body.init_images[1:]
+    body.mask = mask_to_grayscale(body.mask).crop(region)  # The server blurs the crop's mask itself.
+    body.inpaint_full_res = False
+    return PasteBack(source, Image.new('L', source.size, 255), region)
 
 
 class A1111Webservice(WebService, Backend):
@@ -146,15 +169,17 @@ class A1111Webservice(WebService, Backend):
             self._dispatcher = WebUIDispatcher(self)
         return self._dispatcher
 
-    def _submit(self, endpoint: str, task_type: str, snapshot: DiffusionRequestBody) -> 'WebUIGenerationHandle':
+    def _submit(self, endpoint: str, task_type: str, snapshot: DiffusionRequestBody,
+                paste_back: Optional[PasteBack] = None) -> 'WebUIGenerationHandle':
         """Enqueue a POST of `snapshot` to `endpoint` on the client-side dispatcher, returning its handle.
 
         `snapshot` must be a copy the caller no longer changes. Its `force_task_id` is set to a new task id unless it
-        already has one.
+        already has one. `paste_back` is applied to each result image.
         """
         task_id = snapshot.force_task_id or self._new_task_id(task_type)
         snapshot.force_task_id = task_id
-        return self._generation_dispatcher.submit(lambda: self._post_generation(endpoint, snapshot), task_id)
+        return self._generation_dispatcher.submit(lambda: self._post_generation(endpoint, snapshot), task_id,
+                                                  paste_back=paste_back)
 
     def _submit_call(self, run: Callable[[], ImageResponse], task_type: str,
                      interruptible: bool) -> 'WebUIGenerationHandle':
@@ -194,11 +219,14 @@ class A1111Webservice(WebService, Backend):
         """Enqueue an inpainting job and return a handle immediately, implementing `Backend.submit_inpaint`.
 
         WebUI inpaints through its img2img endpoint. See `submit_txt2img` for the dispatch, cancel and copy semantics.
+        With `inpaint_full_res`, the server crops around the mask. When `inpaint_crop_points` is also set, the client
+        crops instead, sends the crop with the server flag off, and pastes each result back into the source.
         """
         require_init_image(diffusion_params, 'inpainting')
         require_mask(diffusion_params, 'inpainting')
-        return self._submit(A1111Webservice.Endpoints.IMG2IMG, 'img2img',
-                            DiffusionRequestBody.from_params(diffusion_params))
+        body = DiffusionRequestBody.from_params(diffusion_params)
+        paste_back = _crop_for_client_inpainting(body)
+        return self._submit(A1111Webservice.Endpoints.IMG2IMG, 'img2img', body, paste_back)
 
     def submit_upscale(self, image: Image.Image, width: int, height: int,
                        upscale_params: Optional[DiffusionUpscalingParams] = None) -> 'WebUIGenerationHandle':

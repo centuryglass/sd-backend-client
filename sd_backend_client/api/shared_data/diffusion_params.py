@@ -10,6 +10,7 @@ from PIL import Image
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
+from sd_backend_client.util.api_defaults import MASK_BLUR_DEFAULT
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +136,42 @@ class DiffusionParams(BaseModel):
     When only one of `mask_blur_x` and `mask_blur_y` is set, the other axis uses `MASK_BLUR_DEFAULT`.
     """
 
+    inpaint_full_res: Optional[bool] = None
+    """Whether inpainting regenerates only the masked region, at the full output size, instead of the whole image.
+
+    The source is cropped around the mask (see `inpaint_full_res_padding` and `inpaint_crop_points`), the crop is
+    resized to `width` x `height` and generated, and the result is pasted back into the full image, so small masked
+    areas keep their detail. The WebUI does this server-side. On ComfyUI the client does it, in the order WebUI
+    uses: blur the mask, find the crop, expand it to the output's aspect ratio, then crop, generate and paste back.
+    An empty mask inpaints the whole image. None leaves it off.
+    """
+
+    inpaint_full_res_padding: Optional[int] = Field(default=None, ge=0)
+    """Padding (in pixels) added around the masked region's bounds when `inpaint_full_res` is enabled.
+
+    None uses `INPAINT_FULL_RES_PADDING_DEFAULT`.
+    """
+
+    inpaint_crop_points: Optional[list[tuple[int, int]]] = None
+    """Extra (x, y) source-image pixels the `inpaint_full_res` crop must contain, for context outside the mask.
+
+    Points outside the image are clamped to it. Ignored unless `inpaint_full_res` is enabled. On WebUI, setting
+    points makes the client crop and paste back, and the server flag is sent off.
+    """
+
     controlnet_units: list[ControlNetUnit] = []
+
+    def mask_blur_extents(self) -> tuple[int, int]:
+        """Return the (horizontal, vertical) mask blur, resolved the way the WebUI does.
+
+        `mask_blur` wins over `mask_blur_x` and `mask_blur_y` when set. Otherwise each unset axis uses
+        `MASK_BLUR_DEFAULT`.
+        """
+        if self.mask_blur is not None:
+            return self.mask_blur, self.mask_blur
+        blur_x = MASK_BLUR_DEFAULT if self.mask_blur_x is None else self.mask_blur_x
+        blur_y = MASK_BLUR_DEFAULT if self.mask_blur_y is None else self.mask_blur_y
+        return blur_x, blur_y
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the request body to a dict, removing unused optional parameters."""

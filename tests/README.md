@@ -172,7 +172,16 @@ From `test_a1111_generation.py`, `test_a1111_async.py` and `test_shared_params.p
 - [ ] Outside the center square of `inpaint_result.png`, the gradient and white square outline match
   `inpaint_source.png` pixel for pixel, with a crisp boundary (`mask_blur=0`). A changed border around an untouched
   center means the mask was inverted.
-- [ ] `upscale_result.png`: `upscale_source.png` at 256x256, with the same composition and no added content.
+- [ ] `webui_full_res_whole.png` and `webui_full_res_full_res.png` (512x512, 20 steps, 0.85 denoise): both repaint
+  the 96x96 patch near the top right of `webui_full_res_source.png` as clockwork gears and leave the rest of the
+  gradient untouched. The `full_res` patch is visibly finer, with sharper gears and screws.
+  `webui_full_res_far_point.png` is coarser than `full_res` again, because the far point at the bottom left widened
+  the crop. Seeds vary in how much detail they draw, so judge the rendering scale rather than the amount of content.
+- [ ] `upscale_sd_source.png`: a 512x512 txt2img render of an ivy-covered stone cottage, generated once per session
+  as the source for every WebUI upscale test. `upscale_source.png` is the same image shrunk to 128x128.
+- [ ] `upscale_result.png`: `upscale_source.png` at 512x512 through the first model upscaler (ESRGAN, DAT, ...),
+  with the same composition and no added content. Leaves, flowers and window frames are crisper than a plain resize.
+  Missing when the server has no model upscaler.
 - [ ] `upscale_sd_result.png`: `upscale_sd_source.png` at 2048x2048, refined by a tiled Ultimate SD Upscale pass
   (visibly sharper than a plain resize, same composition). Missing when the server has no Ultimate SD Upscale
   script.
@@ -195,9 +204,22 @@ are 256x256 at 8 steps.
 - [ ] `comfy_inpaint_result.png`: flower-like content replaces the center square that `comfy_inpaint_mask.png`
   marks white.
 - [ ] Outside the center square of `comfy_inpaint_result.png`, the gradient and white square outline survive. Slight
-  softening is normal, because ComfyUI passes the whole image through the VAE. An edited border around an untouched
-  center means `ComfyUiWebservice.upload_mask` converted the mask polarity wrong.
-- [ ] `comfy_upscale_result.png`: `comfy_upscale_source.png` at 256x256, sharper than a plain resize, with no new
+  softening is normal here, because this test calls raw `inpaint()` and ComfyUI passes the whole image through the
+  VAE. An edited border around an untouched center means `ComfyUiWebservice.upload_mask` converted the mask polarity
+  wrong.
+- [ ] `comfy_submit_inpaint_result.png`: a flower in the center square of `comfy_submit_inpaint_source.png`. Unlike
+  the raw result above, everything outside the square matches the source pixel for pixel, with a crisp boundary
+  (`mask_blur=0`), because `submit_inpaint` composites the result onto the source.
+- [ ] `comfy_mask_blur_0.png` and `comfy_mask_blur_12.png`: the same flower. The first has a hard edge around the
+  square. In the second the flower fades into the gradient over roughly 30 px beyond the original edge.
+- [ ] `comfyui_full_res_whole.png`, `comfyui_full_res_full_res.png` and `comfyui_full_res_far_point.png`: the same
+  three checks as the WebUI images above. Outside the patch the pixels match the source, because the client
+  composites the result through the mask. The generated content reaches the patch edge; a blurry, half-generated band
+  just inside the edge means the sampler got a soft noise mask instead of the rounded one.
+- [ ] `comfy_upscale_sd_source.png`: a 512x512 txt2img render of an ivy-covered stone cottage, generated once per
+  session as the source for every ComfyUI upscale test. `comfy_upscale_source.png` is the same image shrunk to
+  128x128.
+- [ ] `comfy_upscale_result.png`: `comfy_upscale_source.png` at 512x512, sharper than a plain resize, with no new
   content. It is missing when the server has no upscale model installed.
 - [ ] `comfy_upscale_sd_result.png`: `comfy_upscale_sd_source.png` at 2048x2048, refined by Ultimate SD Upscale
   (visibly sharper, same composition). Missing when the server has no Ultimate SD Upscale node.
@@ -239,8 +261,9 @@ generates "a photograph of a city street, detailed" with seed 42, once without C
 |-------------|------------------------|----------------------|
 | All generated images | RGBA, size within 8 px of target | Prompt adherence; black, noise or color-swap output |
 | img2img | Mean difference from source >= 10/255 | Style matches the prompt |
-| Inpainting | Center changes >= 20/255. WebUI border <= 5/255; ComfyUI center change >= 3x border change | Seam quality; the fill is a flower |
-| Upscale | At least 200 px on each side | No added content or artifacts |
+| `inpaint_full_res` | Pixels outside the patch match the source; the patch changed; full-res and far-crop-point results differ from the results they are compared with | The full-res patch is finer and the far-point patch coarser; the seam is clean |
+| Inpainting | Center changes >= 20/255. WebUI border <= 5/255; ComfyUI center change >= 3x border change. ComfyUI `submit_inpaint` border <= 1/255; `mask_blur=12` blends pixels just outside the mask, `mask_blur=0` does not | Seam quality; the fill is a flower |
+| Upscale | Within 8 px of the requested size | Sharper than a plain resize; no added content or artifacts |
 | ControlNet pair | Mean difference >= 2/255 | The edge structure shapes the image |
 | Preprocessor preview | Not a single flat color | Edges match the input shapes |
 | Async queue and cancel | Status sequence; both images returned | Each image matches its own prompt |

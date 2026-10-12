@@ -15,6 +15,7 @@ from PIL import Image
 
 import pytest
 
+from sd_backend_client.util.visual.inpaint_crop import PasteBack
 from sd_backend_client.api.comfyui.comfyui_generation_handle import ComfyGenerationHandle
 from sd_backend_client.api.comfyui.comfyui_progress_listener import LiveProgress
 from sd_backend_client.api.comfyui.comfyui_types import (ImageFileReference, PromptExecOutputs,
@@ -307,7 +308,7 @@ def test_inpaint_result_is_composited_onto_the_source():
     mask.paste(255, (0, 0, 2, 4))      # left half white
     mask.putpixel((2, 0), 128)
     service = FakeComfyService([AsyncTaskProgress(status=AsyncTaskStatus.FINISHED, outputs=_outputs())])
-    handle = ComfyGenerationHandle(service, 'p', paste_back=(source, mask))
+    handle = ComfyGenerationHandle(service, 'p', paste_back=PasteBack(source, mask))
     result = handle.wait()
     image = result.images[0]
     assert image.getpixel((0, 0)) == (0, 0, 0, 255)         # generated image (fake output is all zeros)
