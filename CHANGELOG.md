@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.4.0](https://github.com/centuryglass/sd-backend-client/compare/v0.3.0...v0.4.0) (2026-10-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* composite ComfyUI inpainting results onto the source image ([#119](https://github.com/centuryglass/sd-backend-client/issues/119))
+* apply mask_blur on ComfyUI and return the blurred mask ([#113](https://github.com/centuryglass/sd-backend-client/issues/113))
+
+### Features
+
+* add ParameterDef.display_name, keep description for tooltips ([#114](https://github.com/centuryglass/sd-backend-client/issues/114)) ([94155bd](https://github.com/centuryglass/sd-backend-client/commit/94155bd0b3c3db6646146504a09189494608b8b0)), closes [#109](https://github.com/centuryglass/sd-backend-client/issues/109)
+* apply mask_blur on ComfyUI and return the blurred mask ([#113](https://github.com/centuryglass/sd-backend-client/issues/113)) ([9c5fbc4](https://github.com/centuryglass/sd-backend-client/commit/9c5fbc4a085425363a7dfef8b655bce35e4e2af2))
+* **comfyui:** add ComfyUiWebservice.list_model_configs ([#111](https://github.com/centuryglass/sd-backend-client/issues/111)) ([73c9106](https://github.com/centuryglass/sd-backend-client/commit/73c9106c6001f608e977a342b041a91bc2cc9600))
+* composite ComfyUI inpainting results onto the source image ([#119](https://github.com/centuryglass/sd-backend-client/issues/119)) ([cf8841e](https://github.com/centuryglass/sd-backend-client/commit/cf8841e47b49b73266343494eb9adb0ec23f16ca))
+* support "inpaint only masked" (inpaint_full_res) on ComfyUI ([#120](https://github.com/centuryglass/sd-backend-client/issues/120)) ([c9a9aad](https://github.com/centuryglass/sd-backend-client/commit/c9a9aad5a4ebd0efb09d0789ffaf7a001614d125))
+
+
+### Bug Fixes
+
+* **comfyui:** resize in pixel space in the tiled VAE upscale fallback ([#123](https://github.com/centuryglass/sd-backend-client/issues/123)) ([529b0c8](https://github.com/centuryglass/sd-backend-client/commit/529b0c83fdc835b335c3e00c4a20bdbf31936287))
+
 ## [0.3.0](https://github.com/centuryglass/sd-backend-client/compare/v0.2.1...v0.3.0) (2026-10-09)
 
 
