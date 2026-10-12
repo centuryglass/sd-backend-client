@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sd-backend-client"
-version = "0.3.0"
+version = "0.4.0"
 description = "Standalone, headless Stable Diffusion backend client (ComfyUI / Forge / A1111 WebUI, ControlNet)"
 readme = "README.md"
 requires-python = ">=3.11"
