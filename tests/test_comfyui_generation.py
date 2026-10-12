@@ -6,7 +6,6 @@ that we poll to completion, then download the images (see ``comfy_helpers``). Op
 Results are saved under the output dir for visual fidelity inspection.
 """
 import pytest
-from PIL import Image
 
 from sd_backend_client.api.comfyui_webservice import ComfyModelType
 from sd_backend_client.api.shared_data.api_datatypes import DiffusionUpscalingParams
@@ -14,19 +13,17 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_model import Contro
 from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import PreprocessorParams
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 
-from .comfy_helpers import (COMFY_SIZE, build_comfy_params, find_tile_model, find_tile_preprocessor,
-                            make_comfy_mask, wait_for_comfy_images)
-from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, images_differ,
-                      make_structured_image, region_mean_diff, save_output, shrink)
+from .comfy_helpers import (COMFY_SIZE, build_comfy_params, comfy_sd_upscale_params, find_tile_model,
+                            find_tile_preprocessor, make_comfy_mask, wait_for_comfy_images)
+from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, SD_UPSCALE_SIZE, UPSCALE_SOURCE_SIZE,
+                      assert_upscale_kept_detail, assert_valid_image, images_differ, make_structured_image,
+                      region_mean_diff, save_output, shrink)
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
 
 def _assert_valid_image(image, expected_size: int = COMFY_SIZE):
-    assert isinstance(image, Image.Image)
-    assert image.mode == 'RGBA'  # decoded images are normalized to RGBA
-    assert abs(image.width - expected_size) <= 8
-    assert abs(image.height - expected_size) <= 8
+    assert_valid_image(image, expected_size)
 
 
 def test_txt2img_produces_image(comfy_service, comfy_checkpoint, output_dir):
@@ -164,7 +161,7 @@ def test_upscale(comfy_service, comfy_upscale_source, output_dir):
 
 
 def test_upscale_with_ultimate_sd_upscale(comfy_service, comfy_checkpoint, comfy_upscale_source, output_dir):
-    """Ultimate SD Upscale: a tiled diffusion pass refines a 4x upscale, with an optional tile ControlNet unit.
+    """Ultimate SD Upscale: a tiled diffusion pass refines a 4x model upscale, with an optional tile ControlNet unit.
 
     512x512 -> 2048x2048 so the tiled pass actually spans multiple tiles at the default 512px tile size.
     """
@@ -178,36 +175,38 @@ def test_upscale_with_ultimate_sd_upscale(comfy_service, comfy_checkpoint, comfy
         tile_controlnet = ControlNetUnit(model=ControlNetModel(tile_model),
                                          preprocessor=PreprocessorParams(typedef=tile_preprocessor))
 
-    upscale_params = DiffusionUpscalingParams(use_stable_diffusion_upscaling=True,
-                                              use_ultimate_upscale_script=True,
-                                              diffusion_params=build_comfy_params(comfy_checkpoint,
-                                                                                  prompt=UPSCALE_SOURCE_PROMPT),
-                                              step_count=8,
-                                              tile_controlnet=tile_controlnet)
+    upscale_params = comfy_sd_upscale_params(comfy_service, comfy_checkpoint, use_ultimate_upscale_script=True,
+                                        tile_controlnet=tile_controlnet)
     source = comfy_upscale_source
-    response = comfy_service.upscale(source, 2048, 2048, upscale_params)
-    images = wait_for_comfy_images(comfy_service, response, timeout=300.0)
+    response = comfy_service.upscale(source, SD_UPSCALE_SIZE, SD_UPSCALE_SIZE, upscale_params)
+    images = wait_for_comfy_images(comfy_service, response, timeout=600.0)
     assert len(images) == 1
     result = images[0]
-    _assert_valid_image(result, expected_size=2048)
+    _assert_valid_image(result, expected_size=SD_UPSCALE_SIZE)
     save_output(output_dir, 'comfy_upscale_sd_source', source)
     save_output(output_dir, 'comfy_upscale_sd_result', result)
+    assert_upscale_kept_detail(source, result)
 
 
-def test_upscale_fallback_tiled_vae(comfy_service, comfy_checkpoint, comfy_upscale_source, output_dir):
-    """Without the Ultimate SD Upscale node, the diffusion upscale path falls back to tiled VAE encode/decode."""
-    upscale_params = DiffusionUpscalingParams(use_stable_diffusion_upscaling=True,
-                                              use_ultimate_upscale_script=False,
-                                              diffusion_params=build_comfy_params(comfy_checkpoint,
-                                                                                  prompt=UPSCALE_SOURCE_PROMPT),
-                                              step_count=8)
+@pytest.mark.parametrize('use_upscaler_model', [True, False], ids=['model', 'no_model'])
+def test_upscale_fallback_tiled_vae(comfy_service, comfy_checkpoint, comfy_upscale_source, output_dir,
+                                    use_upscaler_model):
+    """Without the Ultimate SD Upscale node, the diffusion upscale path falls back to tiled VAE encode/decode.
+
+    Runs with and without an upscale model, since each resizes the image through a different branch.
+    """
+    upscale_params = comfy_sd_upscale_params(comfy_service, comfy_checkpoint, use_ultimate_upscale_script=False,
+                                        use_upscaler_model=use_upscaler_model)
     source = comfy_upscale_source
-    response = comfy_service.upscale(source, 2048, 2048, upscale_params)
-    images = wait_for_comfy_images(comfy_service, response, timeout=300.0)
+    response = comfy_service.upscale(source, SD_UPSCALE_SIZE, SD_UPSCALE_SIZE, upscale_params)
+    images = wait_for_comfy_images(comfy_service, response, timeout=600.0)
     assert len(images) == 1
     result = images[0]
-    _assert_valid_image(result, expected_size=2048)
-    save_output(output_dir, 'comfy_upscale_fallback_result', result)
+    _assert_valid_image(result, expected_size=SD_UPSCALE_SIZE)
+    save_output(output_dir, 'comfy_upscale_fallback_result' if use_upscaler_model
+                else 'comfy_upscale_fallback_no_model_result', result)
+    assert_upscale_kept_detail(source, result)
+
 
 
 def test_interrupt_is_accepted(comfy_service):

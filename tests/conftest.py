@@ -32,7 +32,7 @@ from sd_backend_client.api.comfyui_webservice import ComfyUiWebservice
 from sd_backend_client.errors import AuthError, SDBackendError
 
 from .comfy_helpers import build_comfy_params
-from .helpers import UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, fast_request_body
+from .helpers import UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, fast_request_body, pick_test_checkpoint
 from .review_results import ResultsRecorder
 
 DEFAULT_PORT = 7860
@@ -52,8 +52,12 @@ def pytest_configure(config):
     config.addinivalue_line('markers', 'integration: talks to a live WebUI instance.')
     config.addinivalue_line('markers', 'generation: invokes real diffusion; slow, needs a loaded checkpoint.')
     config.addinivalue_line('markers', 'controlnet: requires the ControlNet extension to be installed.')
-    generation_enabled = bool(config.getoption('--run-generation') or os.environ.get('RUN_SD_GENERATION'))
-    config.pluginmanager.register(ResultsRecorder(_output_dir_path(), generation_enabled), 'sd-review-results')
+    config.pluginmanager.register(ResultsRecorder(_output_dir_path(), _generation_enabled(config)),
+                                  'sd-review-results')
+
+
+def _generation_enabled(config) -> bool:
+    return bool(config.getoption('--run-generation') or os.environ.get('RUN_SD_GENERATION'))
 
 
 def _output_dir_path() -> str:
@@ -62,7 +66,7 @@ def _output_dir_path() -> str:
 
 
 def pytest_collection_modifyitems(config, items):
-    if config.getoption('--run-generation') or os.environ.get('RUN_SD_GENERATION'):
+    if _generation_enabled(config):
         return
     skip_gen = pytest.mark.skip(reason='generation tests are opt-in: use --run-generation or RUN_SD_GENERATION=1')
     for item in items:
@@ -120,20 +124,14 @@ def comfy_service(comfy_url) -> ComfyUiWebservice:
 
 @pytest.fixture(scope='session')
 def comfy_checkpoint(comfy_service) -> str:
-    """Name of a checkpoint to generate with, preferring a small SD1.5 model.
+    """Name of the checkpoint to generate with, chosen by `pick_test_checkpoint`.
 
     Skips dependent tests if the server has no checkpoints installed.
     """
-    checkpoints = comfy_service.get_sd_checkpoints()
-    if not checkpoints:
+    checkpoint = pick_test_checkpoint(comfy_service.get_sd_checkpoints())
+    if checkpoint is None:
         pytest.skip('No checkpoints installed on the ComfyUI server.')
-    # Prefer a non-inpainting SD1.5 model when we can identify one; fall back to the first.
-    sd15_hints = ('deliberate_v3.safetensors', 'cyberrealistic', 'dreamshaper', 'v1-5', 'sd15', 'sd-v1')
-    for hint in sd15_hints:
-        match = next((c for c in checkpoints if hint in c.lower() and 'inpaint' not in c.lower()), None)
-        if match:
-            return match
-    return checkpoints[0]
+    return checkpoint
 
 
 @pytest.fixture(scope='session')
@@ -208,11 +206,13 @@ def auth_enforced(api_url) -> bool:
 
 
 @pytest.fixture(scope='session')
-def service(api_url, credentials) -> A1111Webservice:
+def service(request, api_url, credentials) -> A1111Webservice:
     """A live, authenticated A1111Webservice.
 
     Skips the entire session if the server is unreachable, and fails clearly if it
-    requires auth but no SD_UNAME / SD_PASS were provided.
+    requires auth but no SD_UNAME / SD_PASS were provided. With generation tests enabled, it loads the
+    `pick_test_checkpoint` choice on the server for the session and restores the original checkpoint afterward, since
+    WebUI requests that don't name a checkpoint use whichever one is loaded.
     """
     client = A1111Webservice(api_url, credentials_provider=lambda: credentials)
     try:
@@ -224,7 +224,16 @@ def service(api_url, credentials) -> A1111Webservice:
         )
     except SDBackendError as err:
         pytest.skip(f'No WebUI server reachable at {api_url}: {err}')
+    original_checkpoint = None
+    if _generation_enabled(request.config):
+        checkpoint = pick_test_checkpoint(model.title for model in client.get_models())
+        loaded = client.get_config().get('sd_model_checkpoint')
+        if checkpoint is not None and checkpoint != loaded:
+            client.set_config({'sd_model_checkpoint': checkpoint})
+            original_checkpoint = loaded
     yield client
+    if original_checkpoint is not None:
+        client.set_config({'sd_model_checkpoint': original_checkpoint})
     client.disconnect()
 
 

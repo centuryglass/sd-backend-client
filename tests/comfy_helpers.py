@@ -6,11 +6,17 @@ download the resulting image references. These helpers wrap that lifecycle and t
 cache setup the workflow builders read from.
 """
 import time
+from typing import Optional
 
+import pytest
 from PIL import Image
 
 from sd_backend_client.api.comfyui.comfyui_diffusion_params import ComfyUIDiffusionParams
-from sd_backend_client.api.comfyui_webservice import AsyncTaskStatus, ComfyUiWebservice
+from sd_backend_client.api.comfyui_webservice import AsyncTaskStatus, ComfyModelType, ComfyUiWebservice
+from sd_backend_client.api.shared_data.api_datatypes import DiffusionUpscalingParams
+from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
+
+from .helpers import SD_UPSCALE_DENOISE, SD_UPSCALE_STEPS, UPSCALE_SOURCE_PROMPT, pick_upscaler_model
 
 # ComfyUI SD1.5 defaults kept small/cheap but coherent enough to compare.
 COMFY_SIZE = 256
@@ -31,6 +37,26 @@ def build_comfy_params(checkpoint: str, sampler: str = 'euler', scheduler: str =
                                     height=COMFY_SIZE,
                                     seed=1)
 
+
+
+def comfy_sd_upscale_params(service: ComfyUiWebservice, checkpoint: str, use_ultimate_upscale_script: bool,
+                            use_upscaler_model: bool = True,
+                            tile_controlnet: Optional[ControlNetUnit] = None) -> DiffusionUpscalingParams:
+    """Diffusion upscale parameters at the realistic `SD_UPSCALE_STEPS` / `SD_UPSCALE_DENOISE` settings.
+
+    With `use_upscaler_model`, the image goes through the server's `pick_upscaler_model` choice before diffusion, and
+    the test skips if the server has none.
+    """
+    upscaler = pick_upscaler_model(service.get_models(ComfyModelType.UPSCALING)) if use_upscaler_model else None
+    if use_upscaler_model and upscaler is None:
+        pytest.skip('No upscale models installed on the ComfyUI server.')
+    return DiffusionUpscalingParams(upscaling_mode=upscaler or '',
+                                    use_stable_diffusion_upscaling=True,
+                                    use_ultimate_upscale_script=use_ultimate_upscale_script,
+                                    diffusion_params=build_comfy_params(checkpoint, prompt=UPSCALE_SOURCE_PROMPT),
+                                    step_count=SD_UPSCALE_STEPS,
+                                    denoising_strength=SD_UPSCALE_DENOISE,
+                                    tile_controlnet=tile_controlnet)
 
 
 def make_comfy_mask(editable_box: tuple[int, int, int, int], size: int = COMFY_SIZE) -> Image.Image:

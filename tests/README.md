@@ -43,6 +43,12 @@ pytest tests/ --run-generation
 RUN_SD_GENERATION=1 pytest tests/
 ```
 
+Generation tests run on `deliberate_v3` when the server has it, or on the next SD1.5 checkpoint
+in `helpers.PREFERRED_CHECKPOINTS`, and never on an inpainting checkpoint unless the server has
+nothing else. On the WebUI, the `service` fixture loads that checkpoint for the session and
+restores the server's original checkpoint afterward. The diffusion upscale tests also need a
+model-based upscaler (ESRGAN family, DAT, ...) and skip without one.
+
 ## Unit tests (`tests/unit/`)
 
 Backend-independent tests of the pure "functional core": the code that turns parameters

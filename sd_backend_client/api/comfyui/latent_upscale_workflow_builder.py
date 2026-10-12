@@ -18,7 +18,6 @@ from sd_backend_client.api.comfyui.nodes.input.load_upscaler_node import LoadUps
 from sd_backend_client.api.comfyui.nodes.ksampler_node import KSamplerNode
 from sd_backend_client.api.comfyui.nodes.save_image_node import SaveImageNode
 from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import UltimateUpscaleNode
-from sd_backend_client.api.comfyui.nodes.upscale_latent_node import UpscaleLatentNode
 from sd_backend_client.api.comfyui.nodes.vae.vae_decode_tiled_node import VAEDecodeTiledNode
 from sd_backend_client.api.comfyui.nodes.vae.vae_encode_tiled_node import (TILE_MIN, TILE_STEP, TILE_MAX,
                                                                            VAEEncodeTiledNode)
@@ -79,7 +78,8 @@ class LatentUpscaleWorkflowBuilder(DiffusionWorkflowBuilder):
         With Ultimate SD Upscale, the output is the source size times `upscale_by` on both axes, where `upscale_by`
         is the larger of the requested width and height ratios. A requested aspect ratio that differs from the
         source's is not honored on this path. Without it, the image goes through the upscale model (if any), is
-        resized to the exact final size, then refined with tiled img2img.
+        resized to the exact final size in pixel space, then refined by one img2img pass over the whole image. Only
+        the VAE encode and decode are tiled on that path, so the sampler sees the full-size latent at once.
         """
         # Load model(s):
         sd_model, clip, vae = self._load_checkpoint()
@@ -106,8 +106,7 @@ class LatentUpscaleWorkflowBuilder(DiffusionWorkflowBuilder):
         if self._upscale_model_name is not None and self._upscale_model_name != '':
             upscale_model_node = LoadUpscalerNode(model_name=self._upscale_model_name)
         elif self._ultimate_sd_upscale:
-            # Use a basic scaling node to get the image to the right size instead.  If we're not using the
-            # "Ultimate SD Upscale" script this can be skipped, since we'll end up using latent image scaling anyway.
+            # Use a basic scaling node to get the image to the right size instead.
             image = BasicScalingNode(scale_by=self._upscale_multiplier, image=image).image_out
 
         # Set up ultimate upscale script, if available:
@@ -144,8 +143,10 @@ class LatentUpscaleWorkflowBuilder(DiffusionWorkflowBuilder):
         else:  # No ultimate SD upscale, we'll try to get by with img2img with tiled VAE encoding/decoding.
             if upscale_model_node is not None:
                 image = ApplyUpscalerNode(upscale_model=upscale_model_node.upscale_model_out, image=image).image_out
-                image = ImageScaleNode(width=self._final_image_size.width(), height=self._final_image_size.height(),
-                                       image=image).image_out
+            # Resize in pixel space: a latent-space resize decodes to a blurred, mottled image that a low-denoise
+            # img2img pass can't recover.
+            image = ImageScaleNode(width=self._final_image_size.width(), height=self._final_image_size.height(),
+                                   image=image).image_out
 
             vae_tile_size = self.vae_tile_size
             vae_tile_size -= (vae_tile_size % TILE_STEP)
@@ -154,8 +155,6 @@ class LatentUpscaleWorkflowBuilder(DiffusionWorkflowBuilder):
             elif vae_tile_size > TILE_MAX:
                 vae_tile_size = TILE_MAX
             latent = VAEEncodeTiledNode(tile_size=vae_tile_size, pixels=image, vae=vae).latent_out
-            latent = UpscaleLatentNode(width=self._final_image_size.width(), height=self._final_image_size.height(),
-                                       samples=latent).latent_out
             sampler_node = KSamplerNode(cfg=self.cfg_scale, steps=self.steps, sampler_name=self.sampler,
                                         denoise=self.denoising_strength, scheduler=self.scheduler, seed=self.seed,
                                         latent_image=latent, model=sd_model, positive=positive, negative=negative)

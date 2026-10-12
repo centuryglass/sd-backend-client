@@ -6,7 +6,6 @@ on the server. They are opt-in — run with ``--run-generation`` or
 a handful of steps) so a round-trip is as cheap as possible.
 """
 import pytest
-from PIL import Image
 
 from sd_backend_client.api.shared_data.api_datatypes import DiffusionUpscalingParams
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
@@ -15,19 +14,16 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
 
-from .helpers import (fast_request_body, find_tile_controlnet_pairing, images_differ, make_mask,
-                      make_structured_image, make_test_image, region_mean_diff, save_output, shrink, TEST_SIZE,
-                      BASIC_UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE)
+from .helpers import (assert_upscale_kept_detail, assert_valid_image, fast_request_body, find_tile_controlnet_pairing,
+                      images_differ, make_mask, make_structured_image, make_test_image, pick_upscaler_model,
+                      region_mean_diff, save_output, shrink, TEST_SIZE, BASIC_UPSCALE_SOURCE_SIZE, SD_UPSCALE_DENOISE,
+                      SD_UPSCALE_SIZE, SD_UPSCALE_STEPS, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE)
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
 
 def _assert_valid_image(image, expected_size: int = TEST_SIZE):
-    assert isinstance(image, Image.Image)
-    assert image.mode == 'RGBA'  # decoded images are normalized to RGBA
-    # The server may round dimensions to a multiple of 8; allow a little slack.
-    assert abs(image.width - expected_size) <= 8
-    assert abs(image.height - expected_size) <= 8
+    assert_valid_image(image, expected_size)
 
 
 def test_txt2img_produces_image(service, output_dir):
@@ -108,10 +104,7 @@ def test_img2img_inpaint_respects_mask(service, output_dir):
 
 def test_upscale_basic(service, upscale_source, output_dir):
     # Uses the plain "extra-single-image" upscaler path (no SD upscaling / ControlNet).
-    resamplers = ('none', 'lanczos', 'nearest')
-    upscaler = next((u.name for u in service.get_upscalers() if u.name.lower() not in resamplers), None)
-    if upscaler is None:
-        pytest.skip('No model-based upscaler (ESRGAN, DAT, ...) is installed on this server.')
+    upscaler = _upscaler_model(service)
     source = shrink(upscale_source, BASIC_UPSCALE_SOURCE_SIZE)
     response = service.upscale(source, UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_SIZE,
                                DiffusionUpscalingParams(upscaling_mode=upscaler))
@@ -123,7 +116,7 @@ def test_upscale_basic(service, upscale_source, output_dir):
 
 
 def test_upscale_with_ultimate_sd_upscale(service, upscale_source, output_dir):
-    """Ultimate SD Upscale: a tiled diffusion pass refines a 4x upscale, with an optional tile ControlNet unit.
+    """Ultimate SD Upscale: a tiled diffusion pass refines a 4x model upscale, with an optional tile ControlNet unit.
 
     512x512 -> 2048x2048 so the tiled pass actually spans multiple tiles at the default 512px tile size.
     """
@@ -138,18 +131,29 @@ def test_upscale_with_ultimate_sd_upscale(service, upscale_source, output_dir):
                                          preprocessor=PreprocessorParams(typedef=ControlNetPreprocessor(name=module)))
 
     upscale_params = DiffusionUpscalingParams(
+        upscaling_mode=_upscaler_model(service),
         use_stable_diffusion_upscaling=True,
-        step_count=8,
-        diffusion_params=DiffusionParams(prompt=UPSCALE_SOURCE_PROMPT, steps=8),
+        step_count=SD_UPSCALE_STEPS,
+        denoising_strength=SD_UPSCALE_DENOISE,
+        diffusion_params=DiffusionParams(prompt=UPSCALE_SOURCE_PROMPT),
         tile_controlnet=tile_controlnet,
     )
     source = upscale_source
-    response = service.upscale(source, 2048, 2048, upscale_params)
+    response = service.upscale(source, SD_UPSCALE_SIZE, SD_UPSCALE_SIZE, upscale_params)
     assert len(response['images']) == 1
     result = response['images'][0]
-    _assert_valid_image(result, expected_size=2048)
+    _assert_valid_image(result, expected_size=SD_UPSCALE_SIZE)
     save_output(output_dir, 'upscale_sd_source', source)
     save_output(output_dir, 'upscale_sd_result', result)
+    assert_upscale_kept_detail(source, result)
+
+
+def _upscaler_model(service) -> str:
+    """The server's `pick_upscaler_model` choice, skipping the test if it has only resamplers."""
+    upscaler = pick_upscaler_model(u.name for u in service.get_upscalers())
+    if upscaler is None:
+        pytest.skip('No model-based upscaler (ESRGAN, DAT, ...) is installed on this server.')
+    return upscaler
 
 
 def test_interrogate_returns_caption(service):

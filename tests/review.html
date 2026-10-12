@@ -470,14 +470,16 @@ const GROUPS = [
       },
       {
         id: 'usdu', title: 'Ultimate SD Upscale',
-        purpose: 'A tiled diffusion pass refines a 4x upscale (512x512 to 2048x2048), with a tile ControlNet unit when one is installed.',
-        asserted: 'Within 8 px of the requested size.',
+        purpose: 'A tiled diffusion pass refines a 4x model upscale (512x512 to 2048x2048, using the server\'s ESRGAN-family or DAT upscaler), with a tile ControlNet unit when one is installed.',
+        asserted: 'Within 8 px of the requested size. Scaled back to 512x512, the result keeps at least 0.35 of the source\'s edge energy, which a blurred upscale falls far below.',
         backends: {
           [WEBUI]: {
+            settings: '20 steps, 0.35 denoise, 512px tiles',
             tests: [A + 'test_upscale_with_ultimate_sd_upscale'],
             images: [{ file: 'upscale_sd_source.png', label: 'source' }, { file: 'upscale_sd_result.png', label: 'result', missingNote: 'Missing when the server has no Ultimate SD Upscale script.' }],
           },
           [COMFY]: {
+            settings: '20 steps, 0.35 denoise, 512px tiles',
             tests: [C + 'test_upscale_with_ultimate_sd_upscale'],
             images: [{ file: 'comfy_upscale_sd_source.png', label: 'source' }, { file: 'comfy_upscale_sd_result.png', label: 'result', missingNote: 'Missing when the server has no Ultimate SD Upscale node.' }],
           },
@@ -490,13 +492,15 @@ const GROUPS = [
       },
       {
         id: 'usdu-fallback', title: 'Upscale fallback: tiled VAE',
-        purpose: 'With `use_ultimate_upscale_script=False`, the diffusion upscale runs through tiled VAE encode/decode. The test runs whether or not the Ultimate SD Upscale node is installed.',
-        asserted: 'Within 8 px of the requested size.',
+        purpose: 'With `use_ultimate_upscale_script=False`, the image is resized in pixel space (through an upscale model, or with lanczos when there is none) and refined by one img2img pass with tiled VAE encode/decode. The test runs whether or not the Ultimate SD Upscale node is installed.',
+        asserted: 'Within 8 px of the requested size. Scaled back to 512x512, each result keeps at least 0.35 of the source\'s edge energy.',
         backends: {
           [COMFY]: {
-            tests: [C + 'test_upscale_fallback_tiled_vae'],
-            images: [{ file: 'comfy_upscale_sd_source.png', label: 'source' }, { file: 'comfy_upscale_fallback_result.png', label: 'result' }],
-            checks: ['`comfy_upscale_fallback_result.png`: the same 2048x2048 upscale of the cottage, coherent, with no tile-boundary artifacts from the VAE fallback.'],
+            settings: '20 steps, 0.35 denoise',
+            tests: [C + 'test_upscale_fallback_tiled_vae[model]', C + 'test_upscale_fallback_tiled_vae[no_model]'],
+            images: [{ file: 'comfy_upscale_sd_source.png', label: 'source' }, { file: 'comfy_upscale_fallback_result.png', label: 'with model' },
+                     { file: 'comfy_upscale_fallback_no_model_result.png', label: 'no model' }],
+            checks: ['`comfy_upscale_fallback_result.png` and `comfy_upscale_fallback_no_model_result.png`: the same 2048x2048 upscale of the cottage, as sharp as a plain resize or sharper, coherent, with no blur, mottling or tile-boundary artifacts.'],
           },
         },
       },

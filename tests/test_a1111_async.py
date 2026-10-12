@@ -35,9 +35,10 @@ from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
 from sd_backend_client.api.shared_data.generation_handle import GenerationError, GenerationStatus
 from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestBody
 
-from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, add_controlnet_unit,
-                      find_tile_controlnet_pairing, make_controlnet_unit, make_edge_image, save_output,
-                      shrink)
+from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, SD_UPSCALE_DENOISE, SD_UPSCALE_SIZE, SD_UPSCALE_STEPS,
+                      UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, add_controlnet_unit, assert_upscale_kept_detail,
+                      assert_valid_image, find_tile_controlnet_pairing, make_controlnet_unit, make_edge_image,
+                      pick_upscaler_model, save_output, shrink)
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
@@ -58,13 +59,6 @@ def _body(prompt: str = 'a red apple on a wooden table', *, steps: int = 20, siz
     body.save_images = False
     body.send_images = True
     return body
-
-
-def _assert_valid_image(image, expected_size: int) -> None:
-    assert isinstance(image, Image.Image)
-    assert image.mode == 'RGBA'  # decoded images are normalized to RGBA
-    assert abs(image.width - expected_size) <= 8
-    assert abs(image.height - expected_size) <= 8
 
 
 class _StatusPoller:
@@ -120,7 +114,7 @@ def test_submit_txt2img_lifecycle(service, output_dir):
     result = handle.wait(timeout=120, poll_interval=0.2, on_progress=lambda p: seen.append(p.status))
 
     assert len(result.images) == 1
-    _assert_valid_image(result.images[0], expected_size=512)
+    assert_valid_image(result.images[0], expected_size=512)
     save_output(output_dir, 'async_txt2img', result.images[0])
     assert result.task_id == handle.task_id
     assert GenerationStatus.ACTIVE in seen, f'never observed ACTIVE; saw {[s.value for s in seen]}'
@@ -136,7 +130,7 @@ def test_submit_img2img_lifecycle(service, output_dir):
     handle = service.submit_img2img(body)
     result = handle.wait(timeout=120)
     assert len(result.images) >= 1
-    _assert_valid_image(result.images[0], expected_size=512)
+    assert_valid_image(result.images[0], expected_size=512)
     save_output(output_dir, 'async_img2img', result.images[0])
 
 
@@ -147,14 +141,17 @@ def test_submit_upscale_lifecycle(service, upscale_source, output_dir):
     assert handle.task_id and handle.task_id.startswith('task(upscale-')
     result = handle.wait(timeout=120)
     assert len(result.images) == 1
-    _assert_valid_image(result.images[0], expected_size=UPSCALE_SOURCE_SIZE)
+    assert_valid_image(result.images[0], expected_size=UPSCALE_SOURCE_SIZE)
     save_output(output_dir, 'async_upscale', result.images[0])
 
 
 def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(service, upscale_source, output_dir):
-    """Ultimate SD Upscale through the async handle: 512x512 -> 2048x2048 with an optional tile ControlNet unit."""
+    """Ultimate SD Upscale through the async handle: a 4x model upscale refined by a tiled diffusion pass."""
     if not service.get_capabilities().ultimate_upscale:
         pytest.skip('Ultimate SD Upscale is not available on this server.')
+    upscaler = pick_upscaler_model(u.name for u in service.get_upscalers())
+    if upscaler is None:
+        pytest.skip('No model-based upscaler (ESRGAN, DAT, ...) is installed on this server.')
 
     tile_controlnet = None
     pairing = find_tile_controlnet_pairing(service)
@@ -164,15 +161,18 @@ def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(service, upscale_sour
                                          preprocessor=PreprocessorParams(typedef=ControlNetPreprocessor(name=module)))
 
     upscale_params = DiffusionUpscalingParams(
+        upscaling_mode=upscaler,
         use_stable_diffusion_upscaling=True,
-        step_count=8,
-        diffusion_params=DiffusionParams(prompt=UPSCALE_SOURCE_PROMPT, steps=8),
+        step_count=SD_UPSCALE_STEPS,
+        denoising_strength=SD_UPSCALE_DENOISE,
+        diffusion_params=DiffusionParams(prompt=UPSCALE_SOURCE_PROMPT),
         tile_controlnet=tile_controlnet,
     )
-    result = service.submit_upscale(upscale_source, 2048, 2048, upscale_params).wait(timeout=300)
+    result = service.submit_upscale(upscale_source, SD_UPSCALE_SIZE, SD_UPSCALE_SIZE, upscale_params).wait(timeout=600)
     assert len(result.images) == 1
-    _assert_valid_image(result.images[0], expected_size=2048)
+    assert_valid_image(result.images[0], expected_size=SD_UPSCALE_SIZE)
     save_output(output_dir, 'async_upscale_sd', result.images[0])
+    assert_upscale_kept_detail(upscale_source, result.images[0])
 
 
 @pytest.mark.controlnet
@@ -197,7 +197,7 @@ def test_batch_result_has_one_seed_per_image(service, output_dir):
     assert len(result.images) == 2
     assert result.seeds == [500, 501] and result.seed == 500
     for i, image in enumerate(result.images):
-        _assert_valid_image(image, expected_size=256)
+        assert_valid_image(image, expected_size=256)
         save_output(output_dir, f'async_batch_{i}', image)
 
 
@@ -215,7 +215,7 @@ def test_controlnet_result_keeps_detect_maps_out_of_images(controlnet_available,
     assert len(result.images) == 1
     assert result.seeds == [42]
     assert len(result.control_maps) <= 1
-    _assert_valid_image(result.images[0], expected_size=256)
+    assert_valid_image(result.images[0], expected_size=256)
     save_output(output_dir, f'async_controlnet_{module}', result.images[0])
     for i, control_map in enumerate(result.control_maps):
         save_output(output_dir, f'async_controlnet_{module}_map_{i}', control_map)
