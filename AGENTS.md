@@ -215,7 +215,8 @@ don't need rewriting to conform, and nothing enforces these rules mechanically.
 - The ControlNet generation integration tests contain a **silent-failure detector**: they generate the same
   seed+prompt with and without a control unit and fail unless the outputs differ. Keep that invariant in mind when
   touching ControlNet serialization.
-- Generation tests save PNGs to `SD_TEST_OUTPUT_DIR` (default `tests/output/`, gitignored). Write any other test
+- Generation tests save PNGs to `SD_TEST_OUTPUT_DIR` (default `tests/output/`, gitignored), where `tests/review.html`
+  shows them. A test that saves a new or renamed image needs an entry in that page's `GROUPS`. Write any other test
   output to a temporary directory, never the working tree.
 - **Prevent flaky tests instead of quarantining them.**
   - Unit tests don't touch the network, a backend, or wall-clock time.
