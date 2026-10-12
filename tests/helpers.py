@@ -13,6 +13,12 @@ from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestB
 # Keep generation cheap: tiny canvas, minimal steps, single image.
 TEST_SIZE = 256
 TEST_STEPS = 4
+UPSCALE_SOURCE_PROMPT = ('a weathered stone cottage covered in ivy beside a flower garden, highly detailed, '
+                         'sharp focus, intricate textures')
+"""Prompt for the generated upscale-test source: fine foliage and stone texture make upscaling quality visible."""
+UPSCALE_SOURCE_SIZE = 512
+BASIC_UPSCALE_SOURCE_SIZE = 128
+"""The basic upscale tests shrink the generated source to this size, then upscale it back to `UPSCALE_SOURCE_SIZE`."""
 
 
 def make_test_image(width: int = TEST_SIZE, height: int = TEST_SIZE,
@@ -146,3 +152,6 @@ def fast_request_body(prompt: str = 'a red apple on a table') -> DiffusionReques
     return body
 
 
+def shrink(image: Image.Image, size: int) -> Image.Image:
+    """Return a `size` x `size` LANCZOS downscale of `image`."""
+    return image.resize((size, size), Image.Resampling.LANCZOS)

@@ -16,7 +16,8 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_unit import Control
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
 
 from .helpers import (fast_request_body, find_tile_controlnet_pairing, images_differ, make_mask,
-                      make_structured_image, make_test_image, region_mean_diff, save_output, TEST_SIZE)
+                      make_structured_image, make_test_image, region_mean_diff, save_output, shrink, TEST_SIZE,
+                      BASIC_UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE)
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
@@ -105,19 +106,23 @@ def test_img2img_inpaint_respects_mask(service, output_dir):
     )
 
 
-def test_upscale_basic(service, output_dir):
+def test_upscale_basic(service, upscale_source, output_dir):
     # Uses the plain "extra-single-image" upscaler path (no SD upscaling / ControlNet).
-    source = make_structured_image(128, 128)
-    response = service.upscale(source, 256, 256)
+    resamplers = ('none', 'lanczos', 'nearest')
+    upscaler = next((u.name for u in service.get_upscalers() if u.name.lower() not in resamplers), None)
+    if upscaler is None:
+        pytest.skip('No model-based upscaler (ESRGAN, DAT, ...) is installed on this server.')
+    source = shrink(upscale_source, BASIC_UPSCALE_SOURCE_SIZE)
+    response = service.upscale(source, UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_SIZE,
+                               DiffusionUpscalingParams(upscaling_mode=upscaler))
     assert len(response['images']) == 1
     result = response['images'][0]
-    assert isinstance(result, Image.Image)
-    assert result.width >= 200 and result.height >= 200
+    _assert_valid_image(result, expected_size=UPSCALE_SOURCE_SIZE)
     save_output(output_dir, 'upscale_source', source)
     save_output(output_dir, 'upscale_result', result)
 
 
-def test_upscale_with_ultimate_sd_upscale(service, output_dir):
+def test_upscale_with_ultimate_sd_upscale(service, upscale_source, output_dir):
     """Ultimate SD Upscale: a tiled diffusion pass refines a 4x upscale, with an optional tile ControlNet unit.
 
     512x512 -> 2048x2048 so the tiled pass actually spans multiple tiles at the default 512px tile size.
@@ -135,10 +140,10 @@ def test_upscale_with_ultimate_sd_upscale(service, output_dir):
     upscale_params = DiffusionUpscalingParams(
         use_stable_diffusion_upscaling=True,
         step_count=8,
-        diffusion_params=DiffusionParams(prompt='a red apple on a wooden table', steps=8),
+        diffusion_params=DiffusionParams(prompt=UPSCALE_SOURCE_PROMPT, steps=8),
         tile_controlnet=tile_controlnet,
     )
-    source = make_structured_image(512, 512)
+    source = upscale_source
     response = service.upscale(source, 2048, 2048, upscale_params)
     assert len(response['images']) == 1
     result = response['images'][0]

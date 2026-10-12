@@ -31,7 +31,8 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 
 from .comfy_helpers import build_comfy_params, find_canny_preprocessor, find_tile_model, find_tile_preprocessor
-from .helpers import make_edge_image, make_structured_image, save_output
+from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, make_edge_image,
+                      save_output, shrink)
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
@@ -137,17 +138,19 @@ def test_submit_img2img_lifecycle(comfy_service, comfy_checkpoint, output_dir):
     save_output(output_dir, 'comfy_async_img2img', result.images[0])
 
 
-def test_submit_upscale_lifecycle(comfy_service, output_dir):
+def test_submit_upscale_lifecycle(comfy_service, comfy_upscale_source, output_dir):
     """A basic upscale with the server's default model yields one image at the requested size."""
     if not comfy_service.get_models(ComfyModelType.UPSCALING):
         pytest.skip('No upscale models installed on the ComfyUI server.')
-    result = comfy_service.submit_upscale(make_structured_image(128, 128), 256, 256).wait(timeout=180)
+    source = shrink(comfy_upscale_source, BASIC_UPSCALE_SOURCE_SIZE)
+    result = comfy_service.submit_upscale(source, UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_SIZE).wait(timeout=180)
     assert len(result.images) == 1
-    _assert_valid_image(result.images[0], expected_size=256)
+    _assert_valid_image(result.images[0], expected_size=UPSCALE_SOURCE_SIZE)
     save_output(output_dir, 'comfy_async_upscale', result.images[0])
 
 
-def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(comfy_service, comfy_checkpoint, output_dir):
+def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(comfy_service, comfy_checkpoint, comfy_upscale_source,
+                                                           output_dir):
     """Ultimate SD Upscale through the async handle: 512x512 -> 2048x2048 with an optional tile ControlNet unit."""
     if not comfy_service.get_capabilities().ultimate_upscale:
         pytest.skip('Ultimate SD Upscale is not available on this ComfyUI server.')
@@ -161,10 +164,10 @@ def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(comfy_service, comfy_
 
     upscale_params = DiffusionUpscalingParams(use_stable_diffusion_upscaling=True,
                                               use_ultimate_upscale_script=True,
-                                              diffusion_params=_params(comfy_checkpoint),
+                                              diffusion_params=_params(comfy_checkpoint, prompt=UPSCALE_SOURCE_PROMPT),
                                               step_count=8,
                                               tile_controlnet=tile_controlnet)
-    source = make_structured_image(512, 512)
+    source = comfy_upscale_source
     result = comfy_service.submit_upscale(source, 2048, 2048, upscale_params).wait(timeout=300)
     assert len(result.images) == 1
     _assert_valid_image(result.images[0], expected_size=2048)

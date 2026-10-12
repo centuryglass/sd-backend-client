@@ -16,8 +16,8 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_unit import Control
 
 from .comfy_helpers import (COMFY_SIZE, build_comfy_params, find_tile_model, find_tile_preprocessor,
                             make_comfy_mask, wait_for_comfy_images)
-from .helpers import (images_differ, make_structured_image, region_mean_diff,
-                      save_output)
+from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, images_differ,
+                      make_structured_image, region_mean_diff, save_output, shrink)
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
@@ -146,25 +146,24 @@ def test_mask_blur_feathers_the_inpainting_boundary(comfy_service, comfy_checkpo
         f'mask_blur=12 left the area outside the mask unblended (diff {feathered_diff:.2f})'
 
 
-def test_upscale(comfy_service, output_dir):
+def test_upscale(comfy_service, comfy_upscale_source, output_dir):
     upscale_models = comfy_service.get_models(ComfyModelType.UPSCALING)
     if not upscale_models:
         pytest.skip('No upscale models installed on the ComfyUI server.')
     # Basic (non-SD) upscaling path, driven by an explicit upscaler model.
     upscale_params = DiffusionUpscalingParams(upscaling_mode=upscale_models[0])
 
-    source = make_structured_image(128, 128)
-    response = comfy_service.upscale(source, 256, 256, upscale_params)
+    source = shrink(comfy_upscale_source, BASIC_UPSCALE_SOURCE_SIZE)
+    response = comfy_service.upscale(source, UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_SIZE, upscale_params)
     images = wait_for_comfy_images(comfy_service, response)
     assert len(images) >= 1
     result = images[0]
-    assert isinstance(result, Image.Image)
-    assert result.width >= 200 and result.height >= 200
+    _assert_valid_image(result, expected_size=UPSCALE_SOURCE_SIZE)
     save_output(output_dir, 'comfy_upscale_source', source)
     save_output(output_dir, 'comfy_upscale_result', result)
 
 
-def test_upscale_with_ultimate_sd_upscale(comfy_service, comfy_checkpoint, output_dir):
+def test_upscale_with_ultimate_sd_upscale(comfy_service, comfy_checkpoint, comfy_upscale_source, output_dir):
     """Ultimate SD Upscale: a tiled diffusion pass refines a 4x upscale, with an optional tile ControlNet unit.
 
     512x512 -> 2048x2048 so the tiled pass actually spans multiple tiles at the default 512px tile size.
@@ -181,10 +180,11 @@ def test_upscale_with_ultimate_sd_upscale(comfy_service, comfy_checkpoint, outpu
 
     upscale_params = DiffusionUpscalingParams(use_stable_diffusion_upscaling=True,
                                               use_ultimate_upscale_script=True,
-                                              diffusion_params=build_comfy_params(comfy_checkpoint),
+                                              diffusion_params=build_comfy_params(comfy_checkpoint,
+                                                                                  prompt=UPSCALE_SOURCE_PROMPT),
                                               step_count=8,
                                               tile_controlnet=tile_controlnet)
-    source = make_structured_image(512, 512)
+    source = comfy_upscale_source
     response = comfy_service.upscale(source, 2048, 2048, upscale_params)
     images = wait_for_comfy_images(comfy_service, response, timeout=300.0)
     assert len(images) == 1
@@ -194,13 +194,14 @@ def test_upscale_with_ultimate_sd_upscale(comfy_service, comfy_checkpoint, outpu
     save_output(output_dir, 'comfy_upscale_sd_result', result)
 
 
-def test_upscale_fallback_tiled_vae(comfy_service, comfy_checkpoint, output_dir):
+def test_upscale_fallback_tiled_vae(comfy_service, comfy_checkpoint, comfy_upscale_source, output_dir):
     """Without the Ultimate SD Upscale node, the diffusion upscale path falls back to tiled VAE encode/decode."""
     upscale_params = DiffusionUpscalingParams(use_stable_diffusion_upscaling=True,
                                               use_ultimate_upscale_script=False,
-                                              diffusion_params=build_comfy_params(comfy_checkpoint),
+                                              diffusion_params=build_comfy_params(comfy_checkpoint,
+                                                                                  prompt=UPSCALE_SOURCE_PROMPT),
                                               step_count=8)
-    source = make_structured_image(512, 512)
+    source = comfy_upscale_source
     response = comfy_service.upscale(source, 2048, 2048, upscale_params)
     images = wait_for_comfy_images(comfy_service, response, timeout=300.0)
     assert len(images) == 1

@@ -35,8 +35,9 @@ from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
 from sd_backend_client.api.shared_data.generation_handle import GenerationError, GenerationStatus
 from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestBody
 
-from .helpers import (add_controlnet_unit, find_tile_controlnet_pairing, make_controlnet_unit, make_edge_image,
-                      make_structured_image, save_output)
+from .helpers import (BASIC_UPSCALE_SOURCE_SIZE, UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, add_controlnet_unit,
+                      find_tile_controlnet_pairing, make_controlnet_unit, make_edge_image, save_output,
+                      shrink)
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
@@ -139,17 +140,18 @@ def test_submit_img2img_lifecycle(service, output_dir):
     save_output(output_dir, 'async_img2img', result.images[0])
 
 
-def test_submit_upscale_lifecycle(service, output_dir):
+def test_submit_upscale_lifecycle(service, upscale_source, output_dir):
     """A basic upscale runs through the dispatcher and yields one image at the requested size."""
-    handle = service.submit_upscale(make_structured_image(128, 128), 256, 256)
+    handle = service.submit_upscale(shrink(upscale_source, BASIC_UPSCALE_SOURCE_SIZE), UPSCALE_SOURCE_SIZE,
+                                    UPSCALE_SOURCE_SIZE)
     assert handle.task_id and handle.task_id.startswith('task(upscale-')
     result = handle.wait(timeout=120)
     assert len(result.images) == 1
-    _assert_valid_image(result.images[0], expected_size=256)
+    _assert_valid_image(result.images[0], expected_size=UPSCALE_SOURCE_SIZE)
     save_output(output_dir, 'async_upscale', result.images[0])
 
 
-def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(service, output_dir):
+def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(service, upscale_source, output_dir):
     """Ultimate SD Upscale through the async handle: 512x512 -> 2048x2048 with an optional tile ControlNet unit."""
     if not service.get_capabilities().ultimate_upscale:
         pytest.skip('Ultimate SD Upscale is not available on this server.')
@@ -164,10 +166,10 @@ def test_submit_upscale_with_ultimate_sd_upscale_lifecycle(service, output_dir):
     upscale_params = DiffusionUpscalingParams(
         use_stable_diffusion_upscaling=True,
         step_count=8,
-        diffusion_params=DiffusionParams(prompt='a red apple on a wooden table', steps=8),
+        diffusion_params=DiffusionParams(prompt=UPSCALE_SOURCE_PROMPT, steps=8),
         tile_controlnet=tile_controlnet,
     )
-    result = service.submit_upscale(make_structured_image(512, 512), 2048, 2048, upscale_params).wait(timeout=300)
+    result = service.submit_upscale(upscale_source, 2048, 2048, upscale_params).wait(timeout=300)
     assert len(result.images) == 1
     _assert_valid_image(result.images[0], expected_size=2048)
     save_output(output_dir, 'async_upscale_sd', result.images[0])

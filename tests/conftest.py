@@ -24,11 +24,15 @@ diffusion and need a checkpoint loaded. They are gated behind an opt-in flag::
 import os
 
 import pytest
+from PIL import Image
 from pydantic import ValidationError
 
 from sd_backend_client.api.a1111_webservice import A1111Webservice
 from sd_backend_client.api.comfyui_webservice import ComfyUiWebservice
 from sd_backend_client.errors import AuthError, SDBackendError
+
+from .comfy_helpers import build_comfy_params
+from .helpers import UPSCALE_SOURCE_PROMPT, UPSCALE_SOURCE_SIZE, fast_request_body
 
 DEFAULT_PORT = 7860
 COMFY_DEFAULT_PORT = 8188
@@ -214,3 +218,22 @@ def service(api_url, credentials) -> A1111Webservice:
         pytest.skip(f'No WebUI server reachable at {api_url}: {err}')
     yield client
     client.disconnect()
+
+
+@pytest.fixture(scope='session')
+def upscale_source(service) -> Image.Image:
+    """A WebUI txt2img render of `UPSCALE_SOURCE_PROMPT`, generated once per session as the upscale tests' source."""
+    body = fast_request_body(UPSCALE_SOURCE_PROMPT)
+    body.width = body.height = UPSCALE_SOURCE_SIZE
+    body.steps = 20
+    body.cfg_scale = 7.0
+    return service.txt2img(body)['images'][0]
+
+
+@pytest.fixture(scope='session')
+def comfy_upscale_source(comfy_service, comfy_checkpoint) -> Image.Image:
+    """A ComfyUI txt2img render of `UPSCALE_SOURCE_PROMPT`, generated once per session as the upscale tests' source."""
+    params = build_comfy_params(comfy_checkpoint, prompt=UPSCALE_SOURCE_PROMPT)
+    params.width = params.height = UPSCALE_SOURCE_SIZE
+    params.steps = 20
+    return comfy_service.submit_txt2img(params).wait(timeout=300).images[0]
