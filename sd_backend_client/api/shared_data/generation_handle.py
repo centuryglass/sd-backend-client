@@ -59,6 +59,10 @@ class GenerationProgress:
 
     All numeric fields are best-effort: a backend that cannot supply one leaves it ``None`` rather than
     guessing. ``queue_index`` is only meaningful while ``status is PENDING``.
+
+    ``progress`` covers what the server is running right now. On ComfyUI that is one sampler run, so a tiled
+    upscale's ``progress`` restarts from 0 for every tile. ``overall_progress`` covers the whole job. ComfyUI
+    reports it only for Ultimate SD Upscale jobs, and callers fall back to ``progress`` when it is ``None``.
     """
     status: GenerationStatus
     progress: Optional[float] = None       # Fraction complete in [0, 1], if the backend reports it.
@@ -66,6 +70,7 @@ class GenerationProgress:
     eta_seconds: Optional[float] = None    # Estimated seconds remaining, if known.
     preview: Optional[Image.Image] = None  # Live-preview frame, if the backend/caller requested one.
     text_info: Optional[str] = None        # Human-readable status line straight from the server.
+    overall_progress: Optional[float] = None  # Fraction of the whole job complete in [0, 1], if known.
 
     @property
     def done(self) -> bool:

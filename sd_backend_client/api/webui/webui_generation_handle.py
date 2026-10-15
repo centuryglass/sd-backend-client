@@ -258,8 +258,11 @@ class WebUIGenerationHandle(GenerationHandle):
                 preview = image_from_base64(body.current_image)
             except Exception:
                 preview = None
+        # The server's progress already spans the whole job: it counts finished jobs (each Ultimate SD Upscale tile is
+        # one) out of state.job_count.
         return GenerationProgress(GenerationStatus.ACTIVE, progress=body.progress,
-                                 eta_seconds=body.eta_relative, preview=preview, text_info=body.textinfo)
+                                 eta_seconds=body.eta_relative, preview=preview, text_info=body.textinfo,
+                                 overall_progress=body.progress)
 
 
 class WebUIDispatcher:

@@ -100,6 +100,7 @@ def test_job_moves_pending_to_active_to_finished():
     active = handle.poll()
     assert active.status is GenerationStatus.ACTIVE
     assert active.progress == 0.25
+    assert active.overall_progress == 0.25  # The WebUI's progress already spans the whole job.
     assert active.eta_seconds == 1.5
     assert active.text_info == 'Sampling'
 

@@ -7,6 +7,7 @@ from sd_backend_client.api.shared_data.api_datatypes import RedrawMode, SeamFixM
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.util.geometry import Size
 
+from sd_backend_client.api.comfyui.comfyui_progress_listener import SamplerRunPlan
 from sd_backend_client.api.comfyui.comfyui_types import ImageFileReference
 from sd_backend_client.api.comfyui.diffusion_workflow_builder import DiffusionWorkflowBuilder
 from sd_backend_client.api.comfyui.nodes.apply_upscaler_node import ApplyUpscalerNode
@@ -17,7 +18,9 @@ from sd_backend_client.api.comfyui.nodes.input.load_image_node import LoadImageN
 from sd_backend_client.api.comfyui.nodes.input.load_upscaler_node import LoadUpscalerNode
 from sd_backend_client.api.comfyui.nodes.ksampler_node import KSamplerNode
 from sd_backend_client.api.comfyui.nodes.save_image_node import SaveImageNode
-from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import UltimateUpscaleNode
+from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import (UltimateUpscaleNode,
+                                                                       ultimate_upscale_model_runs,
+                                                                       ultimate_upscale_sampler_runs)
 from sd_backend_client.api.comfyui.nodes.vae.vae_decode_tiled_node import VAEDecodeTiledNode
 from sd_backend_client.api.comfyui.nodes.vae.vae_encode_tiled_node import (TILE_MIN, TILE_STEP, TILE_MAX,
                                                                            VAEEncodeTiledNode)
@@ -72,6 +75,30 @@ class LatentUpscaleWorkflowBuilder(DiffusionWorkflowBuilder):
     def tile_size(self, size: Size) -> None:
         self._tile_size = Size(size)
 
+    @property
+    def _has_upscale_model(self) -> bool:
+        return self._upscale_model_name is not None and self._upscale_model_name != ''
+
+    def ultimate_upscale_run_plan(self, source_width: int, source_height: int, node: str) -> Optional[SamplerRunPlan]:
+        """Return the progress runs the workflow's Ultimate SD Upscale node reports, or None if it has none.
+
+        `source_width` and `source_height` are the size of the source image, and `node` is the Ultimate SD Upscale
+        node's key in the built workflow. Must match `build_workflow`'s wiring: without an upscale model, the node's
+        input is pre-scaled by `ImageScaleBy`, which rounds to whole pixels.
+        """
+        if not self._ultimate_sd_upscale:
+            return None
+        width, height, upscale_by = source_width, source_height, self._upscale_multiplier
+        model_runs = 0
+        if self._has_upscale_model:
+            model_runs = ultimate_upscale_model_runs(width, height, upscale_by)
+        else:
+            width, height, upscale_by = round(width * upscale_by), round(height * upscale_by), 1.0
+        sampler_runs = ultimate_upscale_sampler_runs(width, height, upscale_by, self.tile_size.width(),
+                                                     self.tile_size.height(), self.redraw_mode, self.seam_fix_mode)
+        # With tiled_decode, the node decodes each sampled tile with VAEDecodeTiled, which reports its own run.
+        return SamplerRunPlan(node, self.steps, sampler_runs, runs_before=model_runs, run_after_each=self.tiled_decode)
+
     def build_workflow(self) -> ComfyNodeGraph:
         """Use the provided parameters to build a complete workflow graph.
 
@@ -103,7 +130,8 @@ class LatentUpscaleWorkflowBuilder(DiffusionWorkflowBuilder):
 
         # Load upscale model node, if available:
         upscale_model_node: Optional[LoadUpscalerNode] = None
-        if self._upscale_model_name is not None and self._upscale_model_name != '':
+        if self._has_upscale_model:
+            assert self._upscale_model_name is not None
             upscale_model_node = LoadUpscalerNode(model_name=self._upscale_model_name)
         elif self._ultimate_sd_upscale:
             # Use a basic scaling node to get the image to the right size instead.

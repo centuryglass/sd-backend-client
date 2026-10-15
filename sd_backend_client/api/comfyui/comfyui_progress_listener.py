@@ -15,7 +15,7 @@ import struct
 import threading
 import time
 from contextlib import AbstractContextManager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Optional
 
 import websocket
@@ -41,16 +41,42 @@ _END_MESSAGES = ('execution_success', 'execution_error', 'execution_interrupted'
 @dataclass
 class LiveProgress:
     """The latest websocket-reported state of one job. Every field is None until the server reports it."""
-    progress: Optional[float] = None       # Fraction complete in [0, 1] for the node currently reporting steps.
-    eta_seconds: Optional[float] = None    # Estimated seconds left in that node, from its step rate so far.
+    progress: Optional[float] = None       # Fraction complete in [0, 1] for the sampler run currently reporting steps.
+    eta_seconds: Optional[float] = None    # Estimated seconds left in that run, from its step rate so far.
     preview: Optional[Image.Image] = None  # Latest preview frame, sent only when ComfyUI runs with a preview method.
+    overall_progress: Optional[float] = None  # Fraction of all sampler runs in [0, 1], only for jobs with a run plan.
+
+
+@dataclass(frozen=True)
+class SamplerRunPlan:
+    """The progress runs one node of a job is expected to report, used to report progress across its sampler runs.
+
+    ComfyUI reports each sampler run as a separate 1-to-`max` progress sequence under the node's id, so a node that
+    samples many times (Ultimate SD Upscale, once per tile) restarts its progress for every run. The node can also
+    report runs that aren't sampling, such as an upscale model pass or a tiled VAE decode. Their `max` can equal
+    `steps`, so the plan names their positions: `runs_before` runs ahead of the first sampler run, and with
+    `run_after_each`, one run after every sampler run.
+    """
+    node: str                     # The node's key in the submitted workflow.
+    steps: int                    # The `max` each of the node's sampler runs reports.
+    total_runs: int               # How many sampler runs the node makes.
+    runs_before: int = 0          # Runs reported before the first sampler run.
+    run_after_each: bool = False  # Whether one run follows each sampler run.
 
 
 @dataclass
 class _JobState:
     live: LiveProgress
-    node: Optional[str] = None
-    first_step: Optional[tuple[float, float]] = None  # (time, value) of the node's first progress message.
+    run_plan: Optional[SamplerRunPlan] = None
+    runs_started: int = 0  # Sampler runs of run_plan's node seen so far.
+    runs_to_skip: int = 0  # Upcoming runs of run_plan's node that aren't sampler runs.
+    in_sampler_run: bool = False  # Whether the node's current run is a sampler run.
+    last_step: Optional[tuple[Any, float, float]] = None  # (node, value, max) of the latest progress message.
+    first_step: Optional[tuple[float, float]] = None  # (time, value) of the current run's first progress message.
+
+    def __post_init__(self) -> None:
+        if self.run_plan is not None:
+            self.runs_to_skip = self.run_plan.runs_before
 
 
 class ComfyProgressListener:
@@ -88,11 +114,14 @@ class ComfyProgressListener:
         self._thread: Optional[threading.Thread] = None
         self._last_failure: Optional[float] = None
 
-    def watch(self, prompt_id: str) -> None:
-        """Start tracking `prompt_id`, connecting the websocket if it is not already open."""
+    def watch(self, prompt_id: str, run_plan: Optional[SamplerRunPlan] = None) -> None:
+        """Start tracking `prompt_id`, connecting the websocket if it is not already open.
+
+        With a `run_plan`, the job's progress also reports `overall_progress`. A job already watched keeps its plan.
+        """
         with self._lock:
             if prompt_id not in self._jobs:
-                self._jobs[prompt_id] = _JobState(LiveProgress())
+                self._jobs[prompt_id] = _JobState(LiveProgress(), run_plan)
             if self._thread is not None:
                 return
             if self._last_failure is not None and self._clock() - self._last_failure < self._retry_interval:
@@ -109,8 +138,7 @@ class ComfyProgressListener:
         """Return a copy of the latest progress for a watched job, or None if it is not watched."""
         with self._lock:
             state = self._jobs.get(prompt_id)
-            return None if state is None else LiveProgress(state.live.progress, state.live.eta_seconds,
-                                                           state.live.preview)
+            return None if state is None else replace(state.live)
 
     def handle_message(self, message: str | bytes) -> None:
         """Apply one websocket message. Messages for unwatched jobs and unknown message types are ignored."""
@@ -141,10 +169,29 @@ class ComfyProgressListener:
             return
         now = self._clock()
         node = data.get('node')
-        if state.first_step is None or node != state.node or value < state.first_step[1]:
-            state.node = node
+        # Every run starts again from step 1, so a value that doesn't advance starts a new run. A change of node or max
+        # does too: Ultimate SD Upscale reports upscale model and VAE decode runs under its own id.
+        last_step = state.last_step
+        new_run = (last_step is None or node != last_step[0] or maximum != last_step[2] or value <= last_step[1])
+        state.last_step = (node, value, maximum)
+        if new_run or state.first_step is None:
             state.first_step = (now, value)
-        state.live.progress = min(max(value / maximum, 0.0), 1.0)
+        fraction = min(max(value / maximum, 0.0), 1.0)
+        state.live.progress = fraction
+        plan = state.run_plan
+        if plan is not None and plan.total_runs > 0 and node == plan.node:
+            if new_run:
+                state.in_sampler_run = state.runs_to_skip == 0 and maximum == plan.steps
+                if state.runs_to_skip > 0:
+                    state.runs_to_skip -= 1
+                elif state.in_sampler_run:
+                    state.runs_started += 1
+                    state.runs_to_skip = int(plan.run_after_each)
+            # A run the plan doesn't predict can push the count past total_runs. Capping it and never lowering
+            # overall_progress keeps the fraction within [0, 1] and monotonic.
+            if state.in_sampler_run:
+                overall = (min(state.runs_started, plan.total_runs) - 1 + fraction) / plan.total_runs
+                state.live.overall_progress = max(overall, state.live.overall_progress or 0.0)
         start_time, start_value = state.first_step
         if value > start_value:
             state.live.eta_seconds = (now - start_time) / (value - start_value) * (maximum - value)

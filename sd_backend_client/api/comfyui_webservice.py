@@ -23,14 +23,15 @@ from sd_backend_client.api.comfyui.comfyui_types import QueueAdditionRequest, Qu
     QueueDeletionRequest, ImageFileReference, PromptExecOutputs, NodeInfoResponse, SystemStatResponse, ImageUploadParams, \
     MaskUploadParams, IMAGE_UPLOAD_FILE_NAME, ImageUploadResponse, QueueInfoResponse, ACTIVE_QUEUE_KEY, \
     PENDING_QUEUE_KEY, QueueHistoryResponse, PromptHistory, FreeMemoryRequest
-from sd_backend_client.api.comfyui.comfyui_progress_listener import ComfyProgressListener
+from sd_backend_client.api.comfyui.comfyui_progress_listener import ComfyProgressListener, SamplerRunPlan
 from sd_backend_client.api.comfyui.controlnet_comfyui_utils import get_all_preprocessors
 from sd_backend_client.api.comfyui.diffusion_workflow_builder import DiffusionWorkflowBuilder, \
     EXTENSION_MODEL_PATTERN
 from sd_backend_client.api.comfyui.latent_upscale_workflow_builder import LatentUpscaleWorkflowBuilder
 from sd_backend_client.api.comfyui.nodes.controlnet.apply_controlnet_node import ApplyControlNetNode
 from sd_backend_client.api.comfyui.nodes.ksampler_node import KSamplerNode
-from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import ULTIMATE_UPSCALE_NODE_NAME
+from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import (ULTIMATE_UPSCALE_NODE_NAME,
+                                                                       ULTIMATE_UPSCALE_NODE_WITHOUT_UPSCALE_MODEL)
 from sd_backend_client.api.comfyui.preprocessor_preview_workflow_builder import PreprocessorPreviewWorkflowBuilder
 from sd_backend_client.api.shared_data.api_datatypes import DiffusionUpscalingParams
 from sd_backend_client.api.shared_data.backend import Backend, require_init_image, require_mask, \
@@ -672,6 +673,15 @@ class ComfyUiWebservice(WebService, Backend):
         `upscaling_mode` uses the server's first upscaling model. Raises ValueError if the requested size does not
         exceed the image's size, or if a basic upscale names a model the server lacks or the server has none.
         """
+        return self._upscale(image, width, height, upscale_params)[0]
+
+    def _upscale(self, image: Image.Image, width: int, height: int,
+                 upscale_params: Optional[DiffusionUpscalingParams] = None
+                 ) -> tuple[QueueAdditionResponse, Optional[SamplerRunPlan]]:
+        """Queue an upscaling job as `upscale` does, also returning its sampler run plan.
+
+        The plan is None unless the job uses the Ultimate SD Upscale node.
+        """
         require_upscale_size(image, width, height)
         if upscale_params is None:
             upscale_params = DiffusionUpscalingParams()
@@ -718,17 +728,23 @@ class ComfyUiWebservice(WebService, Backend):
             workflow_builder.seam_fix_width = upscale_params.seam_fix_width
             workflow_builder.seam_fix_mask_blur = upscale_params.seam_fix_mask_blur
             workflow_builder.seam_fix_padding = upscale_params.seam_fix_padding
-            workflow_node_graph = workflow_builder.build_workflow()
+            workflow = workflow_builder.build_workflow().get_workflow_dict()
             seed: Optional[int] = workflow_builder.seed
+            node_key = next((key for key, node in workflow.items() if node['class_type'] in
+                             (ULTIMATE_UPSCALE_NODE_NAME, ULTIMATE_UPSCALE_NODE_WITHOUT_UPSCALE_MODEL)), None)
+            run_plan = None if node_key is None else workflow_builder.ultimate_upscale_run_plan(
+                image.width, image.height, node_key)
 
         else:  # Basic upscaling workflow:
             assert upscale_model is not None
-            workflow_node_graph = build_basic_upscaling_workflow(image_reference, upscale_model, Size(width, height))
+            workflow = build_basic_upscaling_workflow(image_reference, upscale_model,
+                                                      Size(width, height)).get_workflow_dict()
             seed = None
+            run_plan = None
 
-        res = self._queue_prompt(workflow_node_graph.get_workflow_dict())
+        res = self._queue_prompt(workflow)
         res.seed = seed
-        return res
+        return res, run_plan
 
     # Queued/in-progress workflow status and control:
 
@@ -806,11 +822,11 @@ class ComfyUiWebservice(WebService, Backend):
         queue_removal_body = QueueDeletionRequest(delete=[task_id])
         self.post(ComfyEndpoints.QUEUE, body=queue_removal_body.model_dump())
 
-    def _handle(self, response: QueueAdditionResponse,
-                paste_back: Optional[PasteBack] = None) -> 'ComfyGenerationHandle':
+    def _handle(self, response: QueueAdditionResponse, paste_back: Optional[PasteBack] = None,
+                run_plan: Optional[SamplerRunPlan] = None) -> 'ComfyGenerationHandle':
         """Wrap a queue response from this service in a generation handle."""
         from sd_backend_client.api.comfyui.comfyui_generation_handle import ComfyGenerationHandle
-        return ComfyGenerationHandle.from_queue_response(self, response, paste_back)
+        return ComfyGenerationHandle.from_queue_response(self, response, paste_back, run_plan)
 
     def submit_txt2img(self, diffusion_params: DiffusionParams) -> 'ComfyGenerationHandle':
         """Queue a txt2img job and return its handle, implementing `Backend.submit_txt2img`."""
@@ -833,8 +849,12 @@ class ComfyUiWebservice(WebService, Backend):
 
     def submit_upscale(self, image: Image.Image, width: int, height: int,
                        upscale_params: Optional[DiffusionUpscalingParams] = None) -> 'ComfyGenerationHandle':
-        """Queue an upscaling job and return its handle, implementing `Backend.submit_upscale`."""
-        return self._handle(self.upscale(image, width, height, upscale_params))
+        """Queue an upscaling job and return its handle, implementing `Backend.submit_upscale`.
+
+        An Ultimate SD Upscale job's progress reports `overall_progress` across all of its tiles.
+        """
+        response, run_plan = self._upscale(image, width, height, upscale_params)
+        return self._handle(response, run_plan=run_plan)
 
     def submit_preprocessor_preview(self, image: Image.Image,
                                     preprocessor: ControlNetPreprocessor | PreprocessorParams,

@@ -14,6 +14,7 @@ import pytest
 import websocket
 from PIL import Image
 
+from sd_backend_client.api.comfyui.comfyui_progress_listener import SamplerRunPlan
 from sd_backend_client.api.comfyui.comfyui_types import ImageFileReference
 from sd_backend_client.api.comfyui.comfyui_diffusion_params import ComfyUIDiffusionParams
 from sd_backend_client.api.comfyui_webservice import (AsyncTaskStatus, ComfyEndpoints, ComfyModelType,
@@ -467,6 +468,32 @@ def test_diffusion_upscale_reports_its_seed():
                                       diffusion_params=ComfyUIDiffusionParams(sd_model_name='model.safetensors',
                                                                               seed=4321))
     assert service.upscale(Image.new('RGBA', (8, 8)), 16, 16, params).seed == 4321
+
+
+def test_ultimate_upscale_handle_carries_a_sampler_run_plan():
+    """An Ultimate SD Upscale job's handle plans the tile node's sampler runs, so it can report overall progress."""
+    service, session = _service({('GET', '/models/configs'): [],
+                                 ('POST', ComfyEndpoints.IMG_UPLOAD): _upload_response(),
+                                 ('GET', '/models/upscale_models'): ['4x.pth'],
+                                 ('GET', f'{ComfyEndpoints.OBJECT_INFO}/UltimateSDUpscale'): {'UltimateSDUpscale': {}},
+                                 ('POST', ComfyEndpoints.PROMPT): {'prompt_id': PROMPT_ID, 'number': 1}})
+    params = DiffusionUpscalingParams(use_stable_diffusion_upscaling=True, upscaling_mode='4x.pth', step_count=12,
+                                      tile_width=512, tile_height=512, seam_fix_mode='Band Pass',
+                                      diffusion_params=ComfyUIDiffusionParams(sd_model_name='model.safetensors'))
+    handle = service.submit_upscale(Image.new('RGBA', (512, 384)), 1024, 768, params)
+
+    prompt = session.of('POST', ComfyEndpoints.PROMPT)[0]['json']['prompt']
+    [node_key] = [key for key, node in prompt.items() if node['class_type'] == 'UltimateSDUpscale']
+    assert handle._run_plan == SamplerRunPlan(node=node_key, steps=12, total_runs=2 * 2 + (1 + 1), runs_before=1,
+                                              run_after_each=True)
+
+
+def test_basic_upscale_handle_has_no_sampler_run_plan():
+    """A basic upscale has no tiled sampler, so its handle reports no overall progress."""
+    service, _ = _service({('POST', ComfyEndpoints.IMG_UPLOAD): _upload_response(),
+                           ('GET', '/models/upscale_models'): ['4x.pth'],
+                           ('POST', ComfyEndpoints.PROMPT): {'prompt_id': PROMPT_ID, 'number': 1}})
+    assert service.submit_upscale(Image.new('RGBA', (8, 8)), 16, 16)._run_plan is None
 
 
 @pytest.mark.parametrize('mask', [None, Image.new('L', (8, 8), 255)])

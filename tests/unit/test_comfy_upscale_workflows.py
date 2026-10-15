@@ -5,13 +5,17 @@ import pytest
 from PIL import Image
 
 from sd_backend_client.api.comfyui.basic_upscale_workflow_builder import build_basic_upscaling_workflow
+from sd_backend_client.api.comfyui.comfyui_progress_listener import SamplerRunPlan
 from sd_backend_client.api.comfyui.comfyui_types import ImageFileReference
 from sd_backend_client.api.comfyui.diffusion_workflow_builder import ExtensionModelType
 from sd_backend_client.api.comfyui.latent_upscale_workflow_builder import LatentUpscaleWorkflowBuilder
-from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import ULTIMATE_UPSCALE_NODE_WITHOUT_UPSCALE_MODEL
+from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import (ULTIMATE_UPSCALE_NODE_WITHOUT_UPSCALE_MODEL,
+                                                                       ultimate_upscale_model_runs,
+                                                                       ultimate_upscale_sampler_runs)
 from sd_backend_client.api.comfyui.nodes.vae.vae_encode_tiled_node import TILE_MAX, TILE_MIN
 from sd_backend_client.api.comfyui_webservice import ComfyUiWebservice
 from sd_backend_client.api.comfyui.preprocessor_preview_workflow_builder import PreprocessorPreviewWorkflowBuilder
+from sd_backend_client.api.shared_data.api_datatypes import RedrawMode, SeamFixMode
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
 from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import (ControlNetPreprocessor,
                                                                               ParameterDef, PreprocessorParams)
@@ -257,6 +261,67 @@ def test_latent_workflow_passes_ultimate_tunables():
     assert (ultimate['inputs']['tile_width'], ultimate['inputs']['tile_height']) == (768, 640)
     assert ultimate['inputs']['seam_fix_mode'] == 'Band Pass'
     assert ultimate['inputs']['mask_blur'] == 4
+
+
+# Sampler runs observed on a live ComfyUI with ComfyUI_UltimateSDUpscale, one run per tile:
+# (source width, source height, upscale_by, tile size, redraw mode, seam-fix mode, runs).
+_OBSERVED_SAMPLER_RUNS = [
+    (512, 384, 2.0, 384, 'Linear', 'None', 6),
+    (512, 384, 2.0, 384, 'Linear', 'Band Pass', 9),
+    (512, 384, 2.0, 384, 'Linear', 'Half Tile', 13),
+    (512, 384, 2.0, 384, 'Linear', 'Half Tile + Intersections', 15),
+    (512, 384, 2.0, 384, 'Chess', 'None', 6),
+    (512, 384, 2.0, 384, 'Chess', 'Half Tile + Intersections', 15),
+    (512, 384, 2.0, 384, 'None', 'None', 0),
+    (512, 384, 2.0, 384, 'None', 'Band Pass', 3),
+    (512, 384, 2.0, 384, 'None', 'Half Tile', 7),
+    (512, 384, 2.0, 384, 'None', 'Half Tile + Intersections', 9),
+    (600, 600, 2.0, 400, 'Chess', 'Half Tile + Intersections', 25),
+    (513, 256, 2.0, 512, 'Linear', 'Half Tile', 3),  # 1026 px rounds to 1024: two columns, not three.
+]
+
+
+@pytest.mark.parametrize('width, height, upscale_by, tile, redraw_mode, seam_fix_mode, runs', _OBSERVED_SAMPLER_RUNS)
+def test_sampler_run_count_matches_live_runs(width: int, height: int, upscale_by: float, tile: int,
+                                             redraw_mode: RedrawMode, seam_fix_mode: SeamFixMode, runs: int):
+    """The predicted sampler run count matches what Ultimate SD Upscale ran on a live server."""
+    assert ultimate_upscale_sampler_runs(width, height, upscale_by, tile, tile, redraw_mode, seam_fix_mode) == runs
+
+
+@pytest.mark.parametrize('width, height, upscale_by, runs', [
+    (512, 384, 2.0, 1),
+    (512, 384, 4.0, 1),
+    (512, 512, 1.001, 0),  # Rounds back to the source size: scale factor 1, no upscale model pass.
+    (11, 11, 4.0, 2),      # 44 px rounds to 48: scale factor 5 becomes 6, run as a 3x pass and a 2x pass.
+])
+def test_upscale_model_run_count(width: int, height: int, upscale_by: float, runs: int):
+    """The upscale model runs once per 2x, 3x or 4x pass the script splits the whole-number scale factor into."""
+    assert ultimate_upscale_model_runs(width, height, upscale_by) == runs
+
+
+def test_run_plan_with_an_upscale_model():
+    """With an upscale model, tiles cover the source scaled by the multiplier, after one upscale model run."""
+    builder = latent_builder(True, 'esrgan.pth')  # 3x with 512 px tiles
+    builder.seam_fix_mode = 'Band Pass'
+    builder.steps = 12
+    assert builder.ultimate_upscale_run_plan(512, 340, '9') == SamplerRunPlan(
+        node='9', steps=12, total_runs=3 * 2 + (2 + 1), runs_before=1, run_after_each=True)  # 1536x1024 px
+
+
+def test_run_plan_without_an_upscale_model_counts_tiles_after_pre_scaling():
+    """Without an upscale model, ImageScaleBy rounds the pre-scaled size to whole pixels, and no model runs first."""
+    builder = LatentUpscaleWorkflowBuilder(SOURCE, 1.2, FINAL_SIZE, Size(512, 512), True)
+    builder.tiled_decode = False
+    plan = builder.ultimate_upscale_run_plan(857, 100, '9')
+    # 857 * 1.2 = 1028.4 px. ImageScaleBy makes that 1028, which rounds to 1024 (2 columns), where 1028.4 would round
+    # to 1032 (3 columns).
+    assert plan is not None
+    assert (plan.total_runs, plan.runs_before, plan.run_after_each) == (2, 0, False)
+
+
+def test_no_run_plan_without_ultimate_upscale():
+    """The single-pass img2img fallback has no tiled sampler to plan."""
+    assert latent_builder(False, 'esrgan.pth').ultimate_upscale_run_plan(512, 340, '9') is None
 
 
 def test_latent_workflow_without_source_image_raises():

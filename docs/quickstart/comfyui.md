@@ -52,6 +52,9 @@ def show_progress(progress):
 result = backend.submit_txt2img(params).wait(on_progress=show_progress)
 ```
 
+`progress` is the fraction of the sampler run in progress. An Ultimate SD Upscale job samples once per tile, so its
+`progress` restarts for every tile. Its snapshots also carry `overall_progress`, the fraction of the whole job.
+
 Pass `live_progress=False` to the constructor to skip the websocket. Handles then report only the queue state.
 
 `handle.cancel()` removes a queued job from the server queue, or interrupts it if it is running.
