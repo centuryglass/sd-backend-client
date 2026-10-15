@@ -159,6 +159,26 @@ class DiffusionParams(BaseModel):
     points makes the client crop and paste back, and the server flag is sent off.
     """
 
+    soft_inpainting: bool = False
+    """Whether inpainting treats the mask's grey edge as gradual, per-pixel change instead of rounding it to on/off.
+
+    The masked change then blends into its surroundings, even at high denoising strength and with normal checkpoints.
+    Each backend runs its own algorithm: the WebUI's Soft Inpainting script, or ComfyUI's Differential Diffusion node.
+    The effect needs a blurred mask, with `mask_blur` well above `MASK_BLUR_DEFAULT`. Results come back composited onto
+    the source, as with plain inpainting.
+
+    Submitting img2img or inpainting with this on raises `ValueError` when there is no mask or the server lacks the
+    feature (see `BackendCapabilities.soft_inpainting`). Text-to-image ignores it.
+    """
+
+    soft_inpainting_params: dict[str, Any] = {}
+    """Soft inpainting settings by `ParameterDef.key`, from `Backend.get_soft_inpainting_parameters`.
+
+    The keys differ between backends, since the two algorithms take different settings. Unset keys use the
+    server's defaults. Submitting validates the values against the server's definitions and raises `ValueError` for an
+    unknown key or an out-of-range value. Ignored unless `soft_inpainting` is on.
+    """
+
     controlnet_units: list[ControlNetUnit] = []
 
     def mask_blur_extents(self) -> tuple[int, int]:

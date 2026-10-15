@@ -10,7 +10,8 @@ from sd_backend_client.api.comfyui.comfyui_types import ImageFileReference, Queu
 from sd_backend_client.api.comfyui_webservice import ComfyUiWebservice
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
 from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestBody
-from sd_backend_client.util.visual.inpaint_crop import PasteBack, compute_crop_region, expand_crop_region
+from sd_backend_client.util.visual.inpaint_crop import PasteBack, compute_crop_region, expand_crop_region, \
+    soft_inpainting_compositing_mask
 
 
 def _mask(size: tuple[int, int], box: tuple[int, int, int, int]) -> Image.Image:
@@ -199,3 +200,13 @@ def test_padding_rejects_negative_values(padding):
     """A negative padding fails validation."""
     with pytest.raises(ValueError):
         DiffusionParams(inpaint_full_res_padding=padding)
+
+
+def test_soft_inpainting_compositing_mask_ramps_across_the_outer_edge_of_the_blur():
+    """Levels up to 10% keep the source, levels from 20% take the result, and levels between ramp linearly."""
+    gradient = Image.new('L', (256, 1))
+    gradient.putdata(list(range(256)))
+    levels = [soft_inpainting_compositing_mask(gradient).getpixel((x, 0)) for x in range(256)]
+    assert levels[:26] == [0] * 26
+    assert levels[51:] == [255] * 205
+    assert levels[26:51] == sorted(levels[26:51]) and 0 < levels[38] < 255

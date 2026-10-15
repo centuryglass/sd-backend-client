@@ -16,6 +16,8 @@ from sd_backend_client.api.comfyui.comfyui_types import CONTROLNET_PREPROCESSOR_
 from sd_backend_client.api.comfyui.controlnet_comfyui_utils import COMBO_INPUT_TYPE, INVALID_PREPROCESSOR_NODES
 from sd_backend_client.api.comfyui_webservice import AsyncTaskStatus, ComfyEndpoints, ComfyUiWebservice
 from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import ControlNetPreprocessor
+from sd_backend_client.api.shared_data.parameter_def import ParameterDef
+from sd_backend_client.api.webui.soft_inpainting import SOFT_INPAINTING_PARAMETERS
 
 from .recorded_replay import RECORDED_DIR, recordings, replay
 
@@ -24,14 +26,22 @@ PARAMETER_INPUT_TYPES = {'INT', 'FLOAT', 'BOOLEAN', 'STRING', COMBO_INPUT_TYPE}
 
 COMFYUI_RECORDINGS = recordings('comfyui')
 WEBUI_RECORDINGS = recordings('webui')
+# Recordings made before soft inpainting discovery existed hold no script-info, and replaying them fails.
+WEBUI_SCRIPT_INFO_RECORDINGS = [recording for recording in WEBUI_RECORDINGS
+                                if A1111Webservice.Endpoints.SCRIPT_INFO in recording.values[0]['responses']]
 
 
 def _assert_parameters_consistent(preprocessor: ControlNetPreprocessor) -> None:
     """Each parameter's default is one of its options and inside its numeric range, and keys are unique."""
-    keys = [parameter.key for parameter in preprocessor.parameters]
-    assert len(keys) == len(set(keys)), f'{preprocessor.name} repeats a parameter key: {keys}'
-    for parameter in preprocessor.parameters:
-        label = f'{preprocessor.name}.{parameter.key}'
+    _assert_parameter_defs_consistent(preprocessor.name, preprocessor.parameters)
+
+
+def _assert_parameter_defs_consistent(owner: str, parameters: list[ParameterDef]) -> None:
+    """Each parameter's default is one of its options and inside its numeric range, and keys are unique."""
+    keys = [parameter.key for parameter in parameters]
+    assert len(keys) == len(set(keys)), f'{owner} repeats a parameter key: {keys}'
+    for parameter in parameters:
+        label = f'{owner}.{parameter.key}'
         if parameter.option_list is not None:
             assert parameter.default_value in parameter.option_list, label
         if isinstance(parameter.default_value, (int, float)) and not isinstance(parameter.default_value, bool):
@@ -148,6 +158,15 @@ def test_comfyui_queue_info_parses(recording):
     assert isinstance(queue_info.queue_running, list) and isinstance(queue_info.queue_pending, list)
 
 
+@pytest.mark.parametrize('recording', COMFYUI_RECORDINGS)
+def test_comfyui_soft_inpainting_parameters(recording):
+    """Differential Diffusion's settings parse from the recorded node info, and never offer a strength of 0."""
+    parameters = _comfy(recording).get_soft_inpainting_parameters()
+    _assert_parameter_defs_consistent('DifferentialDiffusion', parameters)
+    for parameter in parameters:
+        assert parameter.min_val is not None and parameter.min_val > 0
+
+
 # WebUI
 
 def _webui(recording: dict[str, Any]) -> A1111Webservice:
@@ -189,3 +208,14 @@ def test_webui_discovers_every_recorded_module(recording):
     for preprocessor in preprocessors:
         _assert_parameters_consistent(preprocessor)
     assert isinstance(service.get_controlnet_type_categories(), dict)
+
+
+@pytest.mark.parametrize('recording', WEBUI_SCRIPT_INFO_RECORDINGS)
+def test_webui_soft_inpainting_parameters_match_the_known_definitions(recording):
+    """The recorded script-info gives the six known settings, with the defaults and limits the package hardcodes."""
+    parameters = _webui(recording).get_soft_inpainting_parameters()
+    _assert_parameter_defs_consistent('Soft inpainting', parameters)
+    known = [(parameter.key, parameter.display_name, parameter.default_value, parameter.min_val, parameter.max_val,
+              parameter.step_val) for parameter in SOFT_INPAINTING_PARAMETERS]
+    assert [(parameter.key, parameter.display_name, parameter.default_value, parameter.min_val, parameter.max_val,
+             parameter.step_val) for parameter in parameters] == known

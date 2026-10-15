@@ -77,6 +77,10 @@ RUN_SD_GENERATION=1 pytest tests/ # equivalent env-var form
   (`http://127.0.0.1:7860`), `COMFYUI_API_URL` (`http://127.0.0.1:8188`), `SD_UNAME`/`SD_PASS` for A1111
   `--api-auth`. `tests/local.env` (gitignored) is a convenience `source`-able file for credentials. `tests/README.md`
   has the full matrix.
+- **On the maintainer's Arch Linux machine, system Python has a separate, non-editable `sd_backend_client` install**
+  that IntraPaint uses. Leave it in place. It shadows the repo for anything run from outside the repo root, such as
+  `python scripts/capture_fixtures.py`, so run those with `PYTHONPATH=<repo root>`. Running `pytest` from the repo root
+  is unaffected.
 - Runtime dependencies are listed with lower bounds only, in both `pyproject.toml` and `requirements.txt`; keep the
   two lists in sync. CI's `test-minimum-deps` job runs the tests with every floor installed, so raise a floor when new
   code needs a newer release. Dev tools are pinned exactly in `requirements-dev.txt`, and Dependabot proposes their bumps

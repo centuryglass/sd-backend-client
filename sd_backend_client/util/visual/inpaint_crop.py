@@ -76,7 +76,8 @@ def expand_crop_region(region: CropBox, output_size: tuple[int, int], image_size
 class PasteBack:
     """What a finished inpainting job needs to put its results onto the source image.
 
-    `source` and `mask` are full size: `mask` is the blurred mask, white where the result replaces the source. When
+    `source` and `mask` are full size: `mask` is white where the result replaces the source. It is the blurred mask,
+    or `soft_inpainting_compositing_mask` of it for a soft inpainting job. When
     `region` is set, results are crops of that region of `source` and are resized and pasted in before the mask is
     applied.
     """
@@ -99,6 +100,33 @@ class PasteBack:
         if mask.size != image.size:
             mask = mask.resize(image.size)
         return Image.composite(image, source, mask)
+
+
+SOFT_INPAINTING_COMPOSITE_OFFSET = 0.1
+"""Mask level at and below which a soft-inpainted result is not composited in.
+
+See `soft_inpainting_compositing_mask`.
+"""
+
+SOFT_INPAINTING_COMPOSITE_THRESHOLD = 0.2
+"""Mask level at and above which a soft-inpainted result fully replaces the source.
+
+See `soft_inpainting_compositing_mask`.
+"""
+
+
+def soft_inpainting_compositing_mask(blurred_mask: Image.Image) -> Image.Image:
+    """Return the mask to composite a Differential Diffusion result through, from the blurred mask it sampled with.
+
+    Differential Diffusion already fades the change out across the blurred mask's grey band, so compositing through
+    that mask again would fade it twice. The returned mask ramps linearly from 0 at `SOFT_INPAINTING_COMPOSITE_OFFSET`
+    to 1 at `SOFT_INPAINTING_COMPOSITE_THRESHOLD`, as the comfyui-inpaint-nodes "Denoise to Compositing Mask" node does
+    with its defaults. Pixels outside the band keep the source.
+    """
+    offset = SOFT_INPAINTING_COMPOSITE_OFFSET * 255
+    ramp = (SOFT_INPAINTING_COMPOSITE_THRESHOLD - SOFT_INPAINTING_COMPOSITE_OFFSET) * 255
+    lookup = [min(max(round((value - offset) / ramp * 255), 0), 255) for value in range(256)]
+    return blurred_mask.convert('L').point(lookup)
 
 
 def crop_to_region(image: Image.Image, region: CropBox, output_size: tuple[int, int]) -> Image.Image:

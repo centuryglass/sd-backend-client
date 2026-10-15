@@ -12,9 +12,10 @@
    "free_memory": false,
    "interrogate": false,
    "scheduler": true,
+   "soft_inpainting": true,
    "ultimate_upscale": true
   },
-  "captured": "2026-10-08",
+  "captured": "2026-10-15",
   "controlnet_version": null
  },
  "responses": {
@@ -14877,13 +14878,13 @@
    "eta_relative": 0.0,
    "progress": 0.0,
    "state": {
-    "interrupted": true,
+    "interrupted": false,
     "job": "",
     "job_count": 0,
     "job_no": 1,
-    "job_timestamp": "20261008123043",
+    "job_timestamp": "20261015125649",
     "sampling_step": 0,
-    "sampling_steps": 4,
+    "sampling_steps": 8,
     "skipped": false,
     "stopping_generation": false
    },
@@ -15192,6 +15193,71 @@
     "need_inner_model": false
    }
   ],
+  "/sdapi/v1/script-info": [
+   {
+    "args": [
+     {
+      "choices": null,
+      "label": "Soft inpainting",
+      "maximum": null,
+      "minimum": null,
+      "step": null,
+      "value": false
+     },
+     {
+      "choices": null,
+      "label": "Schedule bias",
+      "maximum": 8,
+      "minimum": 0,
+      "step": 0.1,
+      "value": 1
+     },
+     {
+      "choices": null,
+      "label": "Preservation strength",
+      "maximum": 8,
+      "minimum": 0,
+      "step": 0.05,
+      "value": 0.5
+     },
+     {
+      "choices": null,
+      "label": "Transition contrast boost",
+      "maximum": 32,
+      "minimum": 1,
+      "step": 0.5,
+      "value": 4
+     },
+     {
+      "choices": null,
+      "label": "Mask influence",
+      "maximum": 1,
+      "minimum": 0,
+      "step": 0.05,
+      "value": 0
+     },
+     {
+      "choices": null,
+      "label": "Difference threshold",
+      "maximum": 8,
+      "minimum": 0,
+      "step": 0.25,
+      "value": 0.5
+     },
+     {
+      "choices": null,
+      "label": "Difference contrast",
+      "maximum": 8,
+      "minimum": 0,
+      "step": 0.25,
+      "value": 2
+     }
+    ],
+    "is_alwayson": true,
+    "is_img2img": true,
+    "name": "soft inpainting"
+   }
+  ],
   "/sdapi/v1/scripts": {
    "img2img": [
     "loopback",
@@ -15232,131 +15298,11 @@
   "/sdapi/v1/sd-models": [
    {
     "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/aZovyaRPGArtistTools_v4.safetensors",
-    "hash": null,
-    "model_name": "sd_aZovyaRPGArtistTools_v4",
-    "sha256": null,
-    "title": "sd/aZovyaRPGArtistTools_v4.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/cyberrealistic_v80.safetensors",
-    "hash": null,
-    "model_name": "sd_cyberrealistic_v80",
-    "sha256": null,
-    "title": "sd/cyberrealistic_v80.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/juggernautXL_v7.safetensors",
-    "hash": null,
-    "model_name": "sd_juggernautXL_v7",
-    "sha256": null,
-    "title": "sd/juggernautXL_v7.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/dreamlabsoil_v2.safetensors",
-    "hash": null,
-    "model_name": "sd_dreamlabsoil_v2",
-    "sha256": null,
-    "title": "sd/dreamlabsoil_v2.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/illustriousXL_v20.safetensors",
-    "hash": null,
-    "model_name": "sd_illustriousXL_v20",
-    "sha256": null,
-    "title": "sd/illustriousXL_v20.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/etherBluMix_v7.safetensors",
-    "hash": null,
-    "model_name": "sd_etherBluMix_v7",
-    "sha256": null,
-    "title": "sd/etherBluMix_v7.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/etherRealMix_v4.safetensors",
-    "hash": null,
-    "model_name": "sd_etherRealMix_v4",
-    "sha256": null,
-    "title": "sd/etherRealMix_v4.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/FlatIllustration_v10.safetensors",
-    "hash": null,
-    "model_name": "sd_FlatIllustration_v10",
-    "sha256": null,
-    "title": "sd/FlatIllustration_v10.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/commoncanvas_s_nc.safetensors",
-    "hash": null,
-    "model_name": "sd_commoncanvas_s_nc",
-    "sha256": null,
-    "title": "sd/commoncanvas_s_nc.safetensors"
-   },
-   {
-    "config": null,
     "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/arthemyComics_v70.safetensors",
     "hash": null,
     "model_name": "sd_arthemyComics_v70",
     "sha256": null,
     "title": "sd/arthemyComics_v70.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/commoncanvas_xl_nc.safetensors",
-    "hash": null,
-    "model_name": "sd_commoncanvas_xl_nc",
-    "sha256": null,
-    "title": "sd/commoncanvas_xl_nc.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/v1-5-pruned-emaonly.ckpt",
-    "hash": null,
-    "model_name": "sd_v1-5-pruned-emaonly",
-    "sha256": null,
-    "title": "sd/v1-5-pruned-emaonly.ckpt"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/juggernautXL_lightning.safetensors",
-    "hash": null,
-    "model_name": "sd_juggernautXL_lightning",
-    "sha256": null,
-    "title": "sd/juggernautXL_lightning.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/commoncanvas_s_c.safetensors",
-    "hash": null,
-    "model_name": "sd_commoncanvas_s_c",
-    "sha256": null,
-    "title": "sd/commoncanvas_s_c.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/sd_xl_refiner_1.0.safetensors",
-    "hash": null,
-    "model_name": "sd_sd_xl_refiner_1.0",
-    "sha256": null,
-    "title": "sd/sd_xl_refiner_1.0.safetensors"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/dreamshaper_v8.safetensors",
-    "hash": null,
-    "model_name": "sd_dreamshaper_v8",
-    "sha256": null,
-    "title": "sd/dreamshaper_v8.safetensors"
    },
    {
     "config": null,
@@ -15368,27 +15314,35 @@
    },
    {
     "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/deliberate_v3.safetensors",
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/commoncanvas_xl_nc.safetensors",
     "hash": null,
-    "model_name": "sd_deliberate_v3",
+    "model_name": "sd_commoncanvas_xl_nc",
     "sha256": null,
-    "title": "sd/deliberate_v3.safetensors"
+    "title": "sd/commoncanvas_xl_nc.safetensors"
    },
    {
     "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/nextphoto_v30.safetensors",
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/etherRealMix_v4.safetensors",
     "hash": null,
-    "model_name": "sd_nextphoto_v30",
+    "model_name": "sd_etherRealMix_v4",
     "sha256": null,
-    "title": "sd/nextphoto_v30.safetensors"
+    "title": "sd/etherRealMix_v4.safetensors"
    },
    {
     "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/dreamlikeDiffusion_v10.ckpt",
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/illustriousXL_v20.safetensors",
     "hash": null,
-    "model_name": "sd_dreamlikeDiffusion_v10",
+    "model_name": "sd_illustriousXL_v20",
     "sha256": null,
-    "title": "sd/dreamlikeDiffusion_v10.ckpt"
+    "title": "sd/illustriousXL_v20.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/juggernautXL_v7.safetensors",
+    "hash": null,
+    "model_name": "sd_juggernautXL_v7",
+    "sha256": null,
+    "title": "sd/juggernautXL_v7.safetensors"
    },
    {
     "config": null,
@@ -15400,11 +15354,35 @@
    },
    {
     "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/commoncanvas_s_c.safetensors",
+    "hash": null,
+    "model_name": "sd_commoncanvas_s_c",
+    "sha256": null,
+    "title": "sd/commoncanvas_s_c.safetensors"
+   },
+   {
+    "config": null,
     "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/deliberate_v3-inpainting.safetensors",
     "hash": null,
     "model_name": "sd_deliberate_v3-inpainting",
     "sha256": null,
     "title": "sd/deliberate_v3-inpainting.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/pirsusArtstation_v10.safetensors",
+    "hash": null,
+    "model_name": "sd_pirsusArtstation_v10",
+    "sha256": null,
+    "title": "sd/pirsusArtstation_v10.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/nextphoto_v30.safetensors",
+    "hash": null,
+    "model_name": "sd_nextphoto_v30",
+    "sha256": null,
+    "title": "sd/nextphoto_v30.safetensors"
    },
    {
     "config": null,
@@ -15416,19 +15394,27 @@
    },
    {
     "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/lyriel_v16.safetensors",
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/sd_xl_refiner_1.0.safetensors",
     "hash": null,
-    "model_name": "sd_lyriel_v16",
+    "model_name": "sd_sd_xl_refiner_1.0",
     "sha256": null,
-    "title": "sd/lyriel_v16.safetensors"
+    "title": "sd/sd_xl_refiner_1.0.safetensors"
    },
    {
     "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/landscapesupermix_v21.safetensors",
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/juggernautXL_lightning.safetensors",
     "hash": null,
-    "model_name": "sd_landscapesupermix_v21",
+    "model_name": "sd_juggernautXL_lightning",
     "sha256": null,
-    "title": "sd/landscapesupermix_v21.safetensors"
+    "title": "sd/juggernautXL_lightning.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/FlatIllustration_v10.safetensors",
+    "hash": null,
+    "model_name": "sd_FlatIllustration_v10",
+    "sha256": null,
+    "title": "sd/FlatIllustration_v10.safetensors"
    },
    {
     "config": null,
@@ -15440,19 +15426,99 @@
    },
    {
     "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/v1-5-pruned-emaonly.ckpt",
+    "hash": null,
+    "model_name": "sd_v1-5-pruned-emaonly",
+    "sha256": null,
+    "title": "sd/v1-5-pruned-emaonly.ckpt"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/commoncanvas_s_nc.safetensors",
+    "hash": null,
+    "model_name": "sd_commoncanvas_s_nc",
+    "sha256": null,
+    "title": "sd/commoncanvas_s_nc.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/dreamshaper_v8.safetensors",
+    "hash": null,
+    "model_name": "sd_dreamshaper_v8",
+    "sha256": null,
+    "title": "sd/dreamshaper_v8.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/etherBluMix_v7.safetensors",
+    "hash": null,
+    "model_name": "sd_etherBluMix_v7",
+    "sha256": null,
+    "title": "sd/etherBluMix_v7.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/cyberrealistic_v80.safetensors",
+    "hash": null,
+    "model_name": "sd_cyberrealistic_v80",
+    "sha256": null,
+    "title": "sd/cyberrealistic_v80.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/deliberate_v3.safetensors",
+    "hash": null,
+    "model_name": "sd_deliberate_v3",
+    "sha256": null,
+    "title": "sd/deliberate_v3.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/dreamlabsoil_v2.safetensors",
+    "hash": null,
+    "model_name": "sd_dreamlabsoil_v2",
+    "sha256": null,
+    "title": "sd/dreamlabsoil_v2.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/landscapesupermix_v21.safetensors",
+    "hash": null,
+    "model_name": "sd_landscapesupermix_v21",
+    "sha256": null,
+    "title": "sd/landscapesupermix_v21.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/dreamlikeDiffusion_v10.ckpt",
+    "hash": null,
+    "model_name": "sd_dreamlikeDiffusion_v10",
+    "sha256": null,
+    "title": "sd/dreamlikeDiffusion_v10.ckpt"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/lyriel_v16.safetensors",
+    "hash": null,
+    "model_name": "sd_lyriel_v16",
+    "sha256": null,
+    "title": "sd/lyriel_v16.safetensors"
+   },
+   {
+    "config": null,
+    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/aZovyaRPGArtistTools_v4.safetensors",
+    "hash": null,
+    "model_name": "sd_aZovyaRPGArtistTools_v4",
+    "sha256": null,
+    "title": "sd/aZovyaRPGArtistTools_v4.safetensors"
+   },
+   {
+    "config": null,
     "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/juggernaut_reborn.safetensors",
     "hash": "338b85bc4f",
     "model_name": "sd_juggernaut_reborn",
     "sha256": "338b85bc4f7628bc42cce336242e79154a57c2a4360531436e97f7793568f18c",
     "title": "sd/juggernaut_reborn.safetensors [338b85bc4f]"
-   },
-   {
-    "config": null,
-    "filename": "/opt/stabilitymatrix/Data/Packages/Stable Diffusion WebUI Forge - Neo/models/Stable-diffusion/sd/pirsusArtstation_v10.safetensors",
-    "hash": null,
-    "model_name": "sd_pirsusArtstation_v10",
-    "sha256": null,
-    "title": "sd/pirsusArtstation_v10.safetensors"
    }
   ],
   "/sdapi/v1/sd-modules": [],

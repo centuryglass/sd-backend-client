@@ -274,3 +274,46 @@ def test_tag_without_model_lists_raises():
     builder = DiffusionWorkflowBuilder()
     with pytest.raises(ValueError, match='Available LoRA models: none'):
         builder.load_diffusion_parameters(ComfyUIDiffusionParams(prompt='a cat <lora:foo:0.8>', sd_model_name='m'))
+
+
+def _soft_inpainting_builder(mask: bool = True, **soft_inpainting_params: float) -> DiffusionWorkflowBuilder:
+    builder = DiffusionWorkflowBuilder()
+    builder.load_diffusion_parameters(
+        ComfyUIDiffusionParams(prompt='a cat <lora:detail:0.8>', sd_model_name='m.safetensors', seed=1,
+                               soft_inpainting=True, soft_inpainting_params=soft_inpainting_params),
+        LORAS, HYPERNETWORKS)
+    builder.source_image = 'src.png [input]'
+    if mask:
+        builder.mask = 'mask.png [input]'
+    return builder
+
+
+def test_soft_inpainting_samples_through_differential_diffusion_after_the_loras():
+    """Soft inpainting patches the model after the LoRA loaders, and the sampler reads the patched model."""
+    workflow = _soft_inpainting_builder().build_workflow().get_workflow_dict()
+    patch = single_node(workflow, 'DifferentialDiffusion')
+    assert _source_class(workflow, patch['inputs']['model']) == 'LoraLoader'
+    assert _source_class(workflow, single_node(workflow, 'KSampler')['inputs']['model']) == 'DifferentialDiffusion'
+    assert 'strength' not in patch['inputs']  # Older ComfyUI builds reject inputs they don't list.
+    # The sampler's latent carries the noise mask that Differential Diffusion reads:
+    sampled_latent = single_node(workflow, 'KSampler')['inputs']['latent_image']
+    assert _source_class(workflow, workflow[sampled_latent[0]]['inputs']['samples']) == 'SetLatentNoiseMask'
+
+
+def test_soft_inpainting_sends_a_set_strength():
+    """A `strength` setting becomes the node's input."""
+    workflow = _soft_inpainting_builder(strength=0.5).build_workflow().get_workflow_dict()
+    assert single_node(workflow, 'DifferentialDiffusion')['inputs']['strength'] == 0.5
+
+
+@pytest.mark.parametrize('strength', [0.0, 1.5])
+def test_soft_inpainting_rejects_a_strength_comfyui_would_misread_or_reject(strength: float):
+    """ComfyUI treats a strength of 0 as 1, and rejects one above 1."""
+    with pytest.raises(ValueError, match='strength'):
+        _soft_inpainting_builder(strength=strength)
+
+
+def test_soft_inpainting_without_a_mask_leaves_the_model_unpatched():
+    """Without a mask there is no noise mask to schedule, so the model is not patched."""
+    workflow = _soft_inpainting_builder(mask=False).build_workflow().get_workflow_dict()
+    assert nodes_of_type(workflow, 'DifferentialDiffusion') == []

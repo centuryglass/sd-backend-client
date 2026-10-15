@@ -13,8 +13,8 @@ Usage (servers from the integration-test env vars, see tests/README.md):
 
 The ComfyUI capture queues one small txt2img job, so ComfyUI needs a checkpoint (the first one it lists, unless
 --checkpoint names one). The output names the server's models and the ComfyUI checkpoint, so review it before
-committing. ComfyUI's /object_info is trimmed to the nodes the tests read, and system_stats' argv is emptied, since it
-holds local paths.
+committing. ComfyUI's /object_info and the WebUI's /sdapi/v1/script-info are trimmed to the entries the tests read, and
+system_stats' argv is emptied, since it holds local paths.
 """
 import argparse
 import datetime
@@ -34,6 +34,7 @@ from sd_backend_client.api.comfyui.comfyui_types import CONTROLNET_PREPROCESSOR_
 from sd_backend_client.api.comfyui_webservice import AsyncTaskStatus, ComfyEndpoints, ComfyUiWebservice
 from sd_backend_client.api.shared_data.backend import Backend
 from sd_backend_client.api.webservice import WebService
+from sd_backend_client.api.webui.soft_inpainting import SOFT_INPAINTING_SCRIPT_KEY
 from sd_backend_client.errors import ServerError
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
@@ -115,7 +116,7 @@ def _run_discovery(service: Backend) -> dict[str, bool]:
     capabilities the server reported."""
     for list_options in (service.list_checkpoints, service.list_vaes, service.list_loras, service.list_hypernetworks,
                          service.list_samplers, service.list_schedulers, service.list_upscalers,
-                         service.list_controlnet_models):
+                         service.list_controlnet_models, service.get_soft_inpainting_parameters):
         list_options()
     return service.get_capabilities().model_dump()
 
@@ -178,6 +179,10 @@ def capture_webui(url: str, credentials: Optional[tuple[str, str]]) -> dict[str,
     service.get_controlnet_preprocessors()
     service.get_controlnet_type_categories()
     capabilities = _run_discovery(service)
+    if A1111Webservice.Endpoints.SCRIPT_INFO in responses:
+        responses[A1111Webservice.Endpoints.SCRIPT_INFO] = [
+            script for script in responses[A1111Webservice.Endpoints.SCRIPT_INFO]
+            if script['name'].lower() == SOFT_INPAINTING_SCRIPT_KEY]
     return {'meta': {'backend': 'webui', 'controlnet_version': version, 'capabilities': capabilities},
             'responses': responses, 'errors': errors}
 

@@ -60,7 +60,8 @@ def make_backend(cls: type = ComfyUiWebservice) -> Any:
     backend.list_controlnet_models.return_value = []
     backend.get_controlnet_preprocessors.return_value = []
     backend.get_capabilities.return_value = BackendCapabilities(controlnet=False, ultimate_upscale=False,
-                                                                scheduler=True, interrogate=False, free_memory=True)
+                                                                soft_inpainting=False, scheduler=True,
+                                                                interrogate=False, free_memory=True)
     return backend
 
 

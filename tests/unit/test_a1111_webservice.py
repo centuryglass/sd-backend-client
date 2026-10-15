@@ -178,12 +178,14 @@ def test_ultimate_upscale_sends_script_args_through_img2img(monkeypatch):
     service, sent = _service_with_routes(monkeypatch, {A1111Webservice.Endpoints.UPSCALERS: UPSCALERS},
                                          {'images': [image_to_base64(Image.new('RGBA', (1, 1)))]})
     params = DiffusionUpscalingParams(upscaling_mode='R-ESRGAN 4x+', use_stable_diffusion_upscaling=True,
-                                      tile_width=640, tile_height=512)
+                                      tile_width=640, tile_height=512,
+                                      diffusion_params=DiffusionParams(soft_inpainting=True))
     service.upscale(Image.new('RGBA', (4, 2)), 16, 8, params)
 
     endpoint, body = sent[0]
     assert endpoint == A1111Webservice.Endpoints.IMG2IMG
     assert body['script_name'] == 'ultimate sd upscale'
+    assert 'soft inpainting' not in body['alwayson_scripts']  # The upscale pass has no mask.
     args = body['script_args']
     assert len(args) == 18
     assert (args[1], args[2]) == (640, 512)
@@ -354,6 +356,16 @@ def test_submit_txt2img_sends_no_source_image_or_mask(monkeypatch):
     assert 'init_images' not in sent[0][1]
     assert 'mask' not in sent[0][1]
     assert params.init_images is not None and params.mask is not None
+
+
+def test_txt2img_sends_no_soft_inpainting(monkeypatch):
+    """Both txt2img paths leave out the Soft Inpainting script, which only runs on img2img."""
+    service, sent = _service_with_stubbed_post(monkeypatch)
+    params = DiffusionRequestBody(soft_inpainting=True)
+    service.submit_txt2img(params).wait()
+    service.txt2img(params)
+    assert [('soft inpainting' in body['alwayson_scripts']) for _, body in sent] == [False, False]
+    assert params.soft_inpainting
 
 
 def test_submit_upscale_uses_image_and_params_as_they_were_at_submit_time(monkeypatch):

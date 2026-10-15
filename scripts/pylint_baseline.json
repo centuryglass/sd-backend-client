@@ -40,8 +40,7 @@
   },
   "sd_backend_client/api/shared_data/controlnet/controlnet_preprocessor.py": {
     "inconsistent-quotes": 3,
-    "missing-function-docstring": 1,
-    "trailing-newlines": 1
+    "missing-function-docstring": 1
   },
   "sd_backend_client/api/webui/controlnet_webui_constants.py": {
     "line-too-long": 2,

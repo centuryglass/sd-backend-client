@@ -23,6 +23,7 @@ from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestB
 from sd_backend_client.util.visual.image_utils import image_to_base64, image_to_png_bytes
 
 from .fake_session import FakeSession
+from .soft_inpainting_responses import COMFYUI_DIFFERENTIAL_DIFFUSION_INFO, WEBUI_SOFT_INPAINTING_INFO
 from .webui_responses import generation_info, generation_response
 
 PROMPT_ID = '7d4c0f0e-6a3b-4c1e-9f6e-0a1b2c3d4e5f'
@@ -31,6 +32,7 @@ DETECT_MAP_PIXEL = (255, 255, 255, 255)
 SEED = 1234
 UPSCALER_NAME = 'upscaler.pth'
 WAIT_TIMEOUT_S = 5.0
+DIFFERENTIAL_DIFFUSION_INFO = f'{ComfyEndpoints.OBJECT_INFO}/DifferentialDiffusion'
 
 
 def _result_image() -> Image.Image:
@@ -43,12 +45,19 @@ class _Harness:
     def __init__(self, service: Backend, session: FakeSession,
                  generation_requests: Callable[[FakeSession], list[dict[str, Any]]],
                  sent_prompts: Callable[[dict[str, Any]], list[str]],
-                 sent_image_count: Callable[[FakeSession], int]) -> None:
+                 sent_image_count: Callable[[FakeSession], int],
+                 soft_inpainting_routes: list[tuple[str, str]]) -> None:
         self.service = service
         self.session = session
         self.generation_requests = lambda: generation_requests(session)
         self.sent_prompts = sent_prompts
         self.sent_image_count = lambda: sent_image_count(session)
+        self.soft_inpainting_routes = soft_inpainting_routes
+
+    def remove_soft_inpainting(self) -> None:
+        """Make the fake server one without soft inpainting."""
+        for route in self.soft_inpainting_routes:
+            self.session.routes[route] = {'txt2img': [], 'img2img': []} if route[1].endswith('/scripts') else {}
 
 
 def _webui() -> _Harness:
@@ -66,6 +75,8 @@ def _webui() -> _Harness:
         ('GET', A1111Webservice.Endpoints.UPSCALERS): [
             {'name': name, 'model_name': None, 'model_path': None, 'model_url': None, 'scale': 4.0}
             for name in ('None', UPSCALER_NAME)],
+        ('GET', A1111Webservice.Endpoints.SCRIPTS): {'txt2img': [], 'img2img': ['soft inpainting']},
+        ('GET', A1111Webservice.Endpoints.SCRIPT_INFO): [WEBUI_SOFT_INPAINTING_INFO],
         ('GET', A1111Webservice.Endpoints.PROGRESS): {
             'progress': 0.5, 'eta_relative': 1.0, 'current_image': None, 'textinfo': None,
             'state': {'skipped': False, 'interrupted': False, 'stopping_generation': False, 'job': '',
@@ -82,7 +93,7 @@ def _webui() -> _Harness:
         return len(body.get('init_images', [])) + ('mask' in body)
 
     return _Harness(service, session, generation_requests, lambda request: [request['json']['prompt']],
-                    sent_image_count)
+                    sent_image_count, [('GET', A1111Webservice.Endpoints.SCRIPTS)])
 
 
 def _comfyui() -> _Harness:
@@ -101,6 +112,7 @@ def _comfyui() -> _Harness:
         ('POST', ComfyEndpoints.PROMPT): {'prompt_id': PROMPT_ID, 'number': 1, 'node_errors': {}},
         ('GET', f'{ComfyEndpoints.HISTORY}/{PROMPT_ID}'): history,
         ('GET', ComfyEndpoints.VIEW_IMAGE): image_to_png_bytes(_result_image()),
+        ('GET', DIFFERENTIAL_DIFFUSION_INFO): COMFYUI_DIFFERENTIAL_DIFFUSION_INFO,
     })
     service._session = session  # type: ignore[assignment]
 
@@ -112,7 +124,7 @@ def _comfyui() -> _Harness:
         return len(fake.of('POST', ComfyEndpoints.IMG_UPLOAD)) + len(fake.of('POST', ComfyEndpoints.MASK_UPLOAD))
 
     return _Harness(service, session, lambda fake: fake.of('POST', ComfyEndpoints.PROMPT), sent_prompts,
-                    sent_image_count)
+                    sent_image_count, [('GET', DIFFERENTIAL_DIFFUSION_INFO)])
 
 
 BACKENDS = {'webui': _webui, 'comfyui': _comfyui}
@@ -200,6 +212,58 @@ def test_missing_inputs_raise_before_contacting_the_server(harness: _Harness, op
     with pytest.raises(ValueError, match=message):
         submit(harness.service, params)
     assert not harness.session.requests
+
+
+@pytest.mark.parametrize('operation', ['img2img', 'inpaint'])
+def test_soft_inpainting_submits_with_the_server_defaults(harness: _Harness, operation: str):
+    """An inpainting or masked img2img job with soft inpainting on and every setting at its default finishes."""
+    submit, _ = OPERATIONS[operation]
+    defaults = {parameter.key: parameter.default_value
+                for parameter in harness.service.get_soft_inpainting_parameters()}
+    params = _params(init_image=True, mask=True, soft_inpainting=True, soft_inpainting_params=defaults)
+    result = submit(harness.service, params).wait(timeout=WAIT_TIMEOUT_S, poll_interval=0.01)
+    assert [image.getpixel((0, 0)) for image in result.images] == [RESULT_PIXEL]
+
+
+def test_txt2img_ignores_soft_inpainting(harness: _Harness):
+    """Text-to-image runs with soft inpainting on, though it has no mask."""
+    harness.service.submit_txt2img(_params(soft_inpainting=True)).wait(timeout=WAIT_TIMEOUT_S, poll_interval=0.01)
+    assert len(harness.generation_requests()) == 1
+
+
+def test_soft_inpainting_without_a_mask_raises_before_contacting_the_server(harness: _Harness):
+    """Both backends silently ignore soft inpainting without a mask, so the client raises instead."""
+    with pytest.raises(ValueError, match='mask'):
+        harness.service.submit_img2img(_params(init_image=True, soft_inpainting=True))
+    assert not harness.session.requests
+
+
+@pytest.mark.parametrize('operation', ['img2img', 'inpaint'])
+def test_soft_inpainting_on_a_server_without_it_raises(harness: _Harness, operation: str):
+    """Soft inpainting on a server that lacks it raises ValueError naming the capability, and queues nothing."""
+    harness.remove_soft_inpainting()
+    submit, _ = OPERATIONS[operation]
+    with pytest.raises(ValueError, match='BackendCapabilities.soft_inpainting'):
+        submit(harness.service, _params(init_image=True, mask=True, soft_inpainting=True))
+    assert not harness.generation_requests()
+
+
+def test_soft_inpainting_settings_are_validated_against_the_server(harness: _Harness):
+    """An unknown setting or a value above the server's maximum raises ValueError, and queues nothing."""
+    parameter = harness.service.get_soft_inpainting_parameters()[0]
+    assert parameter.max_val is not None
+    for values in ({'no_such_setting': 1.0}, {parameter.key: parameter.max_val + 1}):
+        with pytest.raises(ValueError, match='Soft inpainting'):
+            harness.service.submit_inpaint(_params(init_image=True, mask=True, soft_inpainting=True,
+                                                   soft_inpainting_params=values))
+    assert not harness.generation_requests()
+
+
+def test_soft_inpainting_settings_are_ignored_while_it_is_off(harness: _Harness):
+    """Settings left in `soft_inpainting_params` are not validated or sent while soft inpainting is off."""
+    params = _params(init_image=True, mask=True, soft_inpainting_params={'no_such_setting': 1.0})
+    harness.service.submit_inpaint(params).wait(timeout=WAIT_TIMEOUT_S, poll_interval=0.01)
+    assert len(harness.generation_requests()) == 1
 
 
 PREPROCESSOR = ControlNetPreprocessor(name='canny', parameters=[ParameterDef(key='low_threshold', default_value=100)])

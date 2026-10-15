@@ -11,10 +11,10 @@ import pytest
 from PIL import Image
 
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
-from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestBody
 
-from .comfy_helpers import build_comfy_params, make_comfy_mask
-from .helpers import make_structured_image, region_mean_diff, save_output
+from .comfy_helpers import make_comfy_mask
+from .helpers import region_mean_diff, save_output
+from .inpaint_helpers import inpaint_params
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
@@ -30,17 +30,7 @@ OUTSIDE_MARGIN = 24                    # the blurred mask edge reaches about 10 
 
 def _params(backend: str, request: pytest.FixtureRequest) -> DiffusionParams:
     """Shared inpainting params for `backend`, with the source and mask attached."""
-    if backend == 'comfyui':
-        params: DiffusionParams = build_comfy_params(request.getfixturevalue('comfy_checkpoint'), prompt=PROMPT)
-    else:
-        params = DiffusionRequestBody(prompt=PROMPT, save_images=False, send_images=True)
-    params.width = params.height = SIZE
-    params.steps = STEPS
-    params.seed = 11
-    params.denoising_strength = 0.85
-    params.init_images = [make_structured_image(SIZE, SIZE)]
-    params.mask = make_comfy_mask(MASK_BOX, SIZE)
-    return params
+    return inpaint_params(backend, request, PROMPT, SIZE, STEPS, 11, make_comfy_mask(MASK_BOX, SIZE))
 
 
 def _service(backend: str, request: pytest.FixtureRequest):
