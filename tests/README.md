@@ -143,6 +143,11 @@ workflow builders read from.
 - **`test_shared_params.py`** - each server lists the names in `sampler_names`' tables (unlisted ones are
   warnings); *(opt-in)* img2img resizes a source to `width` x `height` on both backends, and WebUI applies the
   requested scheduler.
+- **`test_inpaint_full_res.py`** *(opt-in)* - "inpaint only masked" (`inpaint_full_res`) and its crop points leave
+  pixels outside the patch untouched and change the patch.
+- **`test_soft_inpainting.py`** *(opt-in)* - soft inpainting, with the same **silent-failure detector** A/B (with vs.
+  without soft inpainting). On the WebUI it also checks the infotext for the Soft Inpainting script. Skipped on a
+  server without soft inpainting.
 
 ## Reviewing saved outputs
 

@@ -38,6 +38,13 @@ class BackendCapabilities(BaseModel):
     runs a plain diffusion pass and WebUI fails the request.
     """
 
+    soft_inpainting: bool
+    """Whether `DiffusionParams.soft_inpainting` takes effect.
+
+    It needs the Soft Inpainting script on WebUI (built into A1111 1.8+ and Forge) or the `DifferentialDiffusion` node
+    on ComfyUI. Without it, submitting with soft inpainting on raises `ValueError`.
+    """
+
     scheduler: bool
     """Whether `DiffusionParams.scheduler` takes effect. WebUI accepts a separate scheduler from A1111 1.9 on."""
 

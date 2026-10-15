@@ -25,6 +25,8 @@ from sd_backend_client.api.comfyui.nodes.input.load_image_node import LoadImageN
 from sd_backend_client.api.comfyui.nodes.input.simple_checkpoint_loader_node import SimpleCheckpointLoaderNode
 from sd_backend_client.api.comfyui.nodes.ksampler_node import KSamplerNode
 from sd_backend_client.api.comfyui.nodes.latent_mask_node import LatentMaskNode
+from sd_backend_client.api.comfyui.nodes.model_extensions.differential_diffusion_node import (
+    STRENGTH_KEY, DifferentialDiffusionNode)
 from sd_backend_client.api.comfyui.nodes.model_extensions.hypernet_loader_node import HypernetLoaderNode
 from sd_backend_client.api.comfyui.nodes.model_extensions.lora_loader_node import LoraLoaderNode
 from sd_backend_client.api.comfyui.nodes.repeat_latent_node import RepeatLatentNode
@@ -91,6 +93,8 @@ class DiffusionWorkflowBuilder:
         self._model_config: Optional[str] = None
         self._source_image: Optional[str] = None
         self._mask: Optional[str] = None
+        self._differential_diffusion = False
+        self._differential_diffusion_strength: Optional[float] = None
 
         self._extension_model_nodes: list[LoraLoaderNode | HypernetLoaderNode] = []
         self._controlnet_units: list[ControlNetNodeData] = []
@@ -254,6 +258,30 @@ class DiffusionWorkflowBuilder:
         self.mask = image_ref_to_str(mask_reference)
 
     @property
+    def differential_diffusion(self) -> bool:
+        """Accesses whether a masked workflow samples through a `DifferentialDiffusion` model patch.
+
+        The patch makes the grey levels of the mask a per-pixel denoising schedule. Workflows without both a source
+        image and a mask leave it out.
+        """
+        return self._differential_diffusion
+
+    @differential_diffusion.setter
+    def differential_diffusion(self, enabled: bool) -> None:
+        self._differential_diffusion = enabled
+
+    @property
+    def differential_diffusion_strength(self) -> Optional[float]:
+        """Accesses the `DifferentialDiffusion` node's `strength` input, or None to leave the input out."""
+        return self._differential_diffusion_strength
+
+    @differential_diffusion_strength.setter
+    def differential_diffusion_strength(self, strength: Optional[float]) -> None:
+        if strength is not None and not 0.0 < strength <= 1.0:
+            raise ValueError(f'Differential Diffusion strength {strength} out of range: expected 0 < strength <= 1')
+        self._differential_diffusion_strength = strength
+
+    @property
     def image_size(self) -> Size:
         """Accesses the generated image size. A source image is stretched to this size before encoding."""
         return self._size
@@ -344,6 +372,9 @@ class DiffusionWorkflowBuilder:
         # Load model(s):
         sd_model, clip, vae = self._load_checkpoint()
         sd_model, clip = self._apply_extension_models(sd_model, clip)
+        if self.differential_diffusion and self.source_image is not None and self.mask is not None:
+            sd_model = DifferentialDiffusionNode(model=sd_model,
+                                                 strength=self.differential_diffusion_strength).model_out
 
         # Load prompt conditioning:
         positive, negative = self._encode_prompts(clip)
@@ -566,6 +597,9 @@ class DiffusionWorkflowBuilder:
         self.vae_tiling_enabled = diffusion_params.vae_tiling_enabled
         self.vae_tile_size = diffusion_params.vae_tile_size
         self.clip_skip = diffusion_params.clip_skip
+        self.differential_diffusion = diffusion_params.soft_inpainting
+        self.differential_diffusion_strength = diffusion_params.soft_inpainting_params.get(STRENGTH_KEY) \
+            if diffusion_params.soft_inpainting else None
 
         self._load_extension_models(available_loras, available_hypernetworks)
 

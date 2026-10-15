@@ -11,6 +11,7 @@ from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
 from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestBody
 from sd_backend_client.util.api_defaults import MASK_BLUR_DEFAULT
 from sd_backend_client.util.visual.image_utils import blur_mask
+from sd_backend_client.util.visual.inpaint_crop import soft_inpainting_compositing_mask
 
 
 def _half_mask(size: int = 64) -> Image.Image:
@@ -54,12 +55,14 @@ class _Capture:
             return ImageFileReference(filename='mask.png', subfolder='', type='input')
 
         with patch.object(service, 'get_models', return_value=[]), \
+                patch.object(service, '_soft_inpainting_parameters', return_value=[]), \
                 patch.object(service, 'upload_image', return_value=ref), \
                 patch.object(service, 'upload_mask', fake_upload_mask), \
                 patch.object(service, '_queue_prompt', return_value=QueueAdditionResponse(prompt_id='x')):
             paste_back = service._generate(params)[1]
         assert paste_back is not None
         self.blurred = paste_back.mask
+        self.composite_mask = paste_back.mask  # The blurred mask, unless soft inpainting is on.
 
 
 def _params(**kwargs: Any) -> DiffusionParams:
@@ -79,6 +82,19 @@ def test_comfyui_uploads_the_rounded_blurred_mask():
     assert {value for _, value in capture.uploaded.getcolors() or []} == {0, 255}
     for x in range(64):
         assert capture.uploaded.getpixel((x, 0)) == (255 if capture.blurred.getpixel((x, 0)) >= 128 else 0)
+
+
+def test_comfyui_soft_inpainting_uploads_the_blurred_mask_unrounded():
+    """Differential Diffusion reads the grey band as a denoising schedule, so the noise mask keeps it."""
+    capture = _Capture(_params(mask_blur=6, soft_inpainting=True))
+    assert capture.uploaded is not None
+    assert capture.uploaded.tobytes() == blur_mask(_half_mask(), 6).tobytes()
+
+
+def test_comfyui_soft_inpainting_composites_through_the_derived_mask():
+    """Results are composited through the compositing mask derived from the blurred mask, not the blurred mask."""
+    capture = _Capture(_params(mask_blur=6, soft_inpainting=True))
+    assert capture.composite_mask.tobytes() == soft_inpainting_compositing_mask(blur_mask(_half_mask(), 6)).tobytes()
 
 
 def test_comfyui_defaults_to_the_webui_blur():

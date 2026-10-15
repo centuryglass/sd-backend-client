@@ -22,7 +22,7 @@ from sd_backend_client.api.comfyui.basic_upscale_workflow_builder import build_b
 from sd_backend_client.api.comfyui.comfyui_types import QueueAdditionRequest, QueueAdditionResponse, \
     QueueDeletionRequest, ImageFileReference, PromptExecOutputs, NodeInfoResponse, SystemStatResponse, ImageUploadParams, \
     MaskUploadParams, IMAGE_UPLOAD_FILE_NAME, ImageUploadResponse, QueueInfoResponse, ACTIVE_QUEUE_KEY, \
-    PENDING_QUEUE_KEY, QueueHistoryResponse, PromptHistory, FreeMemoryRequest
+    PENDING_QUEUE_KEY, QueueHistoryResponse, PromptHistory, FreeMemoryRequest, FloatParamDef
 from sd_backend_client.api.comfyui.comfyui_progress_listener import ComfyProgressListener, SamplerRunPlan
 from sd_backend_client.api.comfyui.controlnet_comfyui_utils import get_all_preprocessors
 from sd_backend_client.api.comfyui.diffusion_workflow_builder import DiffusionWorkflowBuilder, \
@@ -30,12 +30,14 @@ from sd_backend_client.api.comfyui.diffusion_workflow_builder import DiffusionWo
 from sd_backend_client.api.comfyui.latent_upscale_workflow_builder import LatentUpscaleWorkflowBuilder
 from sd_backend_client.api.comfyui.nodes.controlnet.apply_controlnet_node import ApplyControlNetNode
 from sd_backend_client.api.comfyui.nodes.ksampler_node import KSamplerNode
+from sd_backend_client.api.comfyui.nodes.model_extensions.differential_diffusion_node import (
+    STRENGTH_KEY, DifferentialDiffusionNode)
 from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import (ULTIMATE_UPSCALE_NODE_NAME,
                                                                        ULTIMATE_UPSCALE_NODE_WITHOUT_UPSCALE_MODEL)
 from sd_backend_client.api.comfyui.preprocessor_preview_workflow_builder import PreprocessorPreviewWorkflowBuilder
 from sd_backend_client.api.shared_data.api_datatypes import DiffusionUpscalingParams
 from sd_backend_client.api.shared_data.backend import Backend, require_init_image, require_mask, \
-    require_upscale_size
+    require_soft_inpainting, require_upscale_size
 from sd_backend_client.api.shared_data.backend_options import BackendCapabilities, BackendOption
 from sd_backend_client.api.shared_data.controlnet.controlnet_category_builder import ControlNetCategoryBuilder
 from sd_backend_client.api.shared_data.controlnet.controlnet_constants import ControlTypeDef
@@ -44,13 +46,15 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import
     PreprocessorParams
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
+from sd_backend_client.api.shared_data.parameter_def import ParameterDef
 from sd_backend_client.api.shared_data.sampler_names import SAMPLER_WEBUI_NAMES
 from sd_backend_client.api.webservice import WebService, MULTIPART_FORM_DATA_TYPE, DEFAULT_REQUEST_TIMEOUT
 from sd_backend_client.errors import BackendConnectionError, BackendTimeoutError, ServerError, \
     UnexpectedResponseError, WorkflowValidationError
 from sd_backend_client.util.api_defaults import INPAINT_FULL_RES_PADDING_DEFAULT
 from sd_backend_client.util.geometry import Size
-from sd_backend_client.util.visual.inpaint_crop import PasteBack, compute_crop_region, crop_to_region
+from sd_backend_client.util.visual.inpaint_crop import PasteBack, compute_crop_region, crop_to_region, \
+    soft_inpainting_compositing_mask
 from sd_backend_client.util.visual.image_utils import image_to_png_bytes, image_from_bytes, image_from_base64, \
     mask_to_grayscale, blur_mask
 
@@ -67,6 +71,9 @@ UPLOAD_SUBFOLDER = 'sd_backend_client'
 # Keys used when extracting data from the KSampler node definition:
 SAMPLER_OPTION_KEY = 'sampler_name'
 SCHEDULER_OPTION_KEY = 'scheduler'
+
+DIFFERENTIAL_DIFFUSION_STRENGTH_DESCRIPTION = ('How closely each pixel follows the mask\'s denoising schedule. 1 is '
+                                               'full Differential Diffusion; lower values blend the soft mask back in.')
 
 
 class ComfyEndpoints:
@@ -321,14 +328,45 @@ class ComfyUiWebservice(WebService, Backend):
         """List ControlNet models by file name, implementing `Backend.list_controlnet_models`."""
         return [ControlNetModel(name) for name in self.get_controlnet_models()]
 
+    def _soft_inpainting_parameters(self) -> Optional[list[ParameterDef]]:
+        """Return the `DifferentialDiffusion` node's settings, or None when the server lacks the node.
+
+        The list holds `strength` when the node lists it. Its minimum is raised to one step above 0, since ComfyUI
+        treats 0 the same as 1.
+        """
+        node_name = DifferentialDiffusionNode.CLASS_TYPE
+        node_info: dict[str, Any] = self.get(f'{ComfyEndpoints.OBJECT_INFO}/{node_name}').json()
+        if node_name not in node_info:
+            return None
+        strength_input = ((node_info[node_name].get('input') or {}).get('optional') or {}).get(STRENGTH_KEY)
+        if not isinstance(strength_input, list) or len(strength_input) < 2 or strength_input[0] != 'FLOAT':
+            return []
+        try:
+            strength_def = FloatParamDef.model_validate(strength_input[1])
+        except ValidationError as err:
+            logger.warning(f'Ignoring {node_name} {STRENGTH_KEY} input with an unexpected definition: {err}')
+            return []
+        step = strength_def.step or 0.01
+        return [ParameterDef(key=STRENGTH_KEY, display_name='Strength', default_value=float(strength_def.default),
+                             min_val=max(strength_def.min or 0.0, step), max_val=strength_def.max, step_val=step,
+                             description=strength_def.tooltip or DIFFERENTIAL_DIFFUSION_STRENGTH_DESCRIPTION)]
+
+    def get_soft_inpainting_parameters(self) -> list[ParameterDef]:
+        """List Differential Diffusion's settings, implementing `Backend.get_soft_inpainting_parameters`.
+
+        Holds `strength` on ComfyUI builds whose `DifferentialDiffusion` node has it, and nothing on older ones.
+        """
+        return self._soft_inpainting_parameters() or []
+
     def get_capabilities(self) -> BackendCapabilities:
         """Report optional features, implementing `Backend.get_capabilities`.
 
-        ControlNet and Ultimate SD Upscale support are detected from the nodes the workflows use.
+        ControlNet, Ultimate SD Upscale and soft inpainting support are detected from the nodes the workflows use.
         """
         return BackendCapabilities(
             controlnet=self.is_node_available(ApplyControlNetNode.CLASS_TYPE),
             ultimate_upscale=self.is_node_available(ULTIMATE_UPSCALE_NODE_NAME),
+            soft_inpainting=self.is_node_available(DifferentialDiffusionNode.CLASS_TYPE),
             scheduler=True,
             interrogate=False,
             free_memory=True)
@@ -559,8 +597,10 @@ class ComfyUiWebservice(WebService, Backend):
     def _generate(self, diffusion_params: DiffusionParams) -> tuple[QueueAdditionResponse, Optional[PasteBack]]:
         """Queue an img2img or inpainting job, returning the response and what the results need to be pasted back.
 
-        The paste-back is None unless the params hold a mask.
+        The paste-back is None unless the params hold a mask. With soft inpainting on, the sampler gets the blurred mask
+        unrounded, and results are composited through `soft_inpainting_compositing_mask`.
         """
+        require_soft_inpainting(diffusion_params, self._soft_inpainting_parameters)
         workflow_builder = self._build_diffusion_body(diffusion_params)
         paste_back: Optional[PasteBack] = None
         if diffusion_params.init_images is not None and len(diffusion_params.init_images) > 0:
@@ -581,10 +621,15 @@ class ComfyUiWebservice(WebService, Backend):
                     output_size = (diffusion_params.width, diffusion_params.height)
                     upload_image = crop_to_region(source, region, output_size)
                     upload_mask = crop_to_region(blurred_mask, region, output_size)
-                paste_back = PasteBack(source, blurred_mask, region)
-                # The sampler's noise mask is the rounded blurred mask, as with the WebUI's `mask_round`. A soft noise
-                # mask leaves a half-denoised, blurry band along the edge; the blur only feathers the paste-back.
-                upload_mask = upload_mask.point([0] * 128 + [255] * 128)
+                if diffusion_params.soft_inpainting:
+                    # Differential Diffusion reads the grey band as a denoising schedule, so it must stay unrounded.
+                    paste_back = PasteBack(source, soft_inpainting_compositing_mask(blurred_mask), region)
+                else:
+                    paste_back = PasteBack(source, blurred_mask, region)
+                    # The sampler's noise mask is the rounded blurred mask, as with the WebUI's `mask_round`. A soft
+                    # noise mask leaves a half-denoised, blurry band along the edge; the blur only feathers the
+                    # paste-back.
+                    upload_mask = upload_mask.point([0] * 128 + [255] * 128)
             image_reference = self.upload_image(upload_image)
             workflow_builder.set_source_image_from_reference(image_reference)
             if upload_mask is not None:

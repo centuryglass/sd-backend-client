@@ -12,6 +12,7 @@ from PIL import Image
 from sd_backend_client.api import detect
 from sd_backend_client.api.a1111_webservice import A1111Webservice
 from sd_backend_client.api.comfyui.nodes.controlnet.apply_controlnet_node import ApplyControlNetNode
+from sd_backend_client.api.comfyui.nodes.model_extensions.differential_diffusion_node import DifferentialDiffusionNode
 from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import ULTIMATE_UPSCALE_NODE_NAME
 from sd_backend_client.api.comfyui_webservice import ComfyEndpoints, ComfyUiWebservice
 from sd_backend_client.api.detect import connect_to_backend
@@ -19,10 +20,12 @@ from sd_backend_client.api.shared_data.backend import Backend
 from sd_backend_client.api.shared_data.backend_options import BackendCapabilities, BackendOption
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
+from sd_backend_client.api.webui.soft_inpainting import SOFT_INPAINTING_PARAMETERS
 from sd_backend_client.errors import AuthError, ServerError, UnexpectedResponseError
 from sd_backend_client.util.visual.image_utils import image_to_base64
 
 from .fake_session import CannedStatus, FakeSession
+from .soft_inpainting_responses import COMFYUI_DIFFERENTIAL_DIFFUSION_INFO, WEBUI_SOFT_INPAINTING_INFO
 
 CHECKPOINT = 'sd15/model.safetensors'
 NOT_FOUND = CannedStatus(404, '{"detail": "Not Found"}')
@@ -30,7 +33,7 @@ PROMPT_ID = '7d4c0f0e-6a3b-4c1e-9f6e-0a1b2c3d4e5f'
 
 
 def _webui_routes(full: bool) -> dict[tuple[str, str], Any]:
-    """WebUI routes; `full` adds ControlNet, Ultimate SD Upscale and the scheduler list (A1111 1.9+)."""
+    """WebUI routes; `full` adds ControlNet, Soft Inpainting, Ultimate SD Upscale and the scheduler list (1.9+)."""
     endpoints = A1111Webservice.Endpoints
     routes: dict[tuple[str, str], Any] = {
         ('GET', endpoints.SD_MODELS): [{'title': f'{CHECKPOINT} [abc1234567]', 'model_name': 'sd15_model',
@@ -53,7 +56,9 @@ def _webui_routes(full: bool) -> dict[tuple[str, str], Any]:
     }
     if full:
         routes.update({
-            ('GET', endpoints.SCRIPTS): {'txt2img': [], 'img2img': ['loopback', 'ultimate sd upscale']},
+            ('GET', endpoints.SCRIPTS): {'txt2img': [], 'img2img': ['loopback', 'soft inpainting',
+                                                                   'ultimate sd upscale']},
+            ('GET', endpoints.SCRIPT_INFO): [WEBUI_SOFT_INPAINTING_INFO],
             ('GET', endpoints.SCHEDULERS): [{'name': 'karras', 'label': 'Karras'}, {'name': 'ddim', 'label': 'DDIM'}],
             ('GET', endpoints.CONTROLNET_VERSION): {'version': 3},
             ('GET', endpoints.CONTROLNET_MODELS): {'model_list': ['control_v11p_sd15_canny [d14c016b]']},
@@ -62,7 +67,10 @@ def _webui_routes(full: bool) -> dict[tuple[str, str], Any]:
 
 
 def _comfyui_routes(full: bool) -> dict[tuple[str, str], Any]:
-    """ComfyUI routes; `full` adds the Ultimate SD Upscale node. ControlNet nodes are part of ComfyUI itself."""
+    """ComfyUI routes; `full` adds the Ultimate SD Upscale and Differential Diffusion nodes.
+
+    ControlNet nodes are part of ComfyUI itself.
+    """
     models = ComfyEndpoints.MODELS
     info = ComfyEndpoints.OBJECT_INFO
     return {
@@ -82,6 +90,7 @@ def _comfyui_routes(full: bool) -> dict[tuple[str, str], Any]:
             'output_node': False}},
         ('GET', f'{info}/{ApplyControlNetNode.CLASS_TYPE}'): {ApplyControlNetNode.CLASS_TYPE: {}},
         ('GET', f'{info}/{ULTIMATE_UPSCALE_NODE_NAME}'): {ULTIMATE_UPSCALE_NODE_NAME: {}} if full else {},
+        ('GET', f'{info}/{DifferentialDiffusionNode.CLASS_TYPE}'): COMFYUI_DIFFERENTIAL_DIFFUSION_INFO if full else {},
         ('POST', ComfyEndpoints.PROMPT): {'prompt_id': PROMPT_ID, 'number': 1, 'node_errors': {}},
     }
 
@@ -153,9 +162,17 @@ def test_comfyui_model_configs_list_the_values_sd_model_config_accepts():
 
 
 def test_full_server_reports_every_optional_generation_feature(backend: Backend):
-    """A server with ControlNet, Ultimate SD Upscale and schedulers reports all three."""
+    """A server with ControlNet, Ultimate SD Upscale, soft inpainting and schedulers reports all four."""
     capabilities = backend.get_capabilities()
     assert capabilities.controlnet and capabilities.ultimate_upscale and capabilities.scheduler
+    assert capabilities.soft_inpainting
+
+
+def test_server_without_soft_inpainting_lists_no_settings(backend: Backend):
+    """A server without soft inpainting lists no settings for it."""
+    service, _ = BACKENDS['webui' if isinstance(backend, A1111Webservice) else 'comfyui'](full=False)
+    assert not service.get_capabilities().soft_inpainting
+    assert not service.get_soft_inpainting_parameters()
 
 
 def test_checkpoint_name_round_trips_into_a_generation_request():
@@ -236,7 +253,8 @@ def test_webui_without_extensions_lists_nothing_and_reports_missing_features():
     assert not service.list_controlnet_models()
     assert not service.list_schedulers()
     assert service.get_capabilities() == BackendCapabilities(controlnet=False, ultimate_upscale=False,
-                                                             scheduler=False, interrogate=True, free_memory=False)
+                                                             soft_inpainting=False, scheduler=False, interrogate=True,
+                                                             free_memory=False)
 
 
 def test_webui_reports_forge_builtin_controlnet_without_a_version_endpoint():
@@ -258,7 +276,46 @@ def test_comfyui_without_ultimate_upscale_node_reports_it_missing():
     """ComfyUI reports Ultimate SD Upscale only when its node is installed."""
     service, _ = _comfyui(full=False)
     assert service.get_capabilities() == BackendCapabilities(controlnet=True, ultimate_upscale=False,
-                                                             scheduler=True, interrogate=False, free_memory=True)
+                                                             soft_inpainting=False, scheduler=True, interrogate=False,
+                                                             free_memory=True)
+
+
+def test_webui_soft_inpainting_settings_come_from_script_info():
+    """The six settings after the enable flag list in argument order, labelled and bounded by the server."""
+    service, session = _webui()
+    info = dict(WEBUI_SOFT_INPAINTING_INFO, args=list(WEBUI_SOFT_INPAINTING_INFO['args']))
+    info['args'][1] = dict(info['args'][1], label='Schedule bias (server)', maximum=16)
+    session.routes[('GET', A1111Webservice.Endpoints.SCRIPT_INFO)] = [info]
+    parameters = service.get_soft_inpainting_parameters()
+    assert [parameter.key for parameter in parameters] == [parameter.key for parameter in SOFT_INPAINTING_PARAMETERS]
+    assert (parameters[0].display_name, parameters[0].max_val) == ('Schedule bias (server)', 16)
+    assert parameters[2].default_value == 4.0 and parameters[2].min_val == 1
+    assert all(parameter.description for parameter in parameters)
+
+
+@pytest.mark.parametrize('script_info', [[], [dict(WEBUI_SOFT_INPAINTING_INFO, args=[])]])
+def test_webui_soft_inpainting_settings_fall_back_to_the_known_definitions(script_info: list[Any]):
+    """A script-info entry that is missing or has the wrong argument count gives the hardcoded definitions."""
+    service, session = _webui()
+    session.routes[('GET', A1111Webservice.Endpoints.SCRIPT_INFO)] = script_info
+    assert service.get_soft_inpainting_parameters() == list(SOFT_INPAINTING_PARAMETERS)
+
+
+def test_comfyui_soft_inpainting_strength_never_offers_zero():
+    """`strength` lists the server's limits, except that its minimum is one step above 0, which ComfyUI treats as 1."""
+    service, _ = _comfyui()
+    [strength] = service.get_soft_inpainting_parameters()
+    assert (strength.key, strength.default_value, strength.min_val, strength.max_val) == ('strength', 1.0, 0.01, 1.0)
+    assert strength.description
+
+
+def test_comfyui_without_differential_diffusion_strength_supports_soft_inpainting_without_settings():
+    """An older ComfyUI build's node has no `strength` input: soft inpainting works, with nothing to set."""
+    service, session = _comfyui()
+    session.routes[('GET', f'{ComfyEndpoints.OBJECT_INFO}/DifferentialDiffusion')] = {'DifferentialDiffusion': {
+        'input': {'required': {'model': ['MODEL']}}, 'input_order': {'required': ['model']}}}
+    assert service.get_capabilities().soft_inpainting
+    assert not service.get_soft_inpainting_parameters()
 
 
 # connect_to_backend

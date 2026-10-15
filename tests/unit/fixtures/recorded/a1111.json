@@ -9,6 +9,7 @@
    "free_memory": false,
    "interrogate": true,
    "scheduler": true,
+   "soft_inpainting": true,
    "ultimate_upscale": true
   },
   "captured": "2026-10-08",

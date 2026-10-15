@@ -199,3 +199,29 @@ def test_from_params_deep_copies_a_request_body():
 def test_from_params_without_params_is_a_default_body():
     """from_params(None) is a default request body."""
     assert DiffusionRequestBody.from_params(None) == DiffusionRequestBody()
+
+
+def test_to_dict_sends_soft_inpainting_args_in_script_order():
+    """Soft inpainting becomes the script's enable flag and all six settings, set or defaulted, in argument order."""
+    body = DiffusionRequestBody(soft_inpainting=True,
+                                soft_inpainting_params={'mask_influence': 0.25, 'schedule_bias': 2.0})
+    data = body.to_dict()
+    assert data['alwayson_scripts']['soft inpainting'] == {'args': [True, 2.0, 0.5, 4.0, 0.25, 0.5, 2.0]}
+    assert 'soft_inpainting' not in data and 'soft_inpainting_params' not in data
+
+
+def test_to_dict_sends_no_soft_inpainting_while_it_is_off():
+    """With soft inpainting off, neither the script nor the package's own fields are sent."""
+    data = DiffusionRequestBody(soft_inpainting_params={'schedule_bias': 2.0}).to_dict()
+    assert 'soft inpainting' not in data['alwayson_scripts']
+    assert 'soft_inpainting' not in data and 'soft_inpainting_params' not in data
+
+
+def test_to_dict_replaces_a_caller_soft_inpainting_entry_under_any_spelling():
+    """The server matches script names case-insensitively, so a caller's entry is dropped whatever its case."""
+    body = DiffusionRequestBody(soft_inpainting=True, alwayson_scripts={'Soft Inpainting': {'args': [False]},
+                                                                        'other': {'args': [1]}})
+    scripts = body.to_dict()['alwayson_scripts']
+    assert set(scripts) == {'soft inpainting', 'other'}
+    assert scripts['soft inpainting']['args'][0] is True
+    assert body.alwayson_scripts == {'Soft Inpainting': {'args': [False]}, 'other': {'args': [1]}}

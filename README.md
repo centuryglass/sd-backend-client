@@ -124,6 +124,34 @@ params = DiffusionParams(prompt='a bowl of fruit on a table', init_images=[sourc
 backend.submit_inpaint(params).wait().images[0].save('inpainted.png')
 ```
 
+### Soft inpainting
+
+With `soft_inpainting=True`, the grey edge of a blurred mask becomes gradual, per-pixel change, so the repainted
+region blends into its surroundings even at high denoising strength and with normal checkpoints. It needs a mask blur
+well above the default of 4. The WebUI runs its Soft Inpainting script and ComfyUI its Differential Diffusion node,
+and results come back composited onto the source on both. `get_capabilities().soft_inpainting` reports whether the
+server has it, and submitting with it on raises `ValueError` when the server lacks it or there is no mask.
+
+```python
+from PIL import Image, ImageDraw
+
+from sd_backend_client import DiffusionParams, connect_to_backend
+
+source = Image.open('photo.png')
+mask = Image.new('L', source.size, 0)
+ImageDraw.Draw(mask).ellipse((128, 128, 384, 384), fill=255)
+
+backend = connect_to_backend('http://127.0.0.1:8188')
+params = DiffusionParams(prompt='a bowl of fruit on a table', init_images=[source], mask=mask, mask_blur=32,
+                         denoising_strength=0.9, width=source.width, height=source.height,
+                         soft_inpainting=backend.get_capabilities().soft_inpainting)
+backend.submit_inpaint(params).wait().images[0].save('soft_inpainted.png')
+```
+
+The two algorithms take different settings: six on the WebUI, and an optional `strength` on ComfyUI.
+`get_soft_inpainting_parameters()` lists the server's settings as `ParameterDef`s with labels, defaults and ranges.
+Set values by `ParameterDef.key` in `soft_inpainting_params`, and leave out any to use its default.
+
 ## ControlNet
 
 A `ControlNetUnit` pairs a control image with a preprocessor, a ControlNet model, or both. Add units to
@@ -172,7 +200,7 @@ params = DiffusionParams(sd_model_name=checkpoints[0], sampler='dpmpp_2m', sched
 The `list_*` methods return `BackendOption`s whose `name` goes straight into the matching parameter field. Sampler
 and scheduler names are ComfyUI's (`'euler_ancestral'`, `'dpmpp_2m'`, `'karras'`) on both backends; WebUI names
 such as `'Euler a'` are also accepted. `get_capabilities()` reports optional features such as ControlNet, Ultimate SD
-Upscale and scheduler support.
+Upscale, soft inpainting and scheduler support.
 
 ## Backend-specific parameters
 

@@ -18,11 +18,12 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import
     PreprocessorParams
 from sd_backend_client.api.shared_data.api_datatypes import DiffusionUpscalingParams, REDRAW_MODES, SEAM_FIX_MODES
 from sd_backend_client.api.shared_data.backend import Backend, require_init_image, require_mask, \
-    require_upscale_size
+    require_soft_inpainting, require_upscale_size
 from sd_backend_client.api.shared_data.backend_options import BackendCapabilities, BackendOption
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
+from sd_backend_client.api.shared_data.parameter_def import ParameterDef
 from sd_backend_client.api.shared_data.sampler_names import comfyui_sampler_name, comfyui_scheduler_name
 from sd_backend_client.api.webservice import WebService, DEFAULT_REQUEST_TIMEOUT
 from sd_backend_client.api.webui.controlnet_webui_constants import (ControlNetModelResponse, ControlNetModuleResponse,
@@ -35,6 +36,7 @@ from sd_backend_client.api.webui.request_formats import UpscalingRequestBody
 from sd_backend_client.api.webui.response_formats import GenerationInfoData, ProgressResponseBody, \
     InterrogateResponse, PromptStyleData, SamplerInfo, UpscalerInfo, ModelInfo, VaeInfo, LoraInfo
 from sd_backend_client.api.webui.script_info_types import ScriptResponseData, ScriptInfo
+from sd_backend_client.api.webui.soft_inpainting import SOFT_INPAINTING_SCRIPT_KEY, soft_inpainting_parameters
 from sd_backend_client.errors import AuthError, SDBackendError, ServerError, UnexpectedResponseError
 from sd_backend_client.util.api_defaults import INPAINT_FULL_RES_PADDING_DEFAULT
 from sd_backend_client.util.visual.image_utils import (image_to_base64, image_from_base64, image_from_bytes,
@@ -204,6 +206,7 @@ class A1111Webservice(WebService, Backend):
         snapshot = DiffusionRequestBody.from_params(diffusion_params)
         snapshot.init_images = None
         snapshot.mask = None
+        snapshot.soft_inpainting = False
         return self._submit(A1111Webservice.Endpoints.TXT2IMG, 'txt2img', snapshot)
 
     def submit_img2img(self, diffusion_params: DiffusionParams) -> 'WebUIGenerationHandle':
@@ -212,6 +215,7 @@ class A1111Webservice(WebService, Backend):
         See `submit_txt2img` for the dispatch, cancel and copy semantics.
         """
         require_init_image(diffusion_params, 'img2img')
+        require_soft_inpainting(diffusion_params, self._soft_inpainting_parameters)
         return self._submit(A1111Webservice.Endpoints.IMG2IMG, 'img2img',
                             DiffusionRequestBody.from_params(diffusion_params))
 
@@ -224,6 +228,7 @@ class A1111Webservice(WebService, Backend):
         """
         require_init_image(diffusion_params, 'inpainting')
         require_mask(diffusion_params, 'inpainting')
+        require_soft_inpainting(diffusion_params, self._soft_inpainting_parameters)
         body = DiffusionRequestBody.from_params(diffusion_params)
         paste_back = _crop_for_client_inpainting(body)
         return self._submit(A1111Webservice.Endpoints.IMG2IMG, 'img2img', body, paste_back)
@@ -348,6 +353,7 @@ class A1111Webservice(WebService, Backend):
             request_body.init_images = list(request_body.init_images)
         if request_body.mask is None and mask is not None:
             request_body.mask = mask
+        require_soft_inpainting(request_body, self._soft_inpainting_parameters)
         return self._post_generation(A1111Webservice.Endpoints.IMG2IMG, request_body)
 
     def txt2img(self, request_body: Optional[DiffusionParams] = None) -> ImageResponse:
@@ -366,6 +372,8 @@ class A1111Webservice(WebService, Backend):
         """
         if not isinstance(request_body, DiffusionRequestBody):
             request_body = DiffusionRequestBody.from_params(request_body)
+        if request_body.soft_inpainting:
+            request_body = request_body.model_copy(update={'soft_inpainting': False})
         return self._post_generation(A1111Webservice.Endpoints.TXT2IMG, request_body)
 
     def _post_generation(self, endpoint: str, request_body: DiffusionRequestBody) -> ImageResponse:
@@ -454,6 +462,7 @@ class A1111Webservice(WebService, Backend):
             # then override the upscale-specific bits, which take precedence:
             request_body = DiffusionRequestBody.from_params(sd_upscale_params.diffusion_params)
             request_body.init_images = [image]
+            request_body.soft_inpainting = False
             request_body.denoising_strength = sd_upscale_params.denoising_strength
             request_body.steps = sd_upscale_params.step_count
             request_body.width = width
@@ -810,18 +819,36 @@ class A1111Webservice(WebService, Backend):
         return [ControlNetModel(name) for name in ControlNetModelResponse.model_validate(models).model_list
                 if name.lower() != 'none']
 
+    def _soft_inpainting_parameters(self) -> Optional[list[ParameterDef]]:
+        """Return the Soft Inpainting script's settings, or None when the img2img script list lacks it."""
+        if SOFT_INPAINTING_SCRIPT_KEY not in (script.lower() for script in self.get_scripts().img2img):
+            return None
+        script_info = next((script for script in self.get_script_info()
+                            if script.is_img2img and script.name.lower() == SOFT_INPAINTING_SCRIPT_KEY), None)
+        return soft_inpainting_parameters(script_info)
+
+    def get_soft_inpainting_parameters(self) -> list[ParameterDef]:
+        """List the Soft Inpainting script's settings, implementing `Backend.get_soft_inpainting_parameters`.
+
+        Labels, defaults and limits come from `/sdapi/v1/script-info`. Descriptions are the package's own, since the
+        server has none.
+        """
+        return self._soft_inpainting_parameters() or []
+
     def get_capabilities(self) -> BackendCapabilities:
         """Report optional features, implementing `Backend.get_capabilities`.
 
         ControlNet support is detected from `/controlnet/model_list`, which both the sd-webui-controlnet extension and
-        Forge's built-in ControlNet serve; Forge has no `/controlnet/version`. Ultimate SD Upscale is detected from the
-        img2img script list, scheduler support from `/sdapi/v1/schedulers`, and interrogation from whether
+        Forge's built-in ControlNet serve; Forge has no `/controlnet/version`. Ultimate SD Upscale and Soft Inpainting
+        are detected from the img2img script list, scheduler support from `/sdapi/v1/schedulers`, and interrogation
+        from whether
         `/sdapi/v1/interrogate` exists, which Forge Neo drops.
         """
         img2img_scripts = [script.lower() for script in self.get_scripts().img2img]
         return BackendCapabilities(
             controlnet=self._get_if_present(A1111Webservice.Endpoints.CONTROLNET_MODELS) is not None,
             ultimate_upscale=ULTIMATE_UPSCALE_SCRIPT in img2img_scripts,
+            soft_inpainting=SOFT_INPAINTING_SCRIPT_KEY in img2img_scripts,
             scheduler=self._get_if_present(A1111Webservice.Endpoints.SCHEDULERS) is not None,
             interrogate=self._has_post_route(A1111Webservice.Endpoints.INTERROGATE),
             free_memory=False)

@@ -40,6 +40,7 @@ as they were at submit time, so the same `DiffusionParams` can be changed and su
 
 - **img2img:** set `init_images=[image]` and call `submit_img2img`.
 - **Inpainting:** also set `mask`, where white or opaque pixels mark the region to change, and call `submit_inpaint`.
+  Set `soft_inpainting=True` with a large `mask_blur` to blend the change into its surroundings.
 - **Upscaling:** `submit_upscale(image, width, height)`.
 
 ## Choose options the server offers

@@ -7,16 +7,17 @@
    "free_memory": true,
    "interrogate": false,
    "scheduler": true,
+   "soft_inpainting": true,
    "ultimate_upscale": true
   },
-  "captured": "2026-10-08",
-  "number": 0,
-  "prompt_id": "633ded39-37b6-4a00-a7d5-65284a633549",
+  "captured": "2026-10-15",
+  "number": 41,
+  "prompt_id": "51c65163-d93c-4db6-bd9a-eb584f339ab0",
   "version": "0.39.0"
  },
  "responses": {
-  "/history/633ded39-37b6-4a00-a7d5-65284a633549": {
-   "633ded39-37b6-4a00-a7d5-65284a633549": {
+  "/history/51c65163-d93c-4db6-bd9a-eb584f339ab0": {
+   "51c65163-d93c-4db6-bd9a-eb584f339ab0": {
     "meta": {
      "9": {
       "display_node": "9",
@@ -29,7 +30,7 @@
      "9": {
       "images": [
        {
-        "filename": "._00001_.png",
+        "filename": "sd_backend_client_00968_.png",
         "metadata": {
          "height": 256,
          "kind": "image",
@@ -42,17 +43,15 @@
      }
     },
     "prompt": [
-     0,
-     "633ded39-37b6-4a00-a7d5-65284a633549",
+     41,
+     "51c65163-d93c-4db6-bd9a-eb584f339ab0",
      {
       "3": {
-       "class_type": "CLIPTextEncode",
+       "class_type": "EmptyLatentImage",
        "inputs": {
-        "clip": [
-         "4",
-         1
-        ],
-        "text": "a red apple on a wooden table"
+        "batch_size": 1,
+        "height": 256,
+        "width": 256
        }
       },
       "4": {
@@ -72,12 +71,22 @@
        }
       },
       "6": {
+       "class_type": "CLIPTextEncode",
+       "inputs": {
+        "clip": [
+         "4",
+         1
+        ],
+        "text": "a red apple on a wooden table"
+       }
+      },
+      "7": {
        "class_type": "KSampler",
        "inputs": {
         "cfg": 7.0,
         "denoise": 1.0,
         "latent_image": [
-         "7",
+         "3",
          0
         ],
         "model": [
@@ -89,7 +98,7 @@
          0
         ],
         "positive": [
-         "3",
+         "6",
          0
         ],
         "sampler_name": "euler_ancestral",
@@ -98,19 +107,11 @@
         "steps": 4
        }
       },
-      "7": {
-       "class_type": "EmptyLatentImage",
-       "inputs": {
-        "batch_size": 1,
-        "height": 256,
-        "width": 256
-       }
-      },
       "8": {
        "class_type": "VAEDecode",
        "inputs": {
         "samples": [
-         "6",
+         "7",
          0
         ],
         "vae": [
@@ -122,7 +123,7 @@
       "9": {
        "class_type": "SaveImage",
        "inputs": {
-        "filename_prefix": "",
+        "filename_prefix": "sd_backend_client",
         "images": [
          "8",
          0
@@ -131,8 +132,8 @@
       }
      },
      {
-      "client_id": "bb6c938c-c550-48c7-b688-527805727a9d",
-      "create_time": 1791481487691
+      "client_id": "65261aec-c5d1-4c18-a0a5-b718bebf2354",
+      "create_time": 1792086980372
      },
      [
       "9"
@@ -144,23 +145,23 @@
       [
        "execution_start",
        {
-        "prompt_id": "633ded39-37b6-4a00-a7d5-65284a633549",
-        "timestamp": 1791481487692
+        "prompt_id": "51c65163-d93c-4db6-bd9a-eb584f339ab0",
+        "timestamp": 1792086980372
        }
       ],
       [
        "execution_cached",
        {
         "nodes": [],
-        "prompt_id": "633ded39-37b6-4a00-a7d5-65284a633549",
-        "timestamp": 1791481487693
+        "prompt_id": "51c65163-d93c-4db6-bd9a-eb584f339ab0",
+        "timestamp": 1792086980373
        }
       ],
       [
        "execution_success",
        {
-        "prompt_id": "633ded39-37b6-4a00-a7d5-65284a633549",
-        "timestamp": 1791481505445
+        "prompt_id": "51c65163-d93c-4db6-bd9a-eb584f339ab0",
+        "timestamp": 1792087001110
        }
       ]
      ],
@@ -5113,6 +5114,68 @@
     ]
    }
   },
+  "/object_info/DifferentialDiffusion": {
+   "DifferentialDiffusion": {
+    "api_node": false,
+    "category": "experimental",
+    "deprecated": false,
+    "description": "",
+    "dev_only": false,
+    "display_name": "Differential Diffusion",
+    "essentials_category": null,
+    "experimental": true,
+    "has_intermediate_output": false,
+    "input": {
+     "optional": {
+      "strength": [
+       "FLOAT",
+       {
+        "default": 1.0,
+        "max": 1.0,
+        "min": 0.0,
+        "step": 0.01
+       }
+      ]
+     },
+     "required": {
+      "model": [
+       "MODEL",
+       {}
+      ]
+     }
+    },
+    "input_order": {
+     "optional": [
+      "strength"
+     ],
+     "required": [
+      "model"
+     ]
+    },
+    "is_input_list": false,
+    "name": "DifferentialDiffusion",
+    "output": [
+     "MODEL"
+    ],
+    "output_is_list": [
+     false
+    ],
+    "output_matchtypes": null,
+    "output_name": [
+     "MODEL"
+    ],
+    "output_node": false,
+    "output_tooltips": [
+     null
+    ],
+    "price_badge": null,
+    "python_module": "comfy_extras.nodes_differential_diffusion",
+    "search_aliases": [
+     "inpaint gradient",
+     "variable denoise strength"
+    ]
+   }
+  },
   "/object_info/KSampler": {
    "KSampler": {
     "category": "model/sampling",
@@ -5582,10 +5645,10 @@
     {
      "index": 0,
      "name": "cuda:0 NVIDIA GeForce RTX 3080 : cudaMallocAsync",
-     "torch_vram_free": 0,
-     "torch_vram_total": 0,
+     "torch_vram_free": 1839606,
+     "torch_vram_total": 2147483648,
      "type": "cuda",
-     "vram_free": 10112729088,
+     "vram_free": 5257499126,
      "vram_total": 12542345216
     }
    ],
@@ -5625,8 +5688,8 @@
     "os": "linux",
     "python_version": "3.11.13 (main, Jun  5 2025, 13:12:00) [GCC 11.2.0]",
     "pytorch_version": "2.7.0+cu126",
-    "ram_free": 16732200960,
-    "ram_total": 33546616832,
+    "ram_free": 10269511680,
+    "ram_total": 33546608640,
     "required_frontend_version": "1.55.14",
     "required_templates_version": "0.11.78"
    }

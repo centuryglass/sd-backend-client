@@ -273,6 +273,7 @@ const ACN = 'test_a1111_controlnet_generation.py::';
 const CCN = 'test_comfyui_controlnet_generation.py::';
 const FR = 'test_inpaint_full_res.py::';
 const SP = 'test_shared_params.py::';
+const SI = 'test_soft_inpainting.py::';
 
 const WEBUI = 'WebUI';
 const COMFY = 'ComfyUI';
@@ -443,6 +444,29 @@ const GROUPS = [
           },
         },
         checks: ['`*_far_point` renders the patch coarser than `*_full_res`, because the far point widened the crop, while still compositing cleanly onto the source with no seam.'],
+      },
+      {
+        id: 'soft-inpainting', title: 'Soft inpainting blends the change into its surroundings',
+        purpose: 'Both runs repaint an ellipse in the middle of a 512x512 source as a bowl of apples, through a mask blurred with sigma 32, once plainly and once with `soft_inpainting`. The WebUI runs its Soft Inpainting script, ComfyUI its Differential Diffusion node.',
+        asserted: 'The soft result differs from the plain one with the same seed; pixels far outside the mask match the source; on the WebUI, the infotext records the Soft Inpainting script.',
+        backends: {
+          [WEBUI]: {
+            settings: '512x512, 20 steps, 0.85 denoise, mask_blur=32', tests: [SI + 'test_soft_inpainting_changes_the_result[webui]'],
+            images: [{ file: 'webui_soft_inpainting_source.png', label: 'source' }, { file: 'webui_soft_inpainting_mask.png', label: 'mask' },
+                     { file: 'webui_soft_inpainting_plain.png', label: 'plain' }, { file: 'webui_soft_inpainting_soft.png', label: 'soft' }],
+            checks: ['The script composites through a mask built from how much each region changed, so with its default settings the soft result can look faded or ghosted where the change was small.'],
+          },
+          [COMFY]: {
+            settings: '512x512, 20 steps, 0.85 denoise, mask_blur=32', tests: [SI + 'test_soft_inpainting_changes_the_result[comfyui]'],
+            images: [{ file: 'comfyui_soft_inpainting_source.png', label: 'source' }, { file: 'comfyui_soft_inpainting_mask.png', label: 'mask' },
+                     { file: 'comfyui_soft_inpainting_plain.png', label: 'plain' }, { file: 'comfyui_soft_inpainting_soft.png', label: 'soft' }],
+            checks: ['The soft result keeps its full strength out into the blurred band. A change that fades to a ghost toward its edge means the result was composited through the blurred mask instead of the derived compositing mask.'],
+          },
+        },
+        checks: [
+          '`*_plain` shows a visible seam or halo where the ellipse meets the gradient.',
+          '`*_soft` blends the new content into the gradient with no hard edge, and may repaint the circle outline under the blurred band.',
+        ],
       },
     ],
   },

@@ -9,6 +9,7 @@ from sd_backend_client.api.shared_data.diffusion_params import DEFAULT_DENOISING
 from sd_backend_client.api.shared_data.sampler_names import webui_sampler_name, webui_scheduler_name
 from sd_backend_client.api.webui.controlnet_webui_constants import CONTROLNET_SCRIPT_KEY, ControlNetUnitDict
 from sd_backend_client.api.webui.script_info_types import ScriptRequestData
+from sd_backend_client.api.webui.soft_inpainting import SOFT_INPAINTING_SCRIPT_KEY, soft_inpainting_script_args
 from sd_backend_client.util.visual.image_utils import image_to_base64, mask_to_grayscale
 
 logger = logging.getLogger(__name__)
@@ -188,7 +189,9 @@ class DiffusionRequestBody(DiffusionParams):
     """Data for "always-on" scripts (e.g. ControlNet) applied to the generation.
 
     `to_dict` replaces any `alwayson_scripts['controlNet']` entry with args built from `controlnet_units`, so set
-    ControlNet through `controlnet_units`. `to_dict` does not modify this field.
+    ControlNet through `controlnet_units`. With `soft_inpainting` on, it likewise replaces any
+    `alwayson_scripts['soft inpainting']` entry with args built from `soft_inpainting_params`. `to_dict` does not
+    modify this field.
     """
 
 
@@ -254,6 +257,13 @@ class DiffusionRequestBody(DiffusionParams):
             scripts[CONTROLNET_SCRIPT_KEY]['args'].append(control_unit_dict.model_dump(exclude_none=True))
         if 'controlnet_units' in data:
             del data['controlnet_units']  # Include only under scripts
+        del data['soft_inpainting']
+        soft_inpainting_values = data.pop('soft_inpainting_params')
+        if self.soft_inpainting:
+            # The server matches script names case-insensitively, so drop a caller entry under any spelling.
+            for key in [key for key in scripts if key.lower() == SOFT_INPAINTING_SCRIPT_KEY]:
+                del scripts[key]
+            scripts[SOFT_INPAINTING_SCRIPT_KEY] = {'args': soft_inpainting_script_args(soft_inpainting_values)}
         # Ensure images are prefixed base64:
         if 'init_images' in data:
             images = data['init_images']

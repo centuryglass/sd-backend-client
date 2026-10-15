@@ -7,7 +7,7 @@ both backends. Methods outside this class (blocking `txt2img` and `upscale`, `ge
 format, `interrupt`) are backend-specific and differ in signature and return type.
 """
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Callable, Optional
 
 from PIL import Image
 
@@ -19,8 +19,9 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import
     PreprocessorParams
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
 from sd_backend_client.api.shared_data.generation_handle import GenerationHandle
+from sd_backend_client.api.shared_data.parameter_def import ParameterDef, validate_parameter_values
 
-__all__ = ['Backend', 'require_init_image', 'require_mask', 'require_upscale_size']
+__all__ = ['Backend', 'require_init_image', 'require_mask', 'require_soft_inpainting', 'require_upscale_size']
 
 
 class Backend(ABC):
@@ -33,7 +34,7 @@ class Backend(ABC):
 
     @abstractmethod
     def submit_txt2img(self, diffusion_params: DiffusionParams) -> GenerationHandle:
-        """Queue a text-to-image job and return its handle. Init images and the mask are ignored."""
+        """Queue a text-to-image job and return its handle. Init images, the mask and soft inpainting are ignored."""
 
     @abstractmethod
     def submit_img2img(self, diffusion_params: DiffusionParams) -> GenerationHandle:
@@ -137,6 +138,15 @@ class Backend(ABC):
         """Group the server's ControlNet preprocessors and models into control types, keyed by type name."""
 
     @abstractmethod
+    def get_soft_inpainting_parameters(self) -> list[ParameterDef]:
+        """List the server's soft inpainting settings, for `DiffusionParams.soft_inpainting_params`.
+
+        The settings differ between backends: six for the WebUI's Soft Inpainting script, and Differential Diffusion's
+        `strength` on ComfyUI builds that have it. Empty when the server lacks soft inpainting (see
+        `BackendCapabilities.soft_inpainting`). Each call queries the server again.
+        """
+
+    @abstractmethod
     def get_capabilities(self) -> BackendCapabilities:
         """Report which optional features the server has. Each call queries the server again."""
 
@@ -151,6 +161,24 @@ def require_mask(diffusion_params: DiffusionParams, operation: str) -> None:
     """Raise `ValueError` unless `diffusion_params` holds a mask for `operation`."""
     if diffusion_params.mask is None:
         raise ValueError(f'Must set a mask in diffusion_params for {operation}')
+
+
+def require_soft_inpainting(diffusion_params: DiffusionParams,
+                            get_parameters: Callable[[], Optional[list[ParameterDef]]]) -> None:
+    """Raise `ValueError` unless soft inpainting is off, or the job has a mask and valid settings for the server.
+
+    `get_parameters` returns the server's soft inpainting settings, or None when the server lacks soft inpainting. It
+    is called only after the mask check passes, so a missing mask raises without contacting the server. Both backends
+    ignore soft inpainting without a mask, so a request without one raises here instead of silently doing nothing.
+    """
+    if not diffusion_params.soft_inpainting:
+        return
+    require_mask(diffusion_params, 'soft inpainting')
+    parameters = get_parameters()
+    if parameters is None:
+        raise ValueError('Soft inpainting is on, but the server does not support it. Check '
+                         'BackendCapabilities.soft_inpainting, or turn DiffusionParams.soft_inpainting off.')
+    validate_parameter_values(parameters, diffusion_params.soft_inpainting_params, 'Soft inpainting')
 
 
 def require_upscale_size(image: Image.Image, width: int, height: int) -> None:
