@@ -42,6 +42,7 @@ from sd_backend_client.errors import WorkflowValidationError
 from sd_backend_client.util.visual.inpaint_crop import PasteBack
 
 if TYPE_CHECKING:
+    from sd_backend_client.api.comfyui.comfyui_progress_listener import SamplerRunPlan
     from sd_backend_client.api.comfyui.comfyui_types import PromptExecOutputs, QueueAdditionResponse
     from sd_backend_client.api.comfyui_webservice import ComfyUiWebservice
 
@@ -66,7 +67,7 @@ class ComfyGenerationHandle(GenerationHandle):
     def __init__(self, service: 'ComfyUiWebservice', prompt_id: str, number: Optional[int] = None,
                  seed: Optional[int] = None, registration_grace: float = DEFAULT_REGISTRATION_GRACE,
                  clock: Callable[[], float] = time.monotonic,
-                 paste_back: Optional[PasteBack] = None) -> None:
+                 paste_back: Optional[PasteBack] = None, run_plan: Optional[SamplerRunPlan] = None) -> None:
         """
         Parameters
         ----------
@@ -85,6 +86,9 @@ class ComfyGenerationHandle(GenerationHandle):
         paste_back: PasteBack, optional
             An inpainting job's source image, blurred mask and crop region. When set, each result image is composited
             onto the source through the mask, as the WebUI does server-side.
+        run_plan: SamplerRunPlan, optional
+            The sampler runs a tiled job makes, passed to the progress listener so progress reports
+            `overall_progress`.
         """
         super().__init__(prompt_id)
         self._service = service
@@ -92,6 +96,7 @@ class ComfyGenerationHandle(GenerationHandle):
         self._seed = seed
         self._clock = clock
         self._paste_back = paste_back
+        self._run_plan = run_plan
         self._registration_deadline = clock() + registration_grace
         self._lock = threading.Lock()
         self._cancel_requested = False
@@ -100,16 +105,18 @@ class ComfyGenerationHandle(GenerationHandle):
 
     @classmethod
     def from_queue_response(cls, service: 'ComfyUiWebservice', response: 'QueueAdditionResponse',
-                            paste_back: Optional[PasteBack] = None
+                            paste_back: Optional[PasteBack] = None, run_plan: Optional[SamplerRunPlan] = None
                             ) -> 'ComfyGenerationHandle':
-        """Build a handle from any of the service's queue responses. `paste_back` is passed to the constructor.
+        """Build a handle from any of the service's queue responses. `paste_back` and `run_plan` are passed to the
+        constructor.
 
         Raises ``WorkflowValidationError`` if the response has no ``prompt_id``, which means the server rejected
         the workflow.
         """
         if response.prompt_id is None:
             raise WorkflowValidationError(response.error, response.node_errors)
-        return cls(service, response.prompt_id, response.number, seed=response.seed, paste_back=paste_back)
+        return cls(service, response.prompt_id, response.number, seed=response.seed, paste_back=paste_back,
+                   run_plan=run_plan)
 
     # --- GenerationHandle surface -----------------------------------------------------------------
 
@@ -154,12 +161,13 @@ class ComfyGenerationHandle(GenerationHandle):
         assert self._task_id is not None
         if listener is None:
             return snapshot
-        listener.watch(self._task_id)
+        listener.watch(self._task_id, self._run_plan)
         live_progress = listener.get_progress(self._task_id) if live else None
         if live_progress is not None:
             snapshot.progress = live_progress.progress
             snapshot.eta_seconds = live_progress.eta_seconds
             snapshot.preview = live_progress.preview
+            snapshot.overall_progress = live_progress.overall_progress
         return snapshot
 
     def _finish(self, snapshot: GenerationProgress) -> GenerationProgress:

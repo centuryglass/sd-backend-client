@@ -14,7 +14,8 @@ import pytest
 import websocket
 from PIL import Image
 
-from sd_backend_client.api.comfyui.comfyui_progress_listener import ComfyProgressListener, LiveProgress, _JobState
+from sd_backend_client.api.comfyui.comfyui_progress_listener import (ComfyProgressListener, LiveProgress,
+                                                                     SamplerRunPlan, _JobState)
 from sd_backend_client.api.comfyui_webservice import ComfyUiWebservice
 from sd_backend_client.errors import BackendConnectionError
 from sd_backend_client.util.visual.image_utils import image_to_png_bytes
@@ -84,6 +85,135 @@ def test_new_node_restarts_the_eta():
     listener.handle_message(_text('progress', value=1, max=5, prompt_id=PROMPT_ID, node='12'))
     progress = listener.get_progress(PROMPT_ID)
     assert progress is not None and progress.progress == 0.2 and progress.eta_seconds is None
+
+
+def test_restarted_sampler_run_restarts_the_eta():
+    """A node that samples again from step 1 starts a new run, so the ETA ignores the time spent on earlier runs."""
+    clock = FakeClock()
+    listener = _watched(_listener(clock), PROMPT_ID)
+    for run in range(3):
+        clock.now = 100.0 + run * 10.0
+        listener.handle_message(_text('progress', value=1, max=10, prompt_id=PROMPT_ID, node='9'))
+        clock.now += 4.0  # 1 s per step
+        listener.handle_message(_text('progress', value=5, max=10, prompt_id=PROMPT_ID, node='9'))
+        progress = listener.get_progress(PROMPT_ID)
+        assert progress is not None and progress.progress == 0.5
+        assert progress.eta_seconds == pytest.approx(5.0)
+        clock.now += 5.0
+        listener.handle_message(_text('progress', value=10, max=10, prompt_id=PROMPT_ID, node='9'))
+
+
+def test_change_of_max_on_one_node_starts_a_new_run():
+    """A run with a different max under the same node, like an upscale model's, doesn't share the sampler's rate."""
+    clock = FakeClock()
+    listener = _watched(_listener(clock), PROMPT_ID)
+    listener.handle_message(_text('progress', value=1, max=4, prompt_id=PROMPT_ID, node='9'))
+    clock.now += 30.0
+    listener.handle_message(_text('progress', value=2, max=10, prompt_id=PROMPT_ID, node='9'))
+    clock.now += 2.0
+    listener.handle_message(_text('progress', value=4, max=10, prompt_id=PROMPT_ID, node='9'))
+    progress = listener.get_progress(PROMPT_ID)
+    assert progress is not None and progress.eta_seconds == pytest.approx(6.0)
+
+
+def _tiled_job(plan: SamplerRunPlan | None) -> ComfyProgressListener:
+    """A listener watching PROMPT_ID with a run plan, registered as watch() does without starting the thread."""
+    listener = _listener()
+    listener._jobs[PROMPT_ID] = _JobState(LiveProgress(), plan)
+    return listener
+
+
+def _sampler_run(listener: ComfyProgressListener, steps: int, node: str = '9') -> list[float | None]:
+    """Send one sampler run as ComfyUI throttles it (first, middle and last step), returning overall progress after
+    each message."""
+    overall = []
+    for value in (1, steps // 2, steps):
+        listener.handle_message(_text('progress', value=value, max=steps, prompt_id=PROMPT_ID, node=node))
+        progress = listener.get_progress(PROMPT_ID)
+        assert progress is not None
+        overall.append(progress.overall_progress)
+    return overall
+
+
+def test_run_plan_reports_progress_across_sampler_runs():
+    """overall_progress counts finished runs plus the current run's fraction, while progress stays per run."""
+    listener = _tiled_job(SamplerRunPlan(node='9', steps=8, total_runs=4))
+    listener.handle_message(_text('progress', value=1, max=1, prompt_id=PROMPT_ID, node='9'))  # The upscale model.
+    progress = listener.get_progress(PROMPT_ID)
+    assert progress is not None and progress.overall_progress is None
+
+    overall = [value for _ in range(4) for value in _sampler_run(listener, 8)]
+    assert overall == pytest.approx([1 / 32, 4 / 32, 8 / 32, 9 / 32, 12 / 32, 16 / 32,
+                                     17 / 32, 20 / 32, 24 / 32, 25 / 32, 28 / 32, 1.0])
+    progress = listener.get_progress(PROMPT_ID)
+    assert progress is not None and progress.progress == 1.0
+
+
+def test_run_plan_ignores_other_nodes():
+    """Progress from a node other than the planned one doesn't count as a sampler run."""
+    listener = _tiled_job(SamplerRunPlan(node='9', steps=8, total_runs=2))
+    _sampler_run(listener, 8, node='5')
+    progress = listener.get_progress(PROMPT_ID)
+    assert progress is not None and progress.overall_progress is None
+    assert _sampler_run(listener, 8)[-1] == pytest.approx(0.5)
+
+
+def test_run_plan_eta_covers_the_whole_job():
+    """With a run plan, the ETA extrapolates overall progress since sampling began, decode time included."""
+    clock = FakeClock()
+    listener = _listener(clock)
+    listener._jobs[PROMPT_ID] = _JobState(LiveProgress(), SamplerRunPlan(node='9', steps=10, total_runs=4,
+                                                                          runs_before=1, run_after_each=True))
+
+    def send(value: int, maximum: int, at: float):
+        clock.now = at
+        listener.handle_message(_text('progress', value=value, max=maximum, prompt_id=PROMPT_ID, node='9'))
+        progress = listener.get_progress(PROMPT_ID)
+        assert progress is not None
+        return progress.eta_seconds
+
+    assert send(1, 10, at=-5.0) is None  # The upscale model's run says nothing about sampling speed.
+    assert send(1, 10, at=0.0) is None   # Sampling starts: steps finish at 1 s each.
+    assert send(5, 10, at=4.0) == pytest.approx(35.0)
+    send(10, 10, at=9.0)
+    send(1, 3, at=9.5)  # The first tile's decode run.
+    send(3, 3, at=10.0)
+    send(1, 10, at=10.0)
+    assert send(5, 10, at=14.0) == pytest.approx(25.0)
+
+
+# The max of each progress run a live Ultimate SD Upscale job reported (3x3 tiles, Half Tile seam fix, 7 steps, tiled
+# decode): one upscale model run, then each of the 21 sampler runs followed by its tile's VAE decode run.
+_LIVE_RUN_MAXES = [4, 7, 10, 7, 10, 7, 7, 7, 10, 7, 10, 7, 7, 7, 7, 7, 7, 7, 5, 7, 10, 7, 10, 7, 7, 7, 10, 7, 10, 7,
+                   7, 7, 10, 7, 10, 7, 10, 7, 10, 7, 7, 7, 7]
+
+
+def test_run_plan_skips_upscale_and_decode_runs_whose_max_matches_the_steps():
+    """Runs in the plan's non-sampler positions never count, even when their max equals the step count."""
+    listener = _tiled_job(SamplerRunPlan(node='9', steps=7, total_runs=21, runs_before=1, run_after_each=True))
+    overall = []
+    for maximum in _LIVE_RUN_MAXES:
+        overall.extend(_sampler_run(listener, maximum))
+    sampler_finals = [overall[index * 3 + 2] for index in range(1, len(_LIVE_RUN_MAXES), 2)]
+    assert sampler_finals == pytest.approx([run / 21 for run in range(1, 22)])
+    decode_finals = [overall[index * 3 + 2] for index in range(2, len(_LIVE_RUN_MAXES), 2)]
+    assert decode_finals == sampler_finals  # A decode run leaves overall progress where its sampler run ended.
+
+
+def test_run_plan_caps_unplanned_runs_at_complete():
+    """A sampler-like run the plan doesn't predict is counted, but overall progress stays monotonic and never passes 1.
+    """
+    listener = _tiled_job(SamplerRunPlan(node='9', steps=4, total_runs=2))
+    overall = [value or 0.0 for _ in range(3) for value in _sampler_run(listener, 4)]
+    assert overall == sorted(overall)
+    assert overall[-4:] == [1.0] * 4
+
+
+@pytest.mark.parametrize('plan', [None, SamplerRunPlan(node='9', steps=8, total_runs=0)])
+def test_no_overall_progress_without_a_usable_plan(plan: SamplerRunPlan | None):
+    """Jobs without a run plan, or whose plan expects no sampler runs, report no overall progress."""
+    listener = _tiled_job(plan)
+    assert _sampler_run(listener, 8) == [None, None, None]
 
 
 def test_progress_without_prompt_id_goes_to_the_executing_job():

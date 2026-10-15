@@ -70,7 +70,9 @@ A handle offers:
 - `wait(timeout=None, poll_interval=0.5, on_progress=None)` blocks until the job ends and returns a `GenerationResult`.
   It raises `GenerationError` if the job failed or was cancelled, and `BackendTimeoutError` if `timeout` passes first.
 - `poll()` returns a `GenerationProgress` snapshot without blocking: `status` (a `GenerationStatus`), and where the
-  backend reports them, `progress` (0 to 1), `queue_index`, `eta_seconds`, a `preview` image and `text_info`.
+  backend reports them, `progress` (0 to 1), `overall_progress`, `queue_index`, `eta_seconds`, a `preview` image and
+  `text_info`. On ComfyUI, `progress` covers one sampler run, so a tiled upscale's restarts for every tile, while
+  `overall_progress` covers the whole job.
 - `cancel()` tries to stop the job and returns whether the server accepted.
 - `done` reports whether the job has ended, and `task_id` holds the server's id for it.
 

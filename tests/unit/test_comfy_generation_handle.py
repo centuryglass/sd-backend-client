@@ -11,13 +11,14 @@ using a scripted fake service. They cover the pieces that are easy to get subtly
   registration grace period ends;
 - failure detail and live progress passed through from the service.
 """
-from PIL import Image
+from typing import Optional
 
 import pytest
+from PIL import Image
 
 from sd_backend_client.util.visual.inpaint_crop import PasteBack
 from sd_backend_client.api.comfyui.comfyui_generation_handle import ComfyGenerationHandle
-from sd_backend_client.api.comfyui.comfyui_progress_listener import LiveProgress
+from sd_backend_client.api.comfyui.comfyui_progress_listener import LiveProgress, SamplerRunPlan
 from sd_backend_client.api.comfyui.comfyui_types import (ImageFileReference, PromptExecOutputs,
                                                       QueueAdditionResponse)
 from sd_backend_client.api.comfyui_webservice import AsyncTaskProgress, AsyncTaskStatus
@@ -57,10 +58,12 @@ class FakeListener:
     def __init__(self, live: LiveProgress):
         self.live = live
         self.watched: set[str] = set()
+        self.run_plans: dict[str, Optional[SamplerRunPlan]] = {}
 
-    def watch(self, prompt_id: str) -> None:
-        """Record the job as watched."""
+    def watch(self, prompt_id: str, run_plan: Optional[SamplerRunPlan] = None) -> None:
+        """Record the job as watched, with its run plan."""
         self.watched.add(prompt_id)
+        self.run_plans[prompt_id] = run_plan
 
     def unwatch(self, prompt_id: str) -> None:
         """Stop recording the job as watched."""
@@ -250,6 +253,19 @@ def test_active_poll_reports_live_progress_and_finish_unwatches():
     finished = handle.poll()
     assert finished.progress == 1.0
     assert not listener.watched
+
+
+def test_run_plan_reaches_the_listener_and_overall_progress_the_snapshot():
+    """A handle built with a run plan watches its job with that plan and reports the listener's overall progress."""
+    plan = SamplerRunPlan(node='9', steps=20, total_runs=6)
+    listener = FakeListener(LiveProgress(progress=0.5, overall_progress=0.25))
+    service = FakeComfyService([AsyncTaskProgress(status=AsyncTaskStatus.ACTIVE)], progress_listener=listener)
+    handle = ComfyGenerationHandle.from_queue_response(
+        service, QueueAdditionResponse(prompt_id='prompt-123', number=1), run_plan=plan)
+
+    active = handle.poll()
+    assert listener.run_plans == {'prompt-123': plan}
+    assert (active.progress, active.overall_progress) == (0.5, 0.25)
 
 
 # --------------------------------------------------------------------------- #
