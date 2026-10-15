@@ -158,6 +158,30 @@ def test_run_plan_ignores_other_nodes():
     assert _sampler_run(listener, 8)[-1] == pytest.approx(0.5)
 
 
+def test_run_plan_eta_covers_the_whole_job():
+    """With a run plan, the ETA extrapolates overall progress since sampling began, decode time included."""
+    clock = FakeClock()
+    listener = _listener(clock)
+    listener._jobs[PROMPT_ID] = _JobState(LiveProgress(), SamplerRunPlan(node='9', steps=10, total_runs=4,
+                                                                          runs_before=1, run_after_each=True))
+
+    def send(value: int, maximum: int, at: float):
+        clock.now = at
+        listener.handle_message(_text('progress', value=value, max=maximum, prompt_id=PROMPT_ID, node='9'))
+        progress = listener.get_progress(PROMPT_ID)
+        assert progress is not None
+        return progress.eta_seconds
+
+    assert send(1, 10, at=-5.0) is None  # The upscale model's run says nothing about sampling speed.
+    assert send(1, 10, at=0.0) is None   # Sampling starts: steps finish at 1 s each.
+    assert send(5, 10, at=4.0) == pytest.approx(35.0)
+    send(10, 10, at=9.0)
+    send(1, 3, at=9.5)  # The first tile's decode run.
+    send(3, 3, at=10.0)
+    send(1, 10, at=10.0)
+    assert send(5, 10, at=14.0) == pytest.approx(25.0)
+
+
 # The max of each progress run a live Ultimate SD Upscale job reported (3x3 tiles, Half Tile seam fix, 7 steps, tiled
 # decode): one upscale model run, then each of the 21 sampler runs followed by its tile's VAE decode run.
 _LIVE_RUN_MAXES = [4, 7, 10, 7, 10, 7, 7, 7, 10, 7, 10, 7, 7, 7, 7, 7, 7, 7, 5, 7, 10, 7, 10, 7, 7, 7, 10, 7, 10, 7,

@@ -42,7 +42,9 @@ _END_MESSAGES = ('execution_success', 'execution_error', 'execution_interrupted'
 class LiveProgress:
     """The latest websocket-reported state of one job. Every field is None until the server reports it."""
     progress: Optional[float] = None       # Fraction complete in [0, 1] for the sampler run currently reporting steps.
-    eta_seconds: Optional[float] = None    # Estimated seconds left in that run, from its step rate so far.
+    # Estimated seconds left. With a run plan, for the whole job from overall_progress's rate since sampling began.
+    # Otherwise for the current run, from its step rate so far.
+    eta_seconds: Optional[float] = None
     preview: Optional[Image.Image] = None  # Latest preview frame, sent only when ComfyUI runs with a preview method.
     overall_progress: Optional[float] = None  # Fraction of all sampler runs in [0, 1], only for jobs with a run plan.
 
@@ -71,6 +73,7 @@ class _JobState:
     runs_started: int = 0  # Sampler runs of run_plan's node seen so far.
     runs_to_skip: int = 0  # Upcoming runs of run_plan's node that aren't sampler runs.
     in_sampler_run: bool = False  # Whether the node's current run is a sampler run.
+    sampling_start: Optional[tuple[float, float]] = None  # (time, overall_progress) at the first sampler message.
     last_step: Optional[tuple[Any, float, float]] = None  # (node, value, max) of the latest progress message.
     first_step: Optional[tuple[float, float]] = None  # (time, value) of the current run's first progress message.
 
@@ -192,11 +195,30 @@ class ComfyProgressListener:
             if state.in_sampler_run:
                 overall = (min(state.runs_started, plan.total_runs) - 1 + fraction) / plan.total_runs
                 state.live.overall_progress = max(overall, state.live.overall_progress or 0.0)
+                if state.sampling_start is None:
+                    state.sampling_start = (now, state.live.overall_progress)
+            state.live.eta_seconds = self._job_eta(state, now)
+            return
         start_time, start_value = state.first_step
         if value > start_value:
             state.live.eta_seconds = (now - start_time) / (value - start_value) * (maximum - value)
         else:
             state.live.eta_seconds = None
+
+    @staticmethod
+    def _job_eta(state: _JobState, now: float) -> Optional[float]:
+        """Extrapolate the whole job's remaining time from overall_progress's rate since sampling began.
+
+        Every sampler run counts the same, so the estimate drifts when redraw and seam-fix runs take different times.
+        Before sampling begins it is None, since the upscale model's run says nothing about the sampling rate.
+        """
+        overall = state.live.overall_progress
+        if overall is None or state.sampling_start is None:
+            return None
+        start_time, start_overall = state.sampling_start
+        if overall <= start_overall:
+            return None
+        return (now - start_time) / (overall - start_overall) * (1.0 - overall)
 
     def _handle_binary(self, message: bytes) -> None:
         if len(message) < _UINT32.size * 2:

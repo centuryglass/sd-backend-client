@@ -63,6 +63,7 @@ class GenerationProgress:
     ``progress`` covers what the server is running right now. On ComfyUI that is one sampler run, so a tiled
     upscale's ``progress`` restarts from 0 for every tile. ``overall_progress`` covers the whole job. ComfyUI
     reports it only for Ultimate SD Upscale jobs, and callers fall back to ``progress`` when it is ``None``.
+    ``eta_seconds`` covers the whole job whenever ``overall_progress`` is set.
     """
     status: GenerationStatus
     progress: Optional[float] = None       # Fraction complete in [0, 1], if the backend reports it.

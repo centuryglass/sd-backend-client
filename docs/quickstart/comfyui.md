@@ -53,7 +53,8 @@ result = backend.submit_txt2img(params).wait(on_progress=show_progress)
 ```
 
 `progress` is the fraction of the sampler run in progress. An Ultimate SD Upscale job samples once per tile, so its
-`progress` restarts for every tile. Its snapshots also carry `overall_progress`, the fraction of the whole job.
+`progress` restarts for every tile. Its snapshots also carry `overall_progress`, the fraction of the whole job, and
+their `eta_seconds` estimates the whole job's remaining time, assuming every tile takes as long as the tiles so far.
 
 Pass `live_progress=False` to the constructor to skip the websocket. Handles then report only the queue state.
 
