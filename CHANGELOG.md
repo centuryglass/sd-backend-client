@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/centuryglass/sd-backend-client/compare/v0.4.0...v0.5.0) (2026-10-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* support soft inpainting on both backends ([#126](https://github.com/centuryglass/sd-backend-client/issues/126))
+
+### Features
+
+* **comfyui:** report overall progress across Ultimate SD Upscale tiles ([#124](https://github.com/centuryglass/sd-backend-client/issues/124)) ([909fcdb](https://github.com/centuryglass/sd-backend-client/commit/909fcdb496913e3e8f6e5e4181820bc4316ee008))
+* support soft inpainting on both backends ([#126](https://github.com/centuryglass/sd-backend-client/issues/126)) ([9795931](https://github.com/centuryglass/sd-backend-client/commit/9795931401b6733817a78afb3911e27da94e8067))
+
 ## [0.4.0](https://github.com/centuryglass/sd-backend-client/compare/v0.3.0...v0.4.0) (2026-10-12)
 
 
