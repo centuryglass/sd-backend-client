@@ -11,13 +11,11 @@ from typing import Any
 import pytest
 from PIL import Image, ImageDraw
 
-from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
 from sd_backend_client.api.shared_data.generation_handle import GenerationResult
-from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestBody
 from sd_backend_client.api.webui.response_formats import GenerationInfoData
 
-from .comfy_helpers import build_comfy_params
-from .helpers import images_differ, make_structured_image, region_mean_diff, save_output
+from .helpers import images_differ, region_mean_diff, save_output
+from .inpaint_helpers import inpaint_params
 
 pytestmark = [pytest.mark.integration, pytest.mark.generation]
 
@@ -47,16 +45,7 @@ def _service(backend: str, request: pytest.FixtureRequest) -> Any:
 
 def _inpaint(backend: str, request: pytest.FixtureRequest, soft_inpainting: bool) -> tuple[Image.Image,
                                                                                          GenerationResult]:
-    if backend == 'comfyui':
-        params: DiffusionParams = build_comfy_params(request.getfixturevalue('comfy_checkpoint'), prompt=PROMPT)
-    else:
-        params = DiffusionRequestBody(prompt=PROMPT, save_images=False, send_images=True)
-    params.width = params.height = SIZE
-    params.steps = STEPS
-    params.seed = 21
-    params.denoising_strength = 0.85
-    params.init_images = [make_structured_image(SIZE, SIZE)]
-    params.mask = _mask()
+    params = inpaint_params(backend, request, PROMPT, SIZE, STEPS, 21, _mask())
     params.mask_blur = MASK_BLUR
     params.soft_inpainting = soft_inpainting
     result = _service(backend, request).submit_inpaint(params).wait(timeout=300)
