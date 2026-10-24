@@ -7,13 +7,13 @@ mkdocs==1.6.1
 mkdocs-material==9.7.7
 
 # API reference pages: mkdocstrings renders docstrings, and griffe-pydantic adds pydantic field defaults and limits.
-mkdocstrings==1.0.7
-mkdocstrings-python==2.0.9
+mkdocstrings==1.0.8
+mkdocstrings-python==2.0.10
 griffe-pydantic==1.3.2
 
 # Transitive dependency of Material and mkdocstrings. 12.2 changes Highlight.__init__ to require `md`, which
 # mkdocstrings 1.0.6 doesn't pass, so the docs build fails. Unpin once a mkdocstrings release supports it.
-pymdown-extensions==12.2
+pymdown-extensions==12.3
 
 # mkdocstrings formats long signatures with ruff when it is installed.
-ruff==0.17.0
+ruff==0.17.1
