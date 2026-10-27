@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/centuryglass/sd-backend-client/compare/v0.5.0...v0.5.1) (2026-10-27)
+
+
+### Bug Fixes
+
+* keep closed issues out of the session-start issue index ([#133](https://github.com/centuryglass/sd-backend-client/issues/133)) ([f379535](https://github.com/centuryglass/sd-backend-client/commit/f37953558ff1e66bcd346af03572aae1e7d014cb))
+
 ## [0.5.0](https://github.com/centuryglass/sd-backend-client/compare/v0.4.0...v0.5.0) (2026-10-15)
 
 
