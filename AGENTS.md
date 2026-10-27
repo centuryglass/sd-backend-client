@@ -309,9 +309,10 @@ valid for the version it was generated with.
   out.
 - **A fact worth knowing is not a task.** It belongs in the owning module's comment, or here.
 - **Open issues are usually already in context.** The `SessionStart` hook (`.claude/hooks/session-start.sh`) runs
-  `scripts/issues.py`, which writes `.claude/cache/issues/` (`index.md` plus one file per issue) and prints the index.
-  The cache is generated and gitignored; never edit it or treat it as the source of truth. `scripts/issues.py`'s
-  docstring covers the fetch paths and `SD_API_ISSUES_TOKEN`.
+  `scripts/issues.py`, which writes `.claude/cache/issues/` (`index.md` of open issues, `closed.md` of closed ones, and
+  one file per issue) and prints only `index.md`. Read `closed.md` when looking for past work. The cache is generated
+  and gitignored; never edit it or treat it as the source of truth. `scripts/issues.py`'s docstring covers the fetch
+  paths and `SD_API_ISSUES_TOKEN`.
 - **When the hook produced nothing** (rate-limited, no token, or an agent that doesn't run Claude Code hooks), build
   the cache by hand before concluding no issue covers something: fetch the issue list with whatever tool you have
   (the GitHub MCP `list_issues`, `gh issue list --json ...`), save it as JSON, run
