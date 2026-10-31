@@ -4,12 +4,12 @@
 -r requirements.txt
 
 # `pytest tests/` runs the unit tests and skips the integration tests whose backend isn't running (tests/README.md).
-pytest==9.1.1
+pytest==9.2.0
 
 # CI's test job runs pytest with --cov and fails below its --cov-fail-under floor (.github/workflows/ci.yml).
 # coverage is pinned too because CI calls its CLI directly to write the job summary.
 pytest-cov==7.1.0
-coverage==7.16.2
+coverage==7.17.0
 
 # `python scripts/pylint_check.py` is the CI lint gate; `scripts/pylint.sh` shows the full report.
 pylint==4.1.3
