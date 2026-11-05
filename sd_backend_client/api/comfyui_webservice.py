@@ -623,9 +623,10 @@ class ComfyUiWebservice(WebService, Backend):
                     upload_mask = crop_to_region(blurred_mask, region, output_size)
                 if diffusion_params.soft_inpainting:
                     # Differential Diffusion reads the grey band as a denoising schedule, so it must stay unrounded.
-                    paste_back = PasteBack(source, soft_inpainting_compositing_mask(blurred_mask), region)
+                    paste_back = PasteBack(source, soft_inpainting_compositing_mask(blurred_mask), region,
+                                      diffusion_params.return_uncomposited)
                 else:
-                    paste_back = PasteBack(source, blurred_mask, region)
+                    paste_back = PasteBack(source, blurred_mask, region, diffusion_params.return_uncomposited)
                     # The sampler's noise mask is the rounded blurred mask, as with the WebUI's `mask_round`. A soft
                     # noise mask leaves a half-denoised, blurry band along the edge; the blur only feathers the
                     # paste-back.

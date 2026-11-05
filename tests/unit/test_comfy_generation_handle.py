@@ -336,3 +336,38 @@ def test_result_is_untouched_without_paste_back():
     """Jobs without a mask return the downloaded images as they are."""
     service = FakeComfyService([AsyncTaskProgress(status=AsyncTaskStatus.FINISHED, outputs=_outputs())])
     assert ComfyGenerationHandle(service, 'p').wait().images[0].getpixel((0, 0)) == (0, 0, 0, 255)
+
+
+def _soft_mask_paste_back(region=None, return_layers=True):
+    source = Image.new('RGBA', (8, 8), (200, 0, 0, 255))
+    mask = Image.new('L', (8, 8), 0)
+    mask.paste(255, (0, 0, 4, 8))
+    mask.putpixel((4, 0), 100)
+    return source, PasteBack(source, mask, region, return_layers)
+
+
+@pytest.mark.parametrize('region', [None, (2, 2, 6, 6)])
+def test_uncomposited_results_reproduce_the_composited_images(region):
+    """Compositing the reported layers through the reported mask gives `images`, for full-size and cropped jobs."""
+    source, paste_back = _soft_mask_paste_back(region)
+    service = FakeComfyService([AsyncTaskProgress(status=AsyncTaskStatus.FINISHED, outputs=_outputs(2))])
+    result = ComfyGenerationHandle(service, 'p', paste_back=paste_back).wait()
+    assert result.uncomposited_images is not None and result.compositing_masks is not None
+    assert len(result.uncomposited_images) == len(result.compositing_masks) == len(result.images) == 2
+    for image, uncomposited, mask in zip(result.images, result.uncomposited_images, result.compositing_masks):
+        # Without a region the fake server's 4x4 output stands in for a full-size result, so the source follows it.
+        reference = source.resize(uncomposited.size)
+        assert uncomposited.size == mask.size == image.size
+        assert mask.mode == 'L'
+        assert Image.composite(uncomposited, reference, mask).tobytes() == image.tobytes()
+
+
+def test_uncomposited_results_are_none_unless_requested():
+    """Layers are reported only for jobs that ask, and never for jobs without a paste-back."""
+    _, paste_back = _soft_mask_paste_back(return_layers=False)
+    service = FakeComfyService([AsyncTaskProgress(status=AsyncTaskStatus.FINISHED, outputs=_outputs())])
+    result = ComfyGenerationHandle(service, 'p', paste_back=paste_back).wait()
+    assert result.uncomposited_images is None and result.compositing_masks is None
+    plain = ComfyGenerationHandle(FakeComfyService([AsyncTaskProgress(status=AsyncTaskStatus.FINISHED,
+                                                                      outputs=_outputs())]), 'p').wait()
+    assert plain.uncomposited_images is None and plain.compositing_masks is None

@@ -91,6 +91,13 @@ class GenerationResult:
         composite them through the mask again. Plain inpainting composites through the blurred mask. Soft inpainting
         composites through a mask that keeps more of the change in the blurred band: the WebUI's script builds it from
         how much each region changed, and ComfyUI ramps it over the outer edge of the blurred mask.
+    uncomposited_images: list[Image.Image], optional
+        For inpainting jobs submitted with `DiffusionParams.return_uncomposited`: the generated pixels before they
+        were blended onto the source, full size and parallel to `images`. None otherwise, including on the WebUI,
+        whose server does the blending and does not return the raw image.
+    compositing_masks: list[Image.Image], optional
+        Parallel to `uncomposited_images`: 'L' masks, white where the result replaces the source. For each pair,
+        ``Image.composite(uncomposited, source, mask)`` reproduces the matching entry of `images`.
     seeds: list[int]
         The seed each image was generated with, parallel to `images`, or empty when the job used no seed (basic
         upscaling, preprocessor previews) or the backend did not report one per image. A WebUI batch uses
@@ -116,6 +123,8 @@ class GenerationResult:
     task_id: Optional[str] = None
     raw_info: Optional[object] = None
     extra: dict = field(default_factory=dict)
+    uncomposited_images: Optional[list[Image.Image]] = None
+    compositing_masks: Optional[list[Image.Image]] = None
 
 
 ProgressCallback = Callable[[GenerationProgress], None]

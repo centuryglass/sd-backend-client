@@ -61,6 +61,7 @@ class _Capture:
                 patch.object(service, '_queue_prompt', return_value=QueueAdditionResponse(prompt_id='x')):
             paste_back = service._generate(params)[1]
         assert paste_back is not None
+        self.paste_back = paste_back
         self.blurred = paste_back.mask
         self.composite_mask = paste_back.mask  # The blurred mask, unless soft inpainting is on.
 
@@ -149,3 +150,10 @@ def test_webui_body_sends_x_and_y_unchanged():
     data = DiffusionRequestBody(mask_blur_x=2, mask_blur_y=5).to_dict()
     assert data['mask_blur_x'] == 2 and data['mask_blur_y'] == 5
     assert 'mask_blur' not in data
+
+
+def test_return_uncomposited_reaches_the_paste_back():
+    """`DiffusionParams.return_uncomposited` makes the ComfyUI paste-back report its layers, for plain and soft jobs."""
+    assert _Capture(_params(mask_blur=6)).paste_back.return_layers is False
+    assert _Capture(_params(mask_blur=6, return_uncomposited=True)).paste_back.return_layers is True
+    assert _Capture(_params(mask_blur=6, soft_inpainting=True, return_uncomposited=True)).paste_back.return_layers
