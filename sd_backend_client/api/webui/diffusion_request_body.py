@@ -242,6 +242,7 @@ class DiffusionRequestBody(DiffusionParams):
             data['denoising_strength'] = DEFAULT_DENOISING_STRENGTH
         # The WebUI request schema has no sd_model_name field; the checkpoint is selected through override_settings.
         data.pop('inpaint_crop_points', None)  # client-side only; WebUI has no such field
+        data.pop('return_uncomposited', None)  # client-side only; the WebUI always composites
         sd_model_name = data.pop('sd_model_name', '')
         if sd_model_name:
             data.setdefault('override_settings', {}).setdefault('sd_model_checkpoint', sd_model_name)

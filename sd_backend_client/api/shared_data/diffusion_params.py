@@ -179,6 +179,14 @@ class DiffusionParams(BaseModel):
     unknown key or an out-of-range value. Ignored unless `soft_inpainting` is on.
     """
 
+    return_uncomposited: bool = False
+    """Whether inpainting results also report the generated pixels before compositing, and the mask used to blend them.
+
+    Fills `GenerationResult.uncomposited_images` and `GenerationResult.compositing_masks`; `images` stays composited.
+    Only ComfyUI supports it. The WebUI composites on the server without returning the raw image, so its results
+    leave both fields None. Ignored without a mask.
+    """
+
     controlnet_units: list[ControlNetUnit] = []
 
     def mask_blur_extents(self) -> tuple[int, int]:

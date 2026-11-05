@@ -84,21 +84,34 @@ class PasteBack:
     source: Image.Image
     mask: Image.Image
     region: Optional[CropBox] = None
+    return_layers: bool = False
+    """Whether the handle reports `layers` for each result. Set only when the mask is the one the backend composites
+    through; the WebUI's own blend inside a crop is unknown, so its paste-backs leave this off."""
 
-    def apply(self, image: Image.Image) -> Image.Image:
-        """Return `image` composited onto the source: result where the mask is white, source where it is black."""
-        source = self.source.convert('RGBA')
+    def layers(self, image: Image.Image) -> tuple[Image.Image, Image.Image]:
+        """Return `image` as a full-size RGBA image, and the 'L' mask that composites it onto the source.
+
+        When `region` is set, `image` is resized and pasted into a copy of the source first. Both returned images
+        have the size of that result, so `Image.composite(uncomposited, source, mask)` equals `apply(image)` when the
+        sizes match the source's.
+        """
         image = image.convert('RGBA')
         if self.region is not None:
             left, top, right, bottom = self.region
-            uncropped = source.copy()
+            uncropped = self.source.convert('RGBA')
             uncropped.paste(image.resize((right - left, bottom - top), Image.Resampling.LANCZOS), (left, top))
             image = uncropped
         mask = self.mask.convert('L')
-        if image.size != source.size:
-            source = source.resize(image.size)
         if mask.size != image.size:
             mask = mask.resize(image.size)
+        return image, mask
+
+    def apply(self, image: Image.Image) -> Image.Image:
+        """Return `image` composited onto the source: result where the mask is white, source where it is black."""
+        image, mask = self.layers(image)
+        source = self.source.convert('RGBA')
+        if image.size != source.size:
+            source = source.resize(image.size)
         return Image.composite(image, source, mask)
 
 
