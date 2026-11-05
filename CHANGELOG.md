@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/centuryglass/sd-backend-client/compare/v0.5.0...v0.6.0) (2026-11-05)
+
+
+### Features
+
+* optionally return uncomposited inpainting results with their compositing masks ([#137](https://github.com/centuryglass/sd-backend-client/issues/137)) ([1c6ef4c](https://github.com/centuryglass/sd-backend-client/commit/1c6ef4cc26b13cac854cecdfa95105c2c073cb21))
+
+
+### Bug Fixes
+
+* keep closed issues out of the session-start issue index ([#133](https://github.com/centuryglass/sd-backend-client/issues/133)) ([f379535](https://github.com/centuryglass/sd-backend-client/commit/f37953558ff1e66bcd346af03572aae1e7d014cb))
+
 ## [0.5.0](https://github.com/centuryglass/sd-backend-client/compare/v0.4.0...v0.5.0) (2026-10-15)
 
 
