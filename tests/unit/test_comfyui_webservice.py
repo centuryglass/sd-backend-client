@@ -583,3 +583,23 @@ def test_open_websocket_wraps_connection_failures(monkeypatch, failure: Exceptio
         with ComfyUiWebservice('http://127.0.0.1:8188').open_websocket():
             pass
     assert error.value.__cause__ is failure
+
+
+# Output folder handling
+
+
+@pytest.mark.parametrize(('save_outputs', 'output_type', 'other_type'), [(False, 'PreviewImage', 'SaveImage'),
+                                                                         (True, 'SaveImage', 'PreviewImage')])
+def test_save_outputs_selects_the_queued_output_node(save_outputs: bool, output_type: str, other_type: str):
+    """Results go to the server's temp folder unless the service was created with `save_outputs`."""
+    service = ComfyUiWebservice('http://127.0.0.1:8188', save_outputs=save_outputs)
+    service._queue_prompt = MagicMock()  # type: ignore[method-assign]
+    service.get_lora_models = lambda: []  # type: ignore[method-assign]
+    service.get_hypernetwork_models = lambda: []  # type: ignore[method-assign]
+    service.get_models = lambda model_type: []  # type: ignore[method-assign]
+
+    service.txt2img(ComfyUIDiffusionParams(prompt='a cat', sd_model_name='m.safetensors'))
+
+    class_types = [node['class_type'] for node in service._queue_prompt.call_args.args[0].values()]
+    assert class_types.count(output_type) == 1
+    assert other_type not in class_types

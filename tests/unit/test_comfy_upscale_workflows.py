@@ -68,17 +68,35 @@ def test_basic_workflow_resizes_model_output_to_target():
     assert source_class(workflow, resize['inputs']['image']) == 'ImageUpscaleWithModel'
     assert source_class(workflow, apply_model['inputs']['image']) == 'LoadImage'
     assert source_class(workflow, apply_model['inputs']['upscale_model']) == 'UpscaleModelLoader'
-    save = single_node(workflow, 'SaveImage')
+    save = single_node(workflow, 'PreviewImage')
     assert source_class(workflow, save['inputs']['images']) == 'ImageScale'
 
 
 def test_basic_workflow_without_size_skips_resize():
-    """With no final size, the model output goes straight to SaveImage."""
+    """With no final size, the model output goes straight to the output node."""
     workflow = build_basic_upscaling_workflow(SOURCE, 'esrgan.pth').get_workflow_dict()
 
     assert not nodes_of_type(workflow, 'ImageScale')
-    save = single_node(workflow, 'SaveImage')
+    save = single_node(workflow, 'PreviewImage')
     assert source_class(workflow, save['inputs']['images']) == 'ImageUpscaleWithModel'
+
+
+def _saving_latent_workflow(ultimate: bool, upscale_model: Optional[str]) -> dict:
+    """Build a latent upscale graph with `save_output` set."""
+    builder = latent_builder(ultimate, upscale_model)
+    builder.save_output = True
+    return builder.build_workflow().get_workflow_dict()
+
+
+@pytest.mark.parametrize('workflow', [
+    build_basic_upscaling_workflow(SOURCE, 'esrgan.pth', save_output=True).get_workflow_dict(),
+    _saving_latent_workflow(True, 'esrgan.pth'),
+    _saving_latent_workflow(False, None),
+], ids=['basic', 'latent_ultimate', 'latent_plain'])
+def test_upscale_workflows_save_with_visible_prefix(workflow: dict):
+    """With saving requested, the output node is a SaveImage. An empty prefix makes ComfyUI save hidden dotfiles."""
+    assert not nodes_of_type(workflow, 'PreviewImage')
+    assert single_node(workflow, 'SaveImage')['inputs']['filename_prefix'] == 'sd_backend_client'
 
 
 @pytest.mark.parametrize('workflow', [
@@ -86,9 +104,10 @@ def test_basic_workflow_without_size_skips_resize():
     build_latent_workflow(True, 'esrgan.pth'),
     build_latent_workflow(False, None),
 ], ids=['basic', 'latent_ultimate', 'latent_plain'])
-def test_upscale_workflows_save_with_visible_prefix(workflow: dict):
-    """An empty prefix makes ComfyUI save hidden `._00001_.png` files."""
-    assert single_node(workflow, 'SaveImage')['inputs']['filename_prefix'] == 'sd_backend_client'
+def test_upscale_workflows_use_temp_output_by_default(workflow: dict):
+    """By default upscale results go to the temp folder, not the server's output folder."""
+    assert not nodes_of_type(workflow, 'SaveImage')
+    single_node(workflow, 'PreviewImage')
 
 
 def test_latent_workflow_without_ultimate_applies_upscale_model_then_resizes():

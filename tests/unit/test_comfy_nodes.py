@@ -156,3 +156,19 @@ def test_preprocessor_preview_rebuild_without_mask_drops_the_mask():
     assert 'LoadImageMask' not in {node['class_type'] for node in without_mask.values()}
     preprocessor = next(node for node in without_mask.values() if node['class_type'] == 'Inpaint')
     assert 'mask' not in preprocessor['inputs']
+
+
+def test_preprocessor_preview_output_node_follows_save_output():
+    """A preview goes to the temp folder by default and to the output folder, under its own prefix, when saving."""
+    source = ImageFileReference(filename='source.png', subfolder='')
+    preprocessor = ControlNetPreprocessor(name='Canny')
+
+    temp = PreprocessorPreviewWorkflowBuilder(preprocessor).build_workflow(source).get_workflow_dict()
+    saved_builder = PreprocessorPreviewWorkflowBuilder(preprocessor, save_output=True)
+    saved = saved_builder.build_workflow(source).get_workflow_dict()
+
+    assert {node['class_type'] for node in temp.values()} >= {'PreviewImage'}
+    assert 'SaveImage' not in {node['class_type'] for node in temp.values()}
+    save = next(node for node in saved.values() if node['class_type'] == 'SaveImage')
+    assert save['inputs']['filename_prefix'] == 'Canny_preview'
+    assert 'PreviewImage' not in {node['class_type'] for node in saved.values()}

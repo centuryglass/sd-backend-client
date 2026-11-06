@@ -153,7 +153,7 @@ class ComfyUiWebservice(WebService, Backend):
     """
 
     def __init__(self, url: str, request_timeout: Optional[float] = DEFAULT_REQUEST_TIMEOUT,
-                 live_progress: bool = True) -> None:
+                 live_progress: bool = True, save_outputs: bool = False) -> None:
         """Create the webservice client.
 
         Parameters
@@ -166,8 +166,12 @@ class ComfyUiWebservice(WebService, Backend):
         live_progress: bool, default=True
             Whether generation handles report step progress, ETA and preview frames. These come from the server's
             websocket, which a background thread reads while any handle's job is unfinished.
+        save_outputs: bool, default=False
+            Whether generated, upscaled and preview images are saved permanently to the server's output folder. When
+            False they go to its temp folder, which ComfyUI clears on restart. Uploaded input images are unaffected.
         """
         super().__init__(url, request_timeout)
+        self.save_outputs = save_outputs
         self._preprocessor_cache: Optional[list[ControlNetPreprocessor]] = None
         self._ksampler_info: Optional[NodeInfoResponse] = None
         self._client_id = str(uuid.uuid4())
@@ -514,6 +518,7 @@ class ComfyUiWebservice(WebService, Backend):
         """
         if workflow_builder is None:
             workflow_builder = DiffusionWorkflowBuilder()
+        workflow_builder.save_output = self.save_outputs
         available_loras: list[str] = []
         available_hypernetworks: list[str] = []
         prompt_tags = [match.group(1) for prompt in (diffusion_params.prompt, diffusion_params.negative_prompt)
@@ -691,7 +696,7 @@ class ComfyUiWebservice(WebService, Backend):
             mask_reference = self.upload_mask(mask, image_reference)
         else:
             mask_reference = None
-        workflow_builder = PreprocessorPreviewWorkflowBuilder(preprocessor)
+        workflow_builder = PreprocessorPreviewWorkflowBuilder(preprocessor, self.save_outputs)
         workflow = workflow_builder.build_workflow(image_reference, mask_reference)
         return self._queue_prompt(workflow.get_workflow_dict())
 
@@ -784,7 +789,8 @@ class ComfyUiWebservice(WebService, Backend):
         else:  # Basic upscaling workflow:
             assert upscale_model is not None
             workflow = build_basic_upscaling_workflow(image_reference, upscale_model,
-                                                      Size(width, height)).get_workflow_dict()
+                                                      Size(width, height),
+                                                      self.save_outputs).get_workflow_dict()
             seed = None
             run_plan = None
 

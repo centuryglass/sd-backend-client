@@ -60,12 +60,21 @@ def test_txt2img_graph_has_expected_backbone():
     assert sampler['inputs']['denoise'] == 1.0  # txt2img is always full denoise
 
     single_node(workflow, 'VAEDecode')
-    single_node(workflow, 'SaveImage')
+    single_node(workflow, 'PreviewImage')
 
 
-def test_save_image_prefix_is_visible_by_default():
-    """An empty prefix makes ComfyUI save hidden `._00001_.png` files."""
+def test_results_go_to_temp_folder_unless_saving_is_requested():
+    """By default no SaveImage node is emitted, so results don't accumulate in the server's output folder."""
     workflow = make_txt2img_builder().build_workflow().get_workflow_dict()
+    assert not nodes_of_type(workflow, 'SaveImage')
+
+
+def test_save_output_uses_a_visible_filename_prefix():
+    """An empty prefix makes ComfyUI save hidden `._00001_.png` files."""
+    builder = make_txt2img_builder()
+    builder.save_output = True
+    workflow = builder.build_workflow().get_workflow_dict()
+    assert not nodes_of_type(workflow, 'PreviewImage')
     assert single_node(workflow, 'SaveImage')['inputs']['filename_prefix'] == 'sd_backend_client'
 
 
