@@ -17,7 +17,7 @@ from sd_backend_client.api.comfyui.nodes.image_scale_node import ImageScaleNode
 from sd_backend_client.api.comfyui.nodes.input.load_image_node import LoadImageNode
 from sd_backend_client.api.comfyui.nodes.input.load_upscaler_node import LoadUpscalerNode
 from sd_backend_client.api.comfyui.nodes.ksampler_node import KSamplerNode
-from sd_backend_client.api.comfyui.nodes.save_image_node import SaveImageNode
+from sd_backend_client.api.comfyui.nodes.save_image_node import output_image_node
 from sd_backend_client.api.comfyui.nodes.ultimate_upscale_node import (UltimateUpscaleNode,
                                                                        ultimate_upscale_model_runs,
                                                                        ultimate_upscale_sampler_runs)
@@ -189,7 +189,7 @@ class LatentUpscaleWorkflowBuilder(DiffusionWorkflowBuilder):
             image = VAEDecodeTiledNode(tile_size=vae_tile_size, vae=vae, samples=sampler_node.latent_out).image_out
 
         workflow = ComfyNodeGraph()
-        workflow.add_node(SaveImageNode(filename_prefix=self.filename_prefix, images=image))
+        workflow.add_node(output_image_node(image, self.save_output, self.filename_prefix))
         # Changes to the returned graph shouldn't affect the workflow builder, so create a deep copy to return:
         final_workflow = deepcopy(workflow)
         self._clear_saved_node_connections()

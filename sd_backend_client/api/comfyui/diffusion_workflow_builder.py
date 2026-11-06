@@ -30,7 +30,7 @@ from sd_backend_client.api.comfyui.nodes.model_extensions.differential_diffusion
 from sd_backend_client.api.comfyui.nodes.model_extensions.hypernet_loader_node import HypernetLoaderNode
 from sd_backend_client.api.comfyui.nodes.model_extensions.lora_loader_node import LoraLoaderNode
 from sd_backend_client.api.comfyui.nodes.repeat_latent_node import RepeatLatentNode
-from sd_backend_client.api.comfyui.nodes.save_image_node import DEFAULT_FILENAME_PREFIX, SaveImageNode
+from sd_backend_client.api.comfyui.nodes.save_image_node import DEFAULT_FILENAME_PREFIX, output_image_node
 from sd_backend_client.api.comfyui.nodes.vae.vae_decode_node import VAEDecodeNode
 from sd_backend_client.api.comfyui.nodes.vae.vae_decode_tiled_node import VAEDecodeTiledNode
 from sd_backend_client.api.comfyui.nodes.vae.vae_encode_node import VAEEncodeNode
@@ -84,6 +84,7 @@ class DiffusionWorkflowBuilder:
         self._scheduler: str = DEFAULT_SCHEDULER
         self._seed = random_seed()
         self._filename_prefix = DEFAULT_FILENAME_PREFIX
+        self._save_output = False
 
         # Optional params that can be set to alter diffusion behavior:
         self._load_as_inpainting_model = False
@@ -291,8 +292,19 @@ class DiffusionWorkflowBuilder:
         self._size = Size(size)
 
     @property
+    def save_output(self) -> bool:
+        """Accesses whether results are saved permanently to the server's output folder.
+
+        When False, results go to the server's temp folder, which ComfyUI clears on restart."""
+        return self._save_output
+
+    @save_output.setter
+    def save_output(self, save: bool) -> None:
+        self._save_output = save
+
+    @property
     def filename_prefix(self) -> str:
-        """Accesses the prefix used when saving image files."""
+        """Accesses the prefix used when saving image files. It only applies when `save_output` is True."""
         return self._filename_prefix
 
     @filename_prefix.setter
@@ -452,7 +464,7 @@ class DiffusionWorkflowBuilder:
             image = VAEDecodeNode(vae=vae, samples=sampling_node.latent_out).image_out
 
         workflow = ComfyNodeGraph()
-        workflow.add_node(SaveImageNode(filename_prefix=self.filename_prefix, images=image))
+        workflow.add_node(output_image_node(image, self.save_output, self.filename_prefix))
         # Changes to the returned graph shouldn't affect the workflow builder, so create a deep copy to return:
         final_workflow = deepcopy(workflow)
         self._clear_saved_node_connections()
