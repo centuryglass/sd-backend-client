@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/centuryglass/sd-backend-client/compare/v0.6.0...v0.6.1) (2026-11-06)
+
+
+### Bug Fixes
+
+* **comfyui:** send results to the server's temp folder unless saving is requested ([#139](https://github.com/centuryglass/sd-backend-client/issues/139)) ([b907b0a](https://github.com/centuryglass/sd-backend-client/commit/b907b0add874cb7c4308ee5059bb165a02fa9c75))
+
 ## [0.6.0](https://github.com/centuryglass/sd-backend-client/compare/v0.5.0...v0.6.0) (2026-11-05)
 
 
