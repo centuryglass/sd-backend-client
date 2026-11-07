@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.0](https://github.com/centuryglass/sd-backend-client/compare/v0.6.1...v0.7.0) (2026-11-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* **comfyui:** add temp_uploads option to keep uploaded inputs out of ComfyUI/input
+
+### Features
+
+* **comfyui:** add temp_uploads option to keep uploaded inputs out of ComfyUI/input ([bc32f0b](https://github.com/centuryglass/sd-backend-client/commit/bc32f0b8b449ee4a6ef2ef7a099e99c7d3e36a22))
+
 ## [0.6.1](https://github.com/centuryglass/sd-backend-client/compare/v0.6.0...v0.6.1) (2026-11-06)
 
 
