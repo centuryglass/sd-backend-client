@@ -16,6 +16,7 @@ from PIL import Image
 
 from sd_backend_client.api.comfyui.comfyui_progress_listener import SamplerRunPlan
 from sd_backend_client.api.comfyui.comfyui_types import ImageFileReference
+from sd_backend_client.api.comfyui.workflow_builder_utils import image_ref_to_str
 from sd_backend_client.api.comfyui.comfyui_diffusion_params import ComfyUIDiffusionParams
 from sd_backend_client.api.comfyui_webservice import (AsyncTaskStatus, ComfyEndpoints, ComfyModelType,
                                                       ComfyUiWebservice, EXTENDED_TIMEOUT)
@@ -31,8 +32,9 @@ PROMPT_ID = '7d4c0f0e-6a3b-4c1e-9f6e-0a1b2c3d4e5f'
 OTHER_ID = '11111111-2222-3333-4444-555555555555'
 
 
-def _service(routes: Optional[dict[tuple[str, str], Any]] = None) -> tuple[ComfyUiWebservice, _FakeSession]:
-    service = ComfyUiWebservice('http://127.0.0.1:8188')
+def _service(routes: Optional[dict[tuple[str, str], Any]] = None,
+             **service_args: Any) -> tuple[ComfyUiWebservice, _FakeSession]:
+    service = ComfyUiWebservice('http://127.0.0.1:8188', **service_args)
     session = _FakeSession(routes)
     service._session = session  # type: ignore[assignment]
     return service, session
@@ -272,11 +274,44 @@ def test_upload_image_sends_png_multipart_named_by_content():
     assert reference == ImageFileReference(filename='uploaded.png', subfolder='sd_backend_client', type='input')
     uploads = session.of('POST', ComfyEndpoints.IMG_UPLOAD)
     assert len(uploads) == 1
-    assert uploads[0]['data'] == {'type': 'input', 'subfolder': 'sd_backend_client'}
+    assert uploads[0]['data'] == {'type': 'temp', 'subfolder': 'sd_backend_client'}
     name, data, content_type = uploads[0]['files']['image']
     assert re.fullmatch(r'[0-9a-f]{32}\.png', name)
     assert content_type == 'image/png'
     assert Image.open(io.BytesIO(data)).size == (3, 2)
+
+
+@pytest.mark.parametrize(('temp_uploads', 'temp_arg', 'expected_type'), [(False, None, 'input'),
+                                                                         (True, None, 'temp'),
+                                                                         (True, False, 'input'),
+                                                                         (False, True, 'temp')])
+def test_upload_image_temp_follows_service_setting_unless_overridden(temp_uploads: bool, temp_arg: Optional[bool],
+                                                                     expected_type: str):
+    """`temp_uploads` sets the default upload folder type, and an explicit `temp` argument overrides it."""
+    service, session = _service({('POST', ComfyEndpoints.IMG_UPLOAD): _upload_response()},
+                                temp_uploads=temp_uploads)
+    service.upload_image(Image.new('RGBA', (1, 1)), temp=temp_arg)
+    assert session.of('POST', ComfyEndpoints.IMG_UPLOAD)[0]['data']['type'] == expected_type
+
+
+@pytest.mark.parametrize('ref_type', ['input', 'temp'])
+def test_upload_mask_uses_the_folder_type_of_its_reference_image(ref_type: str):
+    """A mask is stored in the same folder type as the image it references."""
+    service, session = _service({('POST', ComfyEndpoints.MASK_UPLOAD): _upload_response('mask.png')})
+    ref = ImageFileReference(filename='image.png', subfolder='sd_backend_client', type=ref_type)  # type: ignore[arg-type]
+    service.upload_mask(Image.new('L', (4, 4), 255), ref)
+    assert session.of('POST', ComfyEndpoints.MASK_UPLOAD)[0]['data']['type'] == ref_type
+
+
+@pytest.mark.parametrize(('ref', 'expected'), [
+    (ImageFileReference(filename='a.png', subfolder='sd_backend_client', type='input'), 'sd_backend_client/a.png'),
+    (ImageFileReference(filename='a.png', subfolder='sd_backend_client', type='temp'),
+     'sd_backend_client/a.png [temp]'),
+    (ImageFileReference(filename='a.png', subfolder='', type='temp'), 'a.png [temp]'),
+    (ImageFileReference(filename='a.png', subfolder=''), 'a.png')])
+def test_image_ref_to_str_annotates_temp_files(ref: ImageFileReference, expected: str):
+    """Load nodes read the temp folder only when the image name carries the ` [temp]` annotation."""
+    assert image_ref_to_str(ref) == expected
 
 
 def test_upload_image_names_differ_for_different_images():

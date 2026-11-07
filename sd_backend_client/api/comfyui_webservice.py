@@ -153,7 +153,8 @@ class ComfyUiWebservice(WebService, Backend):
     """
 
     def __init__(self, url: str, request_timeout: Optional[float] = DEFAULT_REQUEST_TIMEOUT,
-                 live_progress: bool = True, save_outputs: bool = False) -> None:
+                 live_progress: bool = True, save_outputs: bool = False,
+                 temp_uploads: bool = True) -> None:
         """Create the webservice client.
 
         Parameters
@@ -168,10 +169,16 @@ class ComfyUiWebservice(WebService, Backend):
             websocket, which a background thread reads while any handle's job is unfinished.
         save_outputs: bool, default=False
             Whether generated, upscaled and preview images are saved permanently to the server's output folder. When
-            False they go to its temp folder, which ComfyUI clears on restart. Uploaded input images are unaffected.
+            False they go to its temp folder, which ComfyUI clears on restart.
+        temp_uploads: bool, default=True
+            Whether input images and masks that this client uploads go to the server's temp folder instead of
+            `input/sd_backend_client`, so they don't accumulate there. ComfyUI clears the temp folder on restart, so a
+            job still queued across a restart can't find its inputs. `upload_image`'s `temp` argument overrides this
+            per call.
         """
         super().__init__(url, request_timeout)
         self.save_outputs = save_outputs
+        self.temp_uploads = temp_uploads
         self._preprocessor_cache: Optional[list[ControlNetPreprocessor]] = None
         self._ksampler_info: Optional[NodeInfoResponse] = None
         self._client_id = str(uuid.uuid4())
@@ -380,7 +387,7 @@ class ComfyUiWebservice(WebService, Backend):
                            image: Image.Image | str,
                            endpoint:str, name: Optional[str] = None,
                            subfolder: Optional[str] = None,
-                           temp=False, overwrite=False,
+                           temp=True, overwrite=False,
                            original_ref: Optional[ImageFileReference] = None) -> ImageFileReference:
         """Upload an image and return the reference the server saved it under.
 
@@ -426,14 +433,18 @@ class ComfyUiWebservice(WebService, Backend):
 
     def upload_image(self, image: Image.Image | str,
                      name: Optional[str] = None, subfolder: Optional[str] = None,
-                     temp=False, overwrite=False) -> ImageFileReference:
+                     temp: Optional[bool] = None, overwrite=False) -> ImageFileReference:
         """Uploads an image for img2img, inpainting, ControlNet, etc.
+
+        `temp=None` follows the service's `temp_uploads` setting. A temp upload lands in the server's temp folder,
+        which ComfyUI clears on restart.
 
         With no `name`, the file is named by a hash of its contents. A fixed `name` with `overwrite=True` replaces
         the server's file, which changes the input of any queued job that reads it. Use the returned reference, since
         the server may rename the file.
         """
-        return self._upload_image_file(image, ComfyEndpoints.IMG_UPLOAD, name, subfolder, temp, overwrite)
+        return self._upload_image_file(image, ComfyEndpoints.IMG_UPLOAD, name, subfolder,
+                                       self.temp_uploads if temp is None else temp, overwrite)
 
     def upload_mask(self, mask: Image.Image | str, ref_image: ImageFileReference,
                     subfolder: Optional[str] = None,
@@ -441,7 +452,7 @@ class ComfyUiWebservice(WebService, Backend):
         """Upload an inpainting mask for a particular image.
 
         The ref_image parameter should contain data returned by a previous upload_image request. Mask size must match
-        original image size.
+        original image size. The mask is stored in the same folder type (input or temp) as `ref_image`.
 
         `mask` follows the `DiffusionParams.mask` convention: opaque/white pixels mark the region to change. It is
         converted with `mask_to_grayscale` and uploaded as an RGBA PNG whose alpha is `255 - luminance`, because
@@ -463,7 +474,8 @@ class ComfyUiWebservice(WebService, Backend):
         mask_hash = hashlib.blake2b(image_to_png_bytes(comfy_mask), digest_size=16).hexdigest()
         ref_stem = os.path.splitext(ref_image.filename)[0]
         return self._upload_image_file(comfy_mask, ComfyEndpoints.MASK_UPLOAD, f'mask_{mask_hash}_{ref_stem}',
-                                       subfolder, False, overwrite, original_ref=ref_image)
+                                       subfolder, ref_image.type == 'temp', overwrite,
+                                       original_ref=ref_image)
 
 
     def download_images(self, image_refs: list[ImageFileReference]) -> list[Image.Image]:
