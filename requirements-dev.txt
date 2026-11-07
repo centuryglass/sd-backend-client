@@ -9,12 +9,12 @@ pytest==9.2.0
 # CI's test job runs pytest with --cov and fails below its --cov-fail-under floor (.github/workflows/ci.yml).
 # coverage is pinned too because CI calls its CLI directly to write the job summary.
 pytest-cov==7.1.0
-coverage==7.17.0
+coverage==7.17.1
 
 # `python scripts/pylint_check.py` is the CI lint gate; `scripts/pylint.sh` shows the full report.
 pylint==4.1.3
 
 # `mypy` is the CI type-check gate; its settings are in pyproject.toml's [tool.mypy]. types-requests supplies the
 # stubs requests doesn't ship.
-mypy==2.4.0
-types-requests==2.33.0.20261006
+mypy==2.4.1
+types-requests==2.33.0.20261030
