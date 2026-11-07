@@ -154,7 +154,7 @@ class ComfyUiWebservice(WebService, Backend):
 
     def __init__(self, url: str, request_timeout: Optional[float] = DEFAULT_REQUEST_TIMEOUT,
                  live_progress: bool = True, save_outputs: bool = False,
-                 temp_uploads: bool = False) -> None:
+                 temp_uploads: bool = True) -> None:
         """Create the webservice client.
 
         Parameters
@@ -170,7 +170,7 @@ class ComfyUiWebservice(WebService, Backend):
         save_outputs: bool, default=False
             Whether generated, upscaled and preview images are saved permanently to the server's output folder. When
             False they go to its temp folder, which ComfyUI clears on restart.
-        temp_uploads: bool, default=False
+        temp_uploads: bool, default=True
             Whether input images and masks that this client uploads go to the server's temp folder instead of
             `input/sd_backend_client`, so they don't accumulate there. ComfyUI clears the temp folder on restart, so a
             job still queued across a restart can't find its inputs. `upload_image`'s `temp` argument overrides this
