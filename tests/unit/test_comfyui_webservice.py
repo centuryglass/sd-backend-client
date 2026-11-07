@@ -274,7 +274,7 @@ def test_upload_image_sends_png_multipart_named_by_content():
     assert reference == ImageFileReference(filename='uploaded.png', subfolder='sd_backend_client', type='input')
     uploads = session.of('POST', ComfyEndpoints.IMG_UPLOAD)
     assert len(uploads) == 1
-    assert uploads[0]['data'] == {'type': 'input', 'subfolder': 'sd_backend_client'}
+    assert uploads[0]['data'] == {'type': 'temp', 'subfolder': 'sd_backend_client'}
     name, data, content_type = uploads[0]['files']['image']
     assert re.fullmatch(r'[0-9a-f]{32}\.png', name)
     assert content_type == 'image/png'
