@@ -387,7 +387,7 @@ class ComfyUiWebservice(WebService, Backend):
                            image: Image.Image | str,
                            endpoint:str, name: Optional[str] = None,
                            subfolder: Optional[str] = None,
-                           temp=False, overwrite=False,
+                           temp=True, overwrite=False,
                            original_ref: Optional[ImageFileReference] = None) -> ImageFileReference:
         """Upload an image and return the reference the server saved it under.
 
