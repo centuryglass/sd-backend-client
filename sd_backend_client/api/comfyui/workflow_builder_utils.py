@@ -15,7 +15,13 @@ def random_seed() -> int:
 
 
 def image_ref_to_str(image_ref: ImageFileReference) -> str:
-    """Converts an uploaded image/mask file reference to an API-compatible string representation."""
-    if image_ref.subfolder is not None and image_ref.subfolder != '':
-        return f'{image_ref.subfolder}/{image_ref.filename}'
-    return image_ref.filename
+    """Converts an uploaded image/mask file reference to the string ComfyUI's load nodes take.
+
+    A reference to a temp-folder upload gets the ` [temp]` annotation, which tells the load nodes to read the temp
+    folder instead of the input folder."""
+    name = image_ref.filename
+    if image_ref.subfolder:
+        name = f'{image_ref.subfolder}/{name}'
+    if image_ref.type == 'temp':
+        name = f'{name} [temp]'
+    return name
