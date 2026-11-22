@@ -1,0 +1,25 @@
+id = "instant_id_face_keypoints"
+label = "InstantID Face Keypoints"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["instant_id"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["instantid_controlnet_sdxl"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["instant_id_face_keypoints"]
+forge = ["instant_id_face_keypoints"]
+comfyui = []

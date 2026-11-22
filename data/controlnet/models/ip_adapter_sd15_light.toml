@@ -1,0 +1,36 @@
+id = "ip_adapter_sd15_light"
+label = "IP-Adapter SD1.5 Light"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_clip_h"]
+trainer = "h94 (Tencent AI Lab)"
+license = "apache-2.0"
+homepage = "https://huggingface.co/h94/IP-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "ip-adapter_sd15_light.safetensors"
+format = "safetensors"
+size_bytes = 44642768
+sha256 = "0747d08db670535bfa286452a77d93cebad5c677b46d038543f9f2de8690bb26"
+webui_hash = "932b88cf"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/ip-adapter_sd15_light.safetensors"
+
+[[files]]
+filename = "ip-adapter_sd15_light.bin"
+format = "bin"
+size_bytes = 44642819
+sha256 = "f71bfbdd937f2edad0c894ec72d12db02b3be0316f62988e5fc669ca4da6b7e1"
+webui_hash = "be1c9b97"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/ip-adapter_sd15_light.bin"

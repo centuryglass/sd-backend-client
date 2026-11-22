@@ -1,0 +1,28 @@
+id = "ip_adapter_faceid_portrait_v11_sd15"
+label = "IP-Adapter FaceID Portrait 1.1"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_face_id"]
+trainer = "h94 (Tencent AI Lab)"
+license = ""
+homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter_faceid"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "ip-adapter-faceid-portrait-v11_sd15.bin"
+format = "bin"
+size_bytes = 64586623
+sha256 = "a48cb4f89ed18e02c6000f65aa9efec452e87eaed4a1bc9fcf4a460c8d0e3bc6"
+webui_hash = "53ef197c"
+source_url = "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/43907e6f44d079bf1a9102d9a6e56aef7a219bae/ip-adapter-faceid-portrait-v11_sd15.bin"

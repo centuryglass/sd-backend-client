@@ -1,0 +1,20 @@
+id = "depth_zoe_anything"
+label = "Zoe Depth Anything"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["depth"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = []
+
+sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = []
+forge = []
+comfyui = ["Zoe_DepthAnythingPreprocessor"]

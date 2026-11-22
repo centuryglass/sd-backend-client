@@ -1,0 +1,31 @@
+id = "control_v11u_sd15_tile"
+label = "ControlNet 1.1 Tile (unfinished)"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["tile"]
+preprocessors = ["tile_resample"]
+trainer = "lllyasviel"
+license = ""
+homepage = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_comfyanonymous_controlnet_v1_1_fp16_safetensors"]
+research_status = "stub"
+open_questions = [
+    "lllyasviel/ControlNet-v1-1 no longer hosts the v11u tile model this fp16 file was converted from. Find its original model card or release note.",
+]
+
+[[files]]
+filename = "control_v11u_sd15_tile_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601100
+sha256 = "387ac74221099dcd163b3a76060d0fae441301e169646f186875f620b1287a8f"
+webui_hash = "39a89b25"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11u_sd15_tile_fp16.safetensors"

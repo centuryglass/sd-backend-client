@@ -1,0 +1,51 @@
+id = "control_v11p_sd15_scribble"
+label = "ControlNet 1.1 Scribble"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["scribble"]
+preprocessors = ["scribble_hed", "scribble_pidinet"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v11p_sd15_scribble.pth"
+format = "pth"
+size_bytes = 1445235707
+sha256 = "14d33e8bc14ba679595d976789e4eedc36a3d2d21866ab5896355a7e6677749f"
+webui_hash = "d4ba51ff"
+source_url = "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/69fc48b9cbd98661f6d0288dc59b59a5ccb32a6b/control_v11p_sd15_scribble.pth"
+
+[[files]]
+filename = "control_v11p_sd15_scribble_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601100
+sha256 = "99edfd25b54c18c0ab19fba8c5618f741aac1f8c3101e7fa62cce925ad87ae68"
+webui_hash = "4e6af23e"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11p_sd15_scribble_fp16.safetensors"
+
+[[files]]
+filename = "control_lora_rank128_v11p_sd15_scribble_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 135722816
+sha256 = "f1f0288cd6d490d9976a9f4c36282f3d47cb8e02dc6805aa44b38d4404fe008a"
+webui_hash = "131fe54f"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_lora_rank128_v11p_sd15_scribble_fp16.safetensors"
+variant = "rank 128 control-LoRA extraction"

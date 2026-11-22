@@ -1,0 +1,30 @@
+id = "sargezt_xl_softedge"
+label = "SargeZT SDXL Soft Edge"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["softedge"]
+preprocessors = []
+trainer = "SargeZT"
+license = ""
+homepage = "https://huggingface.co/lllyasviel/sd_control_collection"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "Find the original SargeZT release this collection file was renamed from, and its model card.",
+]
+
+[[files]]
+filename = "sargezt_xl_softedge.safetensors"
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "24e0803a8f88377f5ec0ef1582b942266e8451bae559b6d91e3660fdd5729816"
+webui_hash = "b6f7415b"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sargezt_xl_softedge.safetensors"

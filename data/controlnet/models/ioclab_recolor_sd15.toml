@@ -1,0 +1,28 @@
+id = "ioclab_recolor_sd15"
+label = "ioclab Recolor"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["recolor"]
+preprocessors = ["recolor_luminance", "recolor_intensity"]
+trainer = "ioclab"
+license = ""
+homepage = "https://huggingface.co/lllyasviel/sd_control_collection"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = ["Find the original ioclab release of the recolor model and its model card."]
+
+[[files]]
+filename = "ioclab_sd15_recolor.safetensors"
+format = "safetensors"
+size_bytes = 722598616
+sha256 = "a3fc5d9f6601d0636b5f45f07f31ec3b81a13e195c55ef0b89985d84ffa77a64"
+webui_hash = "6641f3c6"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/ioclab_sd15_recolor.safetensors"

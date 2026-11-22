@@ -1,0 +1,31 @@
+id = "nacholmo_qr_pattern_v2_sd15"
+label = "QR Pattern V2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["qr_code"]
+preprocessors = []
+trainer = "Nacholmo"
+license = "creativeml-openrail-m"
+homepage = "https://huggingface.co/Nacholmo/controlnet-qr-pattern-v2"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_nacholmo_controlnet_qr_pattern_v2", "recorded_fixtures"]
+research_status = "stub"
+open_questions = [
+    "The repo also holds the same training at other step counts (\"Other strength levels\"). Decide whether to list them as files of this record.",
+]
+
+[[files]]
+filename = "QRPattern_v2_9500.safetensors"
+also_seen_as = ["controlnetQRPatternQR_v2Sd15.safetensors"]
+format = "safetensors"
+size_bytes = 1445154816
+sha256 = "f0648652d783aae9cba26193b598b47607e2cd48b8e63f994cdd2d8cfbc516bd"
+webui_hash = "2d8d5750"
+source_url = "https://huggingface.co/Nacholmo/controlnet-qr-pattern-v2/resolve/180f80137d64aec140641ac3bb07753a532359a3/automatic1111/QRPattern_v2_9500.safetensors"

@@ -1,0 +1,40 @@
+id = "ip_adapter_clip_h"
+label = "IP-Adapter CLIP-ViT-H"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["ip_adapter"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = [
+    "ip_adapter_sd15",
+    "ip_adapter_sd15_light",
+    "ip_adapter_plus_sd15",
+    "ip_adapter_plus_face_sd15",
+    "ip_adapter_full_face_sd15",
+    "ip_adapter_sd15_light_v11",
+    "ip_adapter_sdxl_vit_h",
+    "ip_adapter_plus_sdxl_vit_h",
+    "ip_adapter_plus_face_sdxl_vit_h",
+]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["ip-adapter_clip_sd15", "ip-adapter_clip_h", "ip-adapter_clip_sdxl_plus_vith"]
+forge = [
+    "CLIP-ViT-H (IPAdapter)",
+    "ip-adapter_clip_sd15_variant",
+    "ip-adapter_clip_sdxl_plus_vith_variant",
+]
+comfyui = []

@@ -1,0 +1,28 @@
+id = "xinsir_openpose_twins_sdxl"
+label = "Xinsir SDXL OpenPose Twins"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["openpose"]
+preprocessors = ["dw_openpose_full"]
+trainer = "xinsir"
+license = "apache-2.0"
+homepage = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_xinsir_controlnet_openpose_sdxl_1_0"]
+research_status = "stub"
+open_questions = ["Find what distinguishes the \"twins\" OpenPose file from the main one."]
+
+[[files]]
+filename = "diffusion_pytorch_model_twins.safetensors"
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "54a2afb1bd21349e475566e5428884bc937a4caecf863b29dea08acc40612fa4"
+webui_hash = "590eff90"
+source_url = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0/resolve/23f966cd5cfdd3f7729c903e243d87152162d2b7/diffusion_pytorch_model_twins.safetensors"

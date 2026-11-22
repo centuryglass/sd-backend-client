@@ -1,0 +1,41 @@
+id = "tile"
+label = "Tile"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = [
+    "Forge lists \"Blur\" as its own type, holding blur_gaussian and the tile models; sd-webui-controlnet files blur under Tile. Should Blur get its own record?",
+]
+
+[names]
+webui = ["Tile"]
+forge = ["Tile", "Blur"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = [
+    "tile_resample",
+    "tile_colorfix",
+    "tile_colorfix_sharp",
+    "ttplanet_tile_gf",
+    "ttplanet_tile_simple",
+    "blur_gaussian",
+]
+models = [
+    "control_v11f1e_sd15_tile",
+    "control_v11u_sd15_tile",
+    "xinsir_tile_sdxl",
+    "xinsir_union_promax_sdxl",
+    "ttplanet_tile_realistic_v1_sdxl",
+    "ttplanet_tile_realistic_v2_sdxl",
+    "kohya_lllite_blur_sdxl",
+    "kohya_lllite_blur_anime_sdxl",
+    "kohya_lllite_blur_anime_beta_sdxl",
+]

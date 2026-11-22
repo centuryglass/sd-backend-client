@@ -1,0 +1,39 @@
+id = "mistoline_sdxl"
+label = "MistoLine"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["lineart", "softedge", "scribble"]
+preprocessors = ["anyline"]
+trainer = "TheMistoAI"
+license = "openrail++"
+homepage = "https://huggingface.co/TheMistoAI/MistoLine"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_themistoai_mistoline"]
+research_status = "stub"
+open_questions = ["List the control types the model card names, and check them against control_types."]
+
+[[files]]
+filename = "mistoLine_fp16.safetensors"
+also_seen_as = ["diffusion_pytorch_model.fp16.safetensors"]
+format = "safetensors"
+precision = "fp16"
+size_bytes = 2502139104
+sha256 = "1df519349f3f2b6a3c6ff23127dd9b98a78e1f50628cf4037a5a9527c08b767c"
+webui_hash = "2583d73c"
+source_url = "https://huggingface.co/TheMistoAI/MistoLine/resolve/1d9d0b3d48b295cf70d80a0f839a3055672f8393/mistoLine_fp16.safetensors"
+
+[[files]]
+filename = "mistoLine_rank256.safetensors"
+format = "safetensors"
+size_bytes = 774423024
+sha256 = "6c46c871a49bf9e74114f0e1f87d818426203fd62847e78043e4ce2d40834d53"
+webui_hash = "0f320932"
+source_url = "https://huggingface.co/TheMistoAI/MistoLine/resolve/1d9d0b3d48b295cf70d80a0f839a3055672f8393/mistoLine_rank256.safetensors"
+variant = "rank 256 control-LoRA extraction"

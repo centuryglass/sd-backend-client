@@ -1,0 +1,28 @@
+id = "mediapipe_face"
+label = "MediaPipe Face"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["openpose"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["crucibleai_mediapipe_face_sd15"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = [
+    "No WebUI control type lists mediapipe_face. Filed under OpenPose as the nearest fit; decide whether face landmarks need their own control type.",
+]
+
+[names]
+webui = ["mediapipe_face"]
+forge = ["mediapipe_face"]
+comfyui = ["MediaPipe-FaceMeshPreprocessor"]

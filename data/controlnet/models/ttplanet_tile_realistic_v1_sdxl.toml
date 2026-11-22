@@ -1,0 +1,38 @@
+id = "ttplanet_tile_realistic_v1_sdxl"
+label = "TTPlanet SDXL Tile Realistic V1"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["tile"]
+preprocessors = ["ttplanet_tile_gf", "ttplanet_tile_simple"]
+trainer = "TTPlanet"
+license = "openrail"
+homepage = "https://huggingface.co/TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "TTPLANET_Controlnet_Tile_realistic_v1_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 2502139104
+sha256 = "fa2a5f2fec814819c835403c778be2c2437d147931921304569fccec2b45173c"
+webui_hash = "6c558c4d"
+source_url = "https://huggingface.co/TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic/resolve/37f1c4575b543fb2036e39f5763d082fdd135318/TTPLANET_Controlnet_Tile_realistic_v1_fp16.safetensors"
+
+[[files]]
+filename = "TTPLANET_Controlnet_Tile_realistic_v1_fp32.safetensors"
+format = "safetensors"
+precision = "fp32"
+size_bytes = 5004167864
+sha256 = "f33012cbac5839885f143aa2accb2e403414c7dad119364bbe18de37e4a65f67"
+webui_hash = "6832653a"
+source_url = "https://huggingface.co/TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic/resolve/37f1c4575b543fb2036e39f5763d082fdd135318/TTPLANET_Controlnet_Tile_realistic_v1_fp32.safetensors"

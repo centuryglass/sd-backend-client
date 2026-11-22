@@ -1,0 +1,28 @@
+id = "photomaker_v2_sdxl"
+label = "PhotoMaker V2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "other"
+control_types = ["photomaker"]
+preprocessors = ["photomaker_clipvision"]
+trainer = "TencentARC"
+license = "apache-2.0"
+homepage = "https://huggingface.co/TencentARC/PhotoMaker-V2"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_photomaker_v2"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "photomaker-v2.bin"
+format = "bin"
+size_bytes = 1799993138
+sha256 = "0eeac57d7e09b95cee670a18e0d939ff303dd6f76d317c950bf584c6c9bdb8f5"
+webui_hash = "ddefbc38"
+source_url = "https://huggingface.co/TencentARC/PhotoMaker-V2/resolve/f5a1e5155dc02166253fa7e29d13519f5ba22eac/photomaker-v2.bin"

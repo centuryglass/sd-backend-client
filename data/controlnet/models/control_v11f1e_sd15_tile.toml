@@ -1,0 +1,51 @@
+id = "control_v11f1e_sd15_tile"
+label = "ControlNet 1.1 Tile"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["tile"]
+preprocessors = ["tile_resample", "tile_colorfix", "tile_colorfix_sharp"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v11f1e_sd15_tile.pth"
+format = "pth"
+size_bytes = 1445235023
+sha256 = "8aa69b8d391e72c2fced6a650268137dc0ed594cafe8a2c0f8b994799a21979b"
+webui_hash = "a371b31b"
+source_url = "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/69fc48b9cbd98661f6d0288dc59b59a5ccb32a6b/control_v11f1e_sd15_tile.pth"
+
+[[files]]
+filename = "control_v11f1e_sd15_tile_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601104
+sha256 = "2f31868eedb243a77932e3c63907a6ba0a2058b6d65b5c27b89ee1b7f618ea33"
+webui_hash = "3b860298"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11f1e_sd15_tile_fp16.safetensors"
+
+[[files]]
+filename = "control_lora_rank128_v11f1e_sd15_tile_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 135722816
+sha256 = "cec00369e99cfed1cec97e1124cf3220df7a99e45354eaa1e3350c485e65154f"
+webui_hash = "d258993f"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_lora_rank128_v11f1e_sd15_tile_fp16.safetensors"
+variant = "rank 128 control-LoRA extraction"

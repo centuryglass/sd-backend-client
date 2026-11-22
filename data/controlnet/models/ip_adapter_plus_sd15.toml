@@ -1,0 +1,44 @@
+id = "ip_adapter_plus_sd15"
+label = "IP-Adapter Plus SD1.5"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_clip_h"]
+trainer = "h94 (Tencent AI Lab)"
+license = "apache-2.0"
+homepage = "https://huggingface.co/h94/IP-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter", "hf_lllyasviel_sd_control_collection", "recorded_fixtures"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "ip-adapter-plus_sd15.safetensors"
+format = "safetensors"
+size_bytes = 98183288
+sha256 = "a1c250be40455cc61a43da1201ec3f1edaea71214865fb47f57927e06cbe4996"
+webui_hash = "836b5c2e"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/ip-adapter-plus_sd15.safetensors"
+
+[[files]]
+filename = "ip-adapter-plus_sd15.bin"
+format = "bin"
+size_bytes = 158033179
+sha256 = "1cb77fc0613369b66be1531cc452b823a4af7d87ee56956000a69fc39e3817ba"
+webui_hash = "c817b455"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/ip-adapter-plus_sd15.bin"
+
+[[files]]
+filename = "ip-adapter_sd15_plus.pth"
+format = "pth"
+size_bytes = 158030471
+sha256 = "a0db87557825ac2f8888ef06ec64c85f175e8ba5467baa2722ade3b4a9feb9f5"
+webui_hash = "32cd8f7f"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/ip-adapter_sd15_plus.pth"

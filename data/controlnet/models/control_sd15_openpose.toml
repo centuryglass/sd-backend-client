@@ -1,0 +1,43 @@
+id = "control_sd15_openpose"
+label = "ControlNet 1.0 OpenPose"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["openpose"]
+preprocessors = ["openpose"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet",
+    "hf_webui_controlnet_modules_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_sd15_openpose.pth"
+format = "pth"
+size_bytes = 5710751843
+sha256 = "d19ffffeeaff6d9feb2204b234c3e1b9aec039ab3e63fca07f4fe5646f2ef591"
+webui_hash = "fef5e48e"
+source_url = "https://huggingface.co/lllyasviel/ControlNet/resolve/e78a8c4a5052a238198043ee5c0cb44e22abb9f7/models/control_sd15_openpose.pth"
+variant = "full checkpoint with SD 1.5 weights"
+
+[[files]]
+filename = "control_openpose-fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722596338
+sha256 = "337a30c5636697704370bd2413b43cebf1937abcdccc96f3525018ad5c220702"
+webui_hash = "9ca67cc5"
+source_url = "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/8148814d89be1b115ae02db98b440aa83b8c0d78/control_openpose-fp16.safetensors"
+variant = "ControlNet weights only"

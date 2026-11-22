@@ -1,0 +1,54 @@
+id = "depth"
+label = "Depth"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Depth"]
+forge = ["Depth"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = [
+    "depth_midas",
+    "depth_leres",
+    "depth_leres_plus",
+    "depth_zoe",
+    "depth_anything",
+    "depth_anything_v2",
+    "depth_zoe_anything",
+    "depth_marigold",
+    "depth_metric3d",
+    "depth_hand_refiner",
+]
+models = [
+    "control_sd15_depth",
+    "control_v11f1p_sd15_depth",
+    "t2iadapter_depth_sd14v1",
+    "t2iadapter_depth_sd15v2",
+    "t2iadapter_zoedepth_sd15v1",
+    "t2i_adapter_depth_midas_sdxl",
+    "t2i_adapter_depth_zoe_sdxl",
+    "diffusers_depth_sdxl",
+    "diffusers_depth_sdxl_mid",
+    "diffusers_depth_sdxl_small",
+    "diffusers_zoe_depth_sdxl",
+    "sargezt_xl_depth",
+    "sargezt_xl_depth_faid_vidit",
+    "sargezt_xl_depth_zeed",
+    "xinsir_depth_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+    "sai_control_lora_depth_sdxl",
+    "kohya_lllite_depth_sdxl",
+    "kohya_lllite_depth_anime_sdxl",
+]

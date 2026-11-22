@@ -1,0 +1,28 @@
+id = "ip_adapter_faceid_portrait_sdxl"
+label = "IP-Adapter FaceID Portrait SDXL"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_face_id"]
+trainer = "h94 (Tencent AI Lab)"
+license = ""
+homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter_faceid"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "ip-adapter-faceid-portrait_sdxl.bin"
+format = "bin"
+size_bytes = 749822515
+sha256 = "5631ce7824cdafd2db37c5e85b985730a95ff59c5b4fc80c2b79b0bee5711512"
+webui_hash = "8c9efc20"
+source_url = "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/43907e6f44d079bf1a9102d9a6e56aef7a219bae/ip-adapter-faceid-portrait_sdxl.bin"

@@ -1,0 +1,29 @@
+id = "noobai_inpaint_sdxl"
+label = "NoobAI Inpainting"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["inpaint"]
+preprocessors = ["inpaint_noobai"]
+trainer = ""
+license = ""
+homepage = ""
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["recorded_fixtures"]
+research_status = "stub"
+open_questions = [
+    "NoobAI_Inpainting_ControlNet.safetensors appears in the recorded ComfyUI fixture, and Forge Neo and reForge ship an inpaint_noobai preprocessor for it. Find its upstream release, trainer and license.",
+]
+
+[[files]]
+filename = "NoobAI_Inpainting_ControlNet.safetensors"
+format = "safetensors"
+sha256 = ""
+webui_hash = ""
+source_url = ""

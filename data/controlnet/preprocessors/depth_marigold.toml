@@ -1,0 +1,20 @@
+id = "depth_marigold"
+label = "Depth Marigold"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["depth"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = []
+
+sources = ["recorded_fixtures", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = []
+forge = ["depth_marigold"]
+comfyui = []

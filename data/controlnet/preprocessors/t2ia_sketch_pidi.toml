@@ -1,0 +1,25 @@
+id = "t2ia_sketch_pidi"
+label = "T2I Sketch PiDiNet"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["t2i_adapter"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["t2iadapter_sketch_sd14v1", "t2iadapter_sketch_sd15v2"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["pidinet_sketch", "t2ia_sketch_pidi"]
+forge = ["t2ia_sketch_pidi"]
+comfyui = []

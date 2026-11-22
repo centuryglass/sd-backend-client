@@ -1,0 +1,28 @@
+id = "diffusers_zoe_depth_sdxl"
+label = "Diffusers SDXL Zoe Depth"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["depth"]
+preprocessors = ["depth_zoe"]
+trainer = "Hugging Face diffusers"
+license = "openrail++"
+homepage = "https://huggingface.co/diffusers/controlnet-zoe-depth-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_diffusers_controlnet_zoe_depth_sdxl_1_0"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 2502139134
+sha256 = "6cd9dad0c25b90a548f2598b575505884d9b535ad17f3e13b8a1701554200ecd"
+webui_hash = "edc9485c"
+source_url = "https://huggingface.co/diffusers/controlnet-zoe-depth-sdxl-1.0/resolve/da3ed44922f9d6a0281d514cac7cc11a7555b076/diffusion_pytorch_model.safetensors"

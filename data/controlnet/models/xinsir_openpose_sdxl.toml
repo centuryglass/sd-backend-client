@@ -1,0 +1,28 @@
+id = "xinsir_openpose_sdxl"
+label = "Xinsir SDXL OpenPose"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["openpose"]
+preprocessors = ["dw_openpose_full"]
+trainer = "xinsir"
+license = "apache-2.0"
+homepage = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_xinsir_controlnet_openpose_sdxl_1_0"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "b8524e557a7df60d081f5d4a0eb109967d107df217943bf88c2d99b9ebcc06c5"
+webui_hash = "d0333a45"
+source_url = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0/resolve/23f966cd5cfdd3f7729c903e243d87152162d2b7/diffusion_pytorch_model.safetensors"

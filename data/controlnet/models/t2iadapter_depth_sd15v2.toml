@@ -1,0 +1,28 @@
+id = "t2iadapter_depth_sd15v2"
+label = "T2I-Adapter Depth v2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "t2i_adapter"
+control_types = ["depth"]
+preprocessors = ["depth_midas"]
+trainer = "TencentARC"
+license = ""
+homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "t2iadapter_depth_sd15v2.pth"
+format = "pth"
+size_bytes = 309489779
+sha256 = "dec4a100ed622e8818c441a28d7bcef129fcd7bde5a3cd7ecc208ddc19cfc764"
+webui_hash = "3489cd37"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models/t2iadapter_depth_sd15v2.pth"

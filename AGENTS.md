@@ -222,6 +222,9 @@ don't need rewriting to conform, and nothing enforces these rules mechanically.
 - Generation tests save PNGs to `SD_TEST_OUTPUT_DIR` (default `tests/output/`, gitignored), where `tests/review.html`
   shows them. A test that saves a new or renamed image needs an entry in that page's `GROUPS`. Write any other test
   output to a temporary directory, never the working tree.
+- **Re-recording `tests/unit/fixtures/recorded/` can fail `tests/unit/test_controlnet_data.py`,** which needs a
+  `data/controlnet/` record for every preprocessor and model the recordings list. `data/controlnet/README.md` covers
+  adding one.
 - **Prevent flaky tests instead of quarantining them.**
   - Unit tests don't touch the network, a backend, or wall-clock time.
   - No retry markers. Beyond the conftest skips above, the only allowed markers are `skip`, with a reason and an

@@ -1,0 +1,27 @@
+id = "normal_map"
+label = "Normal Map"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["NormalMap"]
+forge = ["NormalMap"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["normal_midas", "normal_bae", "normal_dsine", "normal_metric3d"]
+models = [
+    "control_sd15_normal",
+    "control_v11p_sd15_normalbae",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+]

@@ -1,0 +1,31 @@
+id = "xinsir_canny_v2_sdxl"
+label = "Xinsir SDXL Canny V2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["canny"]
+preprocessors = ["canny"]
+trainer = "xinsir"
+license = "apache-2.0"
+homepage = "https://huggingface.co/xinsir/controlnet-canny-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_xinsir_controlnet_canny_sdxl_1_0", "recorded_fixtures"]
+research_status = "stub"
+open_questions = [
+    "xinsir/controlnet-canny-sdxl-1.0 diffusion_pytorch_model_V2.safetensors and xinsir/controlnet-scribble-sdxl-1.0 diffusion_pytorch_model.safetensors have the same sha256. Find out which network the file is, and drop it from the other record.",
+]
+
+[[files]]
+filename = "diffusion_pytorch_model_V2.safetensors"
+also_seen_as = ["xinsirControlnetCanny_v20.safetensors"]
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "b3e4ac47bc814019d50dc842f579301440deb6d8f09ee1b91a30f527ace1b852"
+webui_hash = "ab7dc06d"
+source_url = "https://huggingface.co/xinsir/controlnet-canny-sdxl-1.0/resolve/1271357eda52d54b857c650cacb5b51144643ccb/diffusion_pytorch_model_V2.safetensors"

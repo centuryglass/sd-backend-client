@@ -1,0 +1,43 @@
+id = "control_sd15_normal"
+label = "ControlNet 1.0 Normal"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["normal_map"]
+preprocessors = ["normal_midas"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet",
+    "hf_webui_controlnet_modules_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_sd15_normal.pth"
+format = "pth"
+size_bytes = 5710754879
+sha256 = "1188b9ac6754c9c846536f51bc5128fef8188ab287fc2c3d5768c3a05e31a0d0"
+webui_hash = "fef5e48e"
+source_url = "https://huggingface.co/lllyasviel/ControlNet/resolve/e78a8c4a5052a238198043ee5c0cb44e22abb9f7/models/control_sd15_normal.pth"
+variant = "full checkpoint with SD 1.5 weights"
+
+[[files]]
+filename = "control_normal-fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722596338
+sha256 = "0e778bc30b7278aef1126b685a7ad2a4a0de6a5d8a29172cb5c9aab90e465096"
+webui_hash = "63f96f7c"
+source_url = "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/8148814d89be1b115ae02db98b440aa83b8c0d78/control_normal-fp16.safetensors"
+variant = "ControlNet weights only"

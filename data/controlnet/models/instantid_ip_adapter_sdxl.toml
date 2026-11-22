@@ -1,0 +1,29 @@
+id = "instantid_ip_adapter_sdxl"
+label = "InstantID IP-Adapter"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "ip_adapter"
+control_types = ["instant_id"]
+preprocessors = ["instant_id_face_embedding"]
+trainer = "InstantX"
+license = "apache-2.0"
+homepage = "https://huggingface.co/InstantX/InstantID"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_instantx_instantid"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "ip-adapter.bin"
+also_seen_as = ["ip-adapter_instant_id_sdxl.bin"]
+format = "bin"
+size_bytes = 1691134141
+sha256 = "02b3618e36d803784166660520098089a81388e61a93ef8002aa79a5b1c546e1"
+webui_hash = "eb2d3ec0"
+source_url = "https://huggingface.co/InstantX/InstantID/resolve/57b32dfee076092ad2930c71fd6d439c2c3b1820/ip-adapter.bin"

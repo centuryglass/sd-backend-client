@@ -1,0 +1,54 @@
+id = "thibaud_openpose_xl2"
+label = "Thibaud OpenPose XL2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["openpose"]
+preprocessors = ["openpose"]
+trainer = "thibaud"
+license = "other"
+homepage = "https://huggingface.co/thibaud/controlnet-openpose-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_thibaud_controlnet_openpose_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "OpenPoseXL2.safetensors"
+format = "safetensors"
+size_bytes = 5004167829
+sha256 = "5a4b928cb1e93748217900cb66d4135bf70d932d2924232f925910fad9e43a92"
+webui_hash = "f4251cb4"
+source_url = "https://huggingface.co/thibaud/controlnet-openpose-sdxl-1.0/resolve/1db673ed3dad75181fcf2e24f827597fe34e97b7/OpenPoseXL2.safetensors"
+
+[[files]]
+filename = "control-lora-openposeXL2-rank256.safetensors"
+format = "safetensors"
+size_bytes = 774423024
+sha256 = "8afa079285bf9384eaf8f6322884cb4f24bbe405da490f91f5540d3bff585e75"
+webui_hash = "72a4faf9"
+source_url = "https://huggingface.co/thibaud/controlnet-openpose-sdxl-1.0/resolve/1db673ed3dad75181fcf2e24f827597fe34e97b7/control-lora-openposeXL2-rank256.safetensors"
+variant = "rank 256 control-LoRA extraction"
+
+[[files]]
+filename = "thibaud_xl_openpose.safetensors"
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "9e070426568a3c60c128ffb98c66cdc7a0ea21d0d8abb86f73564aaf2e0c6f42"
+webui_hash = "c7b9cadd"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/thibaud_xl_openpose.safetensors"
+
+[[files]]
+filename = "thibaud_xl_openpose_256lora.safetensors"
+format = "safetensors"
+size_bytes = 774423040
+sha256 = "4d9010a861e032629d2004211bf10a617ba1e93a1cc42fc280db3d0ad1d05303"
+webui_hash = "14288071"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/thibaud_xl_openpose_256lora.safetensors"
+variant = "rank 256 control-LoRA extraction"

@@ -1,0 +1,22 @@
+id = "ip2p"
+label = "Instruct Pix2Pix"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["InstructP2P"]
+forge = []
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = []
+models = ["control_v11e_sd15_ip2p"]

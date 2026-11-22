@@ -1,0 +1,38 @@
+id = "kohya_lllite_canny_anime_sdxl"
+label = "LLLite SDXL Canny Anime"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet_lllite"
+control_types = ["canny"]
+preprocessors = ["canny"]
+trainer = "kohya-ss"
+license = "apache-2.0"
+homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_kohya_ss_controlnet_lllite", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "The sd_control_collection copy is matched to the kohya-ss file by name only, and their sizes differ slightly. Confirm they hold the same network.",
+]
+
+[[files]]
+filename = "controllllite_v01032064e_sdxl_canny_anime.safetensors"
+format = "safetensors"
+size_bytes = 46174136
+sha256 = "d51729ea113eee127b6ddf6db08a4e926fe42ac976e977de68fd354d3157635a"
+webui_hash = "8eef53e1"
+source_url = "https://huggingface.co/kohya-ss/controlnet-lllite/resolve/d14d1353be5a2326229d83e14f9b3c11f3a671bd/controllllite_v01032064e_sdxl_canny_anime.safetensors"
+
+[[files]]
+filename = "kohya_controllllite_xl_canny_anime.safetensors"
+format = "safetensors"
+size_bytes = 46172168
+sha256 = "28c844fc6f5d0fd0dbdcf8100a8b3a4c06b787919c255bfc001a8ce4e53cfa1d"
+webui_hash = "7158f7e0"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/kohya_controllllite_xl_canny_anime.safetensors"

@@ -1,0 +1,28 @@
+id = "pulid_v1_1_sdxl"
+label = "PuLID V1.1"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_pulid", "facexlib"]
+trainer = "guozinan (ByteDance)"
+license = "apache-2.0"
+homepage = "https://huggingface.co/guozinan/PuLID"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_guozinan_pulid"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "pulid_v1.1.safetensors"
+format = "safetensors"
+size_bytes = 984405232
+sha256 = "4cb8ceec1078e0165399b88332ab3c5971619111b8e1730e6bae64144aabae41"
+webui_hash = "feebb26d"
+source_url = "https://huggingface.co/guozinan/PuLID/resolve/492b1451255dc9d9bc3c857259690b5f8b998d4a/pulid_v1.1.safetensors"

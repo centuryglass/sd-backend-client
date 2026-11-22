@@ -1,0 +1,22 @@
+id = "instant_id"
+label = "InstantID"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Instant-ID"]
+forge = ["Instant-ID"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["instant_id_face_embedding", "instant_id_face_keypoints"]
+models = ["instantid_ip_adapter_sdxl", "instantid_controlnet_sdxl"]

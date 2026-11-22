@@ -1,0 +1,45 @@
+id = "t2i_adapter_depth_zoe_sdxl"
+label = "T2I-Adapter SDXL Depth Zoe"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "t2i_adapter"
+control_types = ["depth"]
+preprocessors = ["depth_zoe"]
+trainer = "TencentARC"
+license = "apache-2.0"
+homepage = "https://huggingface.co/TencentARC/t2i-adapter-depth-zoe-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter_depth_zoe_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 316116778
+sha256 = "613884bf550bf6750f2f22cdb17bb92f49a148cad01fdd952118df4d386acd55"
+webui_hash = "d6d01e04"
+source_url = "https://huggingface.co/TencentARC/t2i-adapter-depth-zoe-sdxl-1.0/resolve/b1e696d5a87bf32f7cd6e8f4e85372f833769720/diffusion_pytorch_model.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 158060440
+sha256 = "4c88d7ef823cc75bb44e374cc714ab34261da47ee7853d16d843586ac6e2c34d"
+webui_hash = "b81a3c07"
+source_url = "https://huggingface.co/TencentARC/t2i-adapter-depth-zoe-sdxl-1.0/resolve/b1e696d5a87bf32f7cd6e8f4e85372f833769720/diffusion_pytorch_model.fp16.safetensors"
+
+[[files]]
+filename = "t2i-adapter_diffusers_xl_depth_zoe.safetensors"
+format = "safetensors"
+size_bytes = 158060416
+sha256 = "9c3739465a31d3cb28a9699289bd004db0b546357bcdc2a0cbc8661ddbc5a6cd"
+webui_hash = "cc102381"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_diffusers_xl_depth_zoe.safetensors"

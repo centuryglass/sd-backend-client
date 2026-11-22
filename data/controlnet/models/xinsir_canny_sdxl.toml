@@ -1,0 +1,28 @@
+id = "xinsir_canny_sdxl"
+label = "Xinsir SDXL Canny"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["canny"]
+preprocessors = ["canny"]
+trainer = "xinsir"
+license = "apache-2.0"
+homepage = "https://huggingface.co/xinsir/controlnet-canny-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_xinsir_controlnet_canny_sdxl_1_0"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "bf47cd757ceaf2572c53321329ef819ea38c09a6e3783588387913cd94dff47c"
+webui_hash = "acfd43c3"
+source_url = "https://huggingface.co/xinsir/controlnet-canny-sdxl-1.0/resolve/1271357eda52d54b857c650cacb5b51144643ccb/diffusion_pytorch_model.safetensors"

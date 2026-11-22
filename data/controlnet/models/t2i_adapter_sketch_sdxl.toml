@@ -1,0 +1,45 @@
+id = "t2i_adapter_sketch_sdxl"
+label = "T2I-Adapter SDXL Sketch"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "t2i_adapter"
+control_types = ["scribble"]
+preprocessors = []
+trainer = "TencentARC"
+license = "apache-2.0"
+homepage = "https://huggingface.co/TencentARC/t2i-adapter-sketch-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter_sketch_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 316116778
+sha256 = "95ffaafde9e0a13061205c1d701dd22326be75884b1adfc0c1a1626dfa72d0a4"
+webui_hash = "f71e64c1"
+source_url = "https://huggingface.co/TencentARC/t2i-adapter-sketch-sdxl-1.0/resolve/cc3c4e3362296c6825c370b83838306723ece983/diffusion_pytorch_model.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 158060440
+sha256 = "9f88c53368d53bec6b70fc9d797ec12b88a512d2a7e9068d11fbf621917d9fdd"
+webui_hash = "7e950762"
+source_url = "https://huggingface.co/TencentARC/t2i-adapter-sketch-sdxl-1.0/resolve/cc3c4e3362296c6825c370b83838306723ece983/diffusion_pytorch_model.fp16.safetensors"
+
+[[files]]
+filename = "t2i-adapter_diffusers_xl_sketch.safetensors"
+format = "safetensors"
+size_bytes = 158060416
+sha256 = "ac5ddc5306291ed45ef6bc87a91425e7f76e93a8e2333457c9adc4e6db0579cc"
+webui_hash = "72b96ab1"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_diffusers_xl_sketch.safetensors"

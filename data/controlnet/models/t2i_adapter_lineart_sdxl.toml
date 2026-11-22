@@ -1,0 +1,45 @@
+id = "t2i_adapter_lineart_sdxl"
+label = "T2I-Adapter SDXL Lineart"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "t2i_adapter"
+control_types = ["lineart"]
+preprocessors = ["lineart_realistic"]
+trainer = "TencentARC"
+license = "apache-2.0"
+homepage = "https://huggingface.co/TencentARC/t2i-adapter-lineart-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter_lineart_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 316116778
+sha256 = "08569b1f051787913aaa51f5b80216900a66d939c807d8a9b8637436eaf3d968"
+webui_hash = "6bd745ef"
+source_url = "https://huggingface.co/TencentARC/t2i-adapter-lineart-sdxl-1.0/resolve/5f1f33b049b96fa599f0aa3d77b31dbef5095e97/diffusion_pytorch_model.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 158060440
+sha256 = "c19e9e1038c7c53b238185d8dc9fad87f95aa3124d211e19f39f1165bfb7230f"
+webui_hash = "905c2459"
+source_url = "https://huggingface.co/TencentARC/t2i-adapter-lineart-sdxl-1.0/resolve/5f1f33b049b96fa599f0aa3d77b31dbef5095e97/diffusion_pytorch_model.fp16.safetensors"
+
+[[files]]
+filename = "t2i-adapter_diffusers_xl_lineart.safetensors"
+format = "safetensors"
+size_bytes = 158060416
+sha256 = "f3c203c6993c8a02114acb0856c69e95ae2c1ad4fb4f1554a376b742650828c3"
+webui_hash = "bae0efef"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_diffusers_xl_lineart.safetensors"

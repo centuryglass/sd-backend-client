@@ -1,0 +1,26 @@
+id = "scribble_xdog"
+label = "Scribble XDoG"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["scribble", "sparsectrl"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["sparsectrl_scribble_sd15"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["scribble_xdog"]
+forge = ["scribble_xdog"]
+comfyui = ["Scribble_XDoG_Preprocessor"]

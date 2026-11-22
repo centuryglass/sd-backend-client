@@ -1,0 +1,20 @@
+id = "photomaker_clipvision"
+label = "PhotoMaker CLIP Vision"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["photomaker"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["photomaker_v1_sdxl", "photomaker_v2_sdxl"]
+
+sources = ["recorded_fixtures", "reforge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = []
+forge = ["ClipVision (Photomaker)"]
+comfyui = []

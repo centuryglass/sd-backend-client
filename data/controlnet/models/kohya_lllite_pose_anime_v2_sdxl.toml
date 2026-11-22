@@ -1,0 +1,38 @@
+id = "kohya_lllite_pose_anime_v2_sdxl"
+label = "LLLite SDXL Pose Anime V2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet_lllite"
+control_types = ["openpose"]
+preprocessors = ["openpose"]
+trainer = "kohya-ss"
+license = "apache-2.0"
+homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_kohya_ss_controlnet_lllite", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "The sd_control_collection copy is matched to the kohya-ss file by name only, and their sizes differ slightly. Confirm they hold the same network.",
+]
+
+[[files]]
+filename = "controllllite_v01032064e_sdxl_pose_anime_v2_500-1000.safetensors"
+format = "safetensors"
+size_bytes = 46174176
+sha256 = "23bf4691bf2e2c09131ec92cb2fe0119a31432fd74789b60c654de87f5f304be"
+webui_hash = "be5c1472"
+source_url = "https://huggingface.co/kohya-ss/controlnet-lllite/resolve/d14d1353be5a2326229d83e14f9b3c11f3a671bd/controllllite_v01032064e_sdxl_pose_anime_v2_500-1000.safetensors"
+
+[[files]]
+filename = "kohya_controllllite_xl_openpose_anime_v2.safetensors"
+format = "safetensors"
+size_bytes = 46172168
+sha256 = "6abee66f7787a3416c25c13fa9d4a4a9b56248b7d9832a7e3162d641237da125"
+webui_hash = "b0fa10bb"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/kohya_controllllite_xl_openpose_anime_v2.safetensors"

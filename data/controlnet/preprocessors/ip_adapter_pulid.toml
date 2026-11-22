@@ -1,0 +1,20 @@
+id = "ip_adapter_pulid"
+label = "PuLID"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["ip_adapter"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["pulid_v1_sdxl", "pulid_v1_1_sdxl"]
+
+sources = ["recorded_fixtures", "sdwebui_cn_legacy_preprocessors", "sdwebui_cn_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["ip-adapter_pulid"]
+forge = []
+comfyui = []

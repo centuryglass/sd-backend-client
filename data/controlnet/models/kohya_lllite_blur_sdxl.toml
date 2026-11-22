@@ -1,0 +1,38 @@
+id = "kohya_lllite_blur_sdxl"
+label = "LLLite SDXL Blur"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet_lllite"
+control_types = ["tile"]
+preprocessors = ["blur_gaussian"]
+trainer = "kohya-ss"
+license = "apache-2.0"
+homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_kohya_ss_controlnet_lllite", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "The sd_control_collection copy is matched to the kohya-ss file by name only, and their sizes differ slightly. Confirm they hold the same network.",
+]
+
+[[files]]
+filename = "controllllite_v01032064e_sdxl_blur-500-1000.safetensors"
+format = "safetensors"
+size_bytes = 46174136
+sha256 = "c1045601f957a4de3c6eaa7dc5e81298ab23bc97f06f5c86378c4b2e57f5698b"
+webui_hash = "ef7e1b13"
+source_url = "https://huggingface.co/kohya-ss/controlnet-lllite/resolve/d14d1353be5a2326229d83e14f9b3c11f3a671bd/controllllite_v01032064e_sdxl_blur-500-1000.safetensors"
+
+[[files]]
+filename = "kohya_controllllite_xl_blur.safetensors"
+format = "safetensors"
+size_bytes = 46172168
+sha256 = "d2087bef714d97ca9e9a066a6351c9ec636a3618f2553fc468bec03d74535393"
+webui_hash = "22117d11"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/kohya_controllllite_xl_blur.safetensors"

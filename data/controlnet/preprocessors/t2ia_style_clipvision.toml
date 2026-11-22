@@ -1,0 +1,26 @@
+id = "t2ia_style_clipvision"
+label = "T2I Style CLIP Vision"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["t2i_adapter"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["t2iadapter_style_sd14v1"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["clip_vision", "t2ia_style_clipvision"]
+forge = ["t2ia_style_clipvision_variant"]
+comfyui = []

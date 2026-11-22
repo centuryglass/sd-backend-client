@@ -1,0 +1,26 @@
+id = "openpose_full"
+label = "OpenPose Full"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["openpose"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["control_v11p_sd15_openpose"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["openpose_full"]
+forge = ["openpose_full"]
+comfyui = ["OpenposePreprocessor"]

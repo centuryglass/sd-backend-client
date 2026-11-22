@@ -1,0 +1,28 @@
+id = "latentcat_illumination_sd15"
+label = "Illumination"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["recolor", "qr_code"]
+preprocessors = []
+trainer = "ioclab (latentcat)"
+license = ""
+homepage = "https://huggingface.co/latentcat/latentcat-controlnet"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_latentcat_latentcat_controlnet"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v1p_sd15_illumination.safetensors"
+format = "safetensors"
+size_bytes = 1445154814
+sha256 = "f0524d0cca37e98a5402c22c729ee86da76cd4e44449cf6a90b0619b1f8b3b23"
+webui_hash = "0c4bd571"
+source_url = "https://huggingface.co/latentcat/latentcat-controlnet/resolve/e4f51c7df7c42514faeb600345d287c27f305086/models/control_v1p_sd15_illumination.safetensors"

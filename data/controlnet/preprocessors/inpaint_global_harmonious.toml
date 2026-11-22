@@ -1,0 +1,27 @@
+id = "inpaint_global_harmonious"
+label = "Inpaint Global Harmonious"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["inpaint"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["control_v11p_sd15_inpaint"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = ["Confirm which WebUI inpaint module comfyui_controlnet_aux InpaintPreprocessor matches."]
+
+[names]
+webui = ["inpaint", "inpaint_global_harmonious"]
+forge = ["inpaint_global_harmonious", "inpaint_global_harmonious_variant"]
+comfyui = ["InpaintPreprocessor"]

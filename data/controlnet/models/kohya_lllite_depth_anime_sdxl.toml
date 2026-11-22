@@ -1,0 +1,38 @@
+id = "kohya_lllite_depth_anime_sdxl"
+label = "LLLite SDXL Depth Anime"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet_lllite"
+control_types = ["depth"]
+preprocessors = []
+trainer = "kohya-ss"
+license = "apache-2.0"
+homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_kohya_ss_controlnet_lllite", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "The sd_control_collection copy is matched to the kohya-ss file by name only, and their sizes differ slightly. Confirm they hold the same network.",
+]
+
+[[files]]
+filename = "controllllite_v01008016e_sdxl_depth_anime.safetensors"
+format = "safetensors"
+size_bytes = 11323024
+sha256 = "0ca8e7b93e3c952cde5fcef46a3a86ed5e08bafd2389b8e8285c702bdec3ed20"
+webui_hash = "52017e9b"
+source_url = "https://huggingface.co/kohya-ss/controlnet-lllite/resolve/d14d1353be5a2326229d83e14f9b3c11f3a671bd/controllllite_v01008016e_sdxl_depth_anime.safetensors"
+
+[[files]]
+filename = "kohya_controllllite_xl_depth_anime.safetensors"
+format = "safetensors"
+size_bytes = 11321048
+sha256 = "ea2fe71e9019cc96d0303ce93edc18dddab35426a0b5757dd004f63c592a03de"
+webui_hash = "d52fdcf0"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/kohya_controllllite_xl_depth_anime.safetensors"

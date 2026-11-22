@@ -1,0 +1,40 @@
+id = "xinsir_union_sdxl"
+label = "Xinsir SDXL Union"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "union"
+control_types = [
+    "openpose",
+    "depth",
+    "softedge",
+    "scribble",
+    "canny",
+    "lineart",
+    "mlsd",
+    "normal_map",
+    "segmentation",
+]
+preprocessors = []
+trainer = "xinsir"
+license = "apache-2.0"
+homepage = "https://huggingface.co/xinsir/controlnet-union-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_xinsir_controlnet_union_sdxl_1_0"]
+research_status = "stub"
+open_questions = [
+    "List the control types the union model card names, and check them against control_types.",
+]
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 2512030408
+sha256 = "a9e13fd61f3193887791c8a0dd07a07202174dc47d5ddaea94ea1344f07c7467"
+webui_hash = "15e6ad5d"
+source_url = "https://huggingface.co/xinsir/controlnet-union-sdxl-1.0/resolve/801a4a3fa3d4c936f4feea95b98607bc6726f80c/diffusion_pytorch_model.safetensors"

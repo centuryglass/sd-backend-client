@@ -1,0 +1,45 @@
+id = "scribble"
+label = "Scribble"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = [
+    "Forge, reForge and Forge Neo list \"Scribble\" and \"Sketch\" as separate types with overlapping preprocessors and models. Is Sketch a distinct control type, or an alias kept for T2I-Adapter sketch models?",
+]
+
+[names]
+webui = ["Scribble"]
+forge = ["Scribble", "Sketch"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = [
+    "invert",
+    "binary",
+    "scribble_hed",
+    "scribble_pidinet",
+    "scribble_xdog",
+    "scribble_threshold",
+]
+models = [
+    "control_sd15_scribble",
+    "control_v11p_sd15_scribble",
+    "t2iadapter_sketch_sd14v1",
+    "t2iadapter_sketch_sd15v2",
+    "t2i_adapter_sketch_sdxl",
+    "t2i_adapter_xl_sketch",
+    "xinsir_scribble_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+    "xinsir_anime_painter_sdxl",
+    "sai_control_lora_sketch_sdxl",
+    "kohya_lllite_fake_scribble_anime_sdxl",
+    "mistoline_sdxl",
+]

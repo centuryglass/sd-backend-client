@@ -1,0 +1,26 @@
+id = "ip_adapter_clip_g"
+label = "IP-Adapter CLIP-ViT-bigG"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["ip_adapter"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["ip_adapter_sd15_vit_g", "ip_adapter_sdxl"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["ip-adapter_clip_sdxl", "ip-adapter_clip_g"]
+forge = ["CLIP-ViT-bigG (IPAdapter)", "ip-adapter_clip_sdxl_variant"]
+comfyui = []

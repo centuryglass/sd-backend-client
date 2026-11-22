@@ -1,0 +1,43 @@
+id = "control_sd15_mlsd"
+label = "ControlNet 1.0 MLSD"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["mlsd"]
+preprocessors = ["mlsd"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet",
+    "hf_webui_controlnet_modules_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_sd15_mlsd.pth"
+format = "pth"
+size_bytes = 5710751843
+sha256 = "4520b22400756ac96be61f900a59ab648ec487127beb7a095a708a4d3472b6eb"
+webui_hash = "fef5e48e"
+source_url = "https://huggingface.co/lllyasviel/ControlNet/resolve/e78a8c4a5052a238198043ee5c0cb44e22abb9f7/models/control_sd15_mlsd.pth"
+variant = "full checkpoint with SD 1.5 weights"
+
+[[files]]
+filename = "control_mlsd-fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722596338
+sha256 = "d8513fa9c65046467ed1a575f5593ac3e05f4cdffc8f07bf5f3c075afe0ea3d9"
+webui_hash = "e3705cfa"
+source_url = "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/8148814d89be1b115ae02db98b440aa83b8c0d78/control_mlsd-fp16.safetensors"
+variant = "ControlNet weights only"

@@ -1,0 +1,27 @@
+id = "mlsd"
+label = "MLSD Straight Lines"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["MLSD"]
+forge = ["MLSD"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["invert", "mlsd"]
+models = [
+    "control_sd15_mlsd",
+    "control_v11p_sd15_mlsd",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+]

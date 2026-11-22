@@ -1,0 +1,39 @@
+id = "ip_adapter_faceid_plusv2_sd15"
+label = "IP-Adapter FaceID Plus V2 SD1.5"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_face_id_plus"]
+trainer = "h94 (Tencent AI Lab)"
+license = ""
+homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter_faceid"]
+research_status = "stub"
+open_questions = [
+    "The companion LoRA is listed as a file of this record. Decide whether it needs its own record, since it loads as a LoRA, not as a ControlNet unit.",
+]
+
+[[files]]
+filename = "ip-adapter-faceid-plusv2_sd15.bin"
+format = "bin"
+size_bytes = 156558509
+sha256 = "26d0d86a1d60d6cc811d3b8862178b461e1eeb651e6fe2b72ba17aa95411e313"
+webui_hash = "6e14fc1a"
+source_url = "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/43907e6f44d079bf1a9102d9a6e56aef7a219bae/ip-adapter-faceid-plusv2_sd15.bin"
+
+[[files]]
+filename = "ip-adapter-faceid-plusv2_sd15_lora.safetensors"
+format = "safetensors"
+size_bytes = 51059544
+sha256 = "8abff87a15a049f3e0186c2e82c1c8e77783baf2cfb63f34c412656052eb57b0"
+webui_hash = "b903ebf9"
+source_url = "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/43907e6f44d079bf1a9102d9a6e56aef7a219bae/ip-adapter-faceid-plusv2_sd15_lora.safetensors"
+variant = "companion LoRA, loaded alongside the adapter"

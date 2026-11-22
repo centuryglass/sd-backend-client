@@ -1,0 +1,39 @@
+id = "canny"
+label = "Canny"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Canny"]
+forge = ["Canny"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["canny", "pyracanny", "invert"]
+models = [
+    "control_sd15_canny",
+    "control_v11p_sd15_canny",
+    "t2iadapter_canny_sd14v1",
+    "t2iadapter_canny_sd15v2",
+    "t2i_adapter_canny_sdxl",
+    "t2i_adapter_xl_canny",
+    "diffusers_canny_sdxl",
+    "diffusers_canny_sdxl_mid",
+    "diffusers_canny_sdxl_small",
+    "xinsir_canny_sdxl",
+    "xinsir_canny_v2_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+    "sai_control_lora_canny_sdxl",
+    "kohya_lllite_canny_sdxl",
+    "kohya_lllite_canny_anime_sdxl",
+]

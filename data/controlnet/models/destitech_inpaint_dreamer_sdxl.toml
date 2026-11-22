@@ -1,0 +1,39 @@
+id = "destitech_inpaint_dreamer_sdxl"
+label = "Inpaint Dreamer"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["inpaint"]
+preprocessors = []
+trainer = "destitech"
+license = "openrail"
+homepage = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_destitech_controlnet_inpaint_dreamer_sdxl"]
+research_status = "stub"
+open_questions = [
+    "controlnetxlCNXL_destitechInpaint-inpainting.safetensors (a Civitai download) appears in the recorded ComfyUI fixture. Hash a copy to find which destitech release it is.",
+]
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 2502139104
+sha256 = "5eeffc07f59c084811f239caf9d2c3d11d0b1ad8270c1fe1daf150a074d064ce"
+webui_hash = "961adabe"
+source_url = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl/resolve/e37388101f7f551a0ed5a621c0d7da434f0e0124/diffusion_pytorch_model.fp16.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 5004167864
+sha256 = "0362d3318f4f42aa14b715603ea2be08618e466efa2409dce4193a366099436b"
+webui_hash = "563c5565"
+source_url = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl/resolve/e37388101f7f551a0ed5a621c0d7da434f0e0124/diffusion_pytorch_model.safetensors"

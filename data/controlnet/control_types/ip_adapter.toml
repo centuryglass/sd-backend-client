@@ -1,0 +1,53 @@
+id = "ip_adapter"
+label = "IP-Adapter"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["IP-Adapter"]
+forge = ["IP-Adapter"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = [
+    "ip_adapter_clip_h",
+    "ip_adapter_clip_g",
+    "ip_adapter_face_id",
+    "ip_adapter_face_id_plus",
+    "ip_adapter_pulid",
+    "facexlib",
+    "ip_adapter_auto",
+]
+models = [
+    "ip_adapter_sd15",
+    "ip_adapter_sd15_light",
+    "ip_adapter_sd15_vit_g",
+    "ip_adapter_plus_sd15",
+    "ip_adapter_plus_face_sd15",
+    "ip_adapter_full_face_sd15",
+    "ip_adapter_sd15_light_v11",
+    "ip_adapter_sdxl",
+    "ip_adapter_sdxl_vit_h",
+    "ip_adapter_plus_sdxl_vit_h",
+    "ip_adapter_plus_face_sdxl_vit_h",
+    "ip_adapter_faceid_sd15",
+    "ip_adapter_faceid_plus_sd15",
+    "ip_adapter_faceid_plusv2_sd15",
+    "ip_adapter_faceid_portrait_sd15",
+    "ip_adapter_faceid_portrait_v11_sd15",
+    "ip_adapter_faceid_sdxl",
+    "ip_adapter_faceid_plusv2_sdxl",
+    "ip_adapter_faceid_portrait_sdxl",
+    "ip_adapter_faceid_portrait_sdxl_unnorm",
+    "pulid_v1_sdxl",
+    "pulid_v1_1_sdxl",
+]

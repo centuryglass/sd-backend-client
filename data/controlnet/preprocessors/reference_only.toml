@@ -1,0 +1,26 @@
+id = "reference_only"
+label = "Reference Only"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["reference"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = []
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["reference_only"]
+forge = ["reference_only", "reference_only_variant"]
+comfyui = []

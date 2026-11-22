@@ -1,0 +1,28 @@
+id = "t2iadapter_sketch_sd15v2"
+label = "T2I-Adapter Sketch v2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "t2i_adapter"
+control_types = ["scribble", "t2i_adapter"]
+preprocessors = ["t2ia_sketch_pidi"]
+trainer = "TencentARC"
+license = ""
+homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "t2iadapter_sketch_sd15v2.pth"
+format = "pth"
+size_bytes = 308015219
+sha256 = "8757c9e8ea0689b97257dc530172325b8215aa4e97df7c91c1a8d4e7265b894c"
+webui_hash = "f5789421"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models/t2iadapter_sketch_sd15v2.pth"

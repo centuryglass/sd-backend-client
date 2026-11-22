@@ -1,0 +1,22 @@
+id = "shuffle"
+label = "Shuffle"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Shuffle"]
+forge = ["Shuffle"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["shuffle"]
+models = ["control_v11e_sd15_shuffle"]
