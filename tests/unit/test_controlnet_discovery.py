@@ -1,6 +1,7 @@
 """Offline tests for ControlNet option discovery: preprocessor parsing on both backends, and control type categories.
 
-The inputs are hand-written in the shapes ComfyUI's /object_info and the WebUI's /controlnet/module_list return.
+Most inputs are hand-written in the shapes ComfyUI's /object_info and the WebUI's /controlnet/module_list return.
+The control type tests at the end also replay `fixtures/recorded/` server responses (see `recorded_replay`).
 `fixtures/a1111_controlnet_module_list.json` is a subset of the A1111 sd-webui-controlnet extension's
 /controlnet/module_list response, written from the extension's source (`get_modules_detail` and
 `PreprocessorParameter.api_json`). To refresh it from a live server, run
@@ -13,14 +14,18 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
+from sd_backend_client.api.a1111_webservice import A1111Webservice
 from sd_backend_client.api.comfyui.comfyui_types import NodeInfoResponse
 from sd_backend_client.api.comfyui.controlnet_comfyui_utils import get_all_preprocessors as comfy_preprocessors
+from sd_backend_client.api.comfyui_webservice import ComfyUiWebservice
 from sd_backend_client.api.shared_data.controlnet.controlnet_category_builder import ControlNetCategoryBuilder
 from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import (ControlNetPreprocessor,
                                                                                 PreprocessorParams)
 from sd_backend_client.api.webui.controlnet_webui_constants import ControlNetModuleResponse, ModuleDetail
 from sd_backend_client.api.webui.controlnet_webui_utils import get_all_preprocessors as webui_preprocessors
 from sd_backend_client.errors import UnexpectedResponseError
+
+from .recorded_replay import RECORDED_DIR, recordings, replay
 
 PREPROCESSOR_CATEGORY = 'ControlNet Preprocessors/Line Extractors'
 A1111_MODULE_LIST = Path(__file__).parent / 'fixtures' / 'a1111_controlnet_module_list.json'
@@ -247,3 +252,40 @@ def test_category_builder_prefers_api_type_definitions():
     builder = ControlNetCategoryBuilder(['canny'], ['api_model', 'control_v11p_sd15_canny [d14c016b]'],
                                         None, api_types)  # type: ignore[arg-type]
     assert builder.get_control_types()['Canny']['default_model'] == 'api_model'
+
+
+def _forge_recording() -> dict[str, Any]:
+    return json.loads((RECORDED_DIR / 'forge.json').read_text(encoding='utf-8'))
+
+
+@pytest.mark.parametrize('recording', recordings('comfyui'))
+def test_comfyui_pose_preprocessors_sort_into_openpose(recording):
+    """ComfyUI's OpenPose, DWPose, animal pose and DensePose nodes land in OpenPose, and nothing else does."""
+    service = ComfyUiWebservice('http://127.0.0.1:8188')
+    replay(service, recording)
+    assert service.get_controlnet_type_categories()['OpenPose']['module_list'] == \
+        ['None', 'AnimalPosePreprocessor', 'DWPreprocessor', 'DensePosePreprocessor', 'OpenposePreprocessor']
+
+
+def test_static_openpose_definition_sorts_forge_options():
+    """Without API control types, the static OpenPose definition takes the pose preprocessors and default model."""
+    responses = _forge_recording()['responses']
+    builder = ControlNetCategoryBuilder(responses['/controlnet/module_list']['module_list'],
+                                        responses['/controlnet/model_list']['model_list'])
+    openpose = builder.get_control_types()['OpenPose']
+    for preprocessor in ('openpose_full', 'dw_openpose_full', 'animal_openpose',
+                         'densepose (pruple bg & purple torso)'):
+        assert preprocessor in openpose['module_list']
+    assert openpose['default_option'] == 'openpose_full'
+    assert openpose['default_model'] == 'control_v11p_sd15_openpose [cab727d4]'
+
+
+@pytest.mark.parametrize('recording', recordings('webui'))
+def test_shuffle_model_stays_out_of_softedge(recording):
+    """The shuffle model is listed under Shuffle and not under SoftEdge."""
+    service = A1111Webservice('http://127.0.0.1:7860')
+    replay(service, recording)
+    control_types = service.get_controlnet_type_categories()
+    shuffle_models = [model for model in control_types['Shuffle']['model_list'] if 'shuffle' in model]
+    assert shuffle_models
+    assert not set(shuffle_models) & set(control_types['SoftEdge']['model_list'])
