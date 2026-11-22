@@ -289,3 +289,29 @@ def test_shuffle_model_stays_out_of_softedge(recording):
     shuffle_models = [model for model in control_types['Shuffle']['model_list'] if 'shuffle' in model]
     assert shuffle_models
     assert not set(shuffle_models) & set(control_types['SoftEdge']['model_list'])
+
+
+@pytest.mark.parametrize('recording', recordings('comfyui'))
+def test_comfyui_soft_edge_options_sort_into_softedge(recording):
+    """ComfyUI's HED, PiDiNet and TEED nodes and the HED model land in SoftEdge, and the scribble variants don't."""
+    service = ComfyUiWebservice('http://127.0.0.1:8188')
+    replay(service, recording)
+    categories = service.get_controlnet_type_categories()
+    assert categories['SoftEdge']['module_list'] == \
+        ['None', 'HEDPreprocessor', 'PiDiNetPreprocessor', 'TEEDPreprocessor']
+    assert categories['SoftEdge']['model_list'] == ['None', 'control_hed-fp16.safetensors']
+    assert 'Scribble_PiDiNet_Preprocessor' in categories['Scribble']['module_list']
+
+
+def test_static_softedge_definition_excludes_scribble_and_sketch_variants():
+    """Without API control types, SoftEdge takes soft edge preprocessors and models, but no scribble or sketch ones."""
+    responses = json.loads((RECORDED_DIR / 'a1111.json').read_text(encoding='utf-8'))['responses']
+    builder = ControlNetCategoryBuilder(responses['/controlnet/module_list']['module_list'],
+                                        responses['/controlnet/model_list']['model_list'])
+    softedge = builder.get_control_types()['SoftEdge']
+    for preprocessor in ('softedge_teed', 'hed', 'hed_safe', 'pidinet', 'pidinet_safe'):
+        assert preprocessor in softedge['module_list']
+    for preprocessor in ('scribble_hed', 'scribble_pidinet', 'pidinet_scribble', 'pidinet_sketch', 't2ia_sketch_pidi'):
+        assert preprocessor not in softedge['module_list']
+    assert 'control_hed-fp16 [13fee50b]' in softedge['model_list']
+    assert not any('scribble' in model for model in softedge['model_list'])
