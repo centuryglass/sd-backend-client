@@ -153,12 +153,13 @@ jobs:
       - name: Run unit tests against the installed wheel
         # The tests run from a copy outside the checkout, so the package can only be imported from the wheel installed
         # in the clean venv. Inside the checkout, pytest puts the repository root on sys.path, which would shadow it.
-        # README.md, docs/ and examples/ are copied too, since tests/unit/test_readme_examples.py runs them.
+        # README.md, docs/ and examples/ are copied too, since tests/unit/test_readme_examples.py runs them, and so are
+        # scripts/ and data/, which tests/unit/test_controlnet_data.py loads.
         run: |
           python -m venv "$RUNNER_TEMP/venv"
           "$RUNNER_TEMP/venv/bin/pip" install dist/*.whl "$(grep '^pytest==' requirements-dev.txt)"
           mkdir "$RUNNER_TEMP/installed"
-          cp -r tests examples docs README.md "$RUNNER_TEMP/installed/"
+          cp -r tests examples docs scripts data README.md "$RUNNER_TEMP/installed/"
           cd "$RUNNER_TEMP/installed"
           "$RUNNER_TEMP/venv/bin/python" -c 'import sd_backend_client, sys; print(sd_backend_client.__file__); sys.exit("site-packages" not in sd_backend_client.__file__)'
           "$RUNNER_TEMP/venv/bin/python" -m pytest tests/unit
