@@ -177,8 +177,10 @@ STATIC_CONTROL_TYPE_DEFS: dict[str, StaticControlTypeDef] = {
         'model_list': [NONE_VALUE, 'control_v11p_sd15_softedge [a8575a2a]'],
         'default_option': 'softedge_pidinet',
         'default_model': 'control_v11p_sd15_softedge [a8575a2a]',
-        'preprocessor_pattern': r'(?i).*softedge.*',
-        'model_pattern': r'(?i).*softedge.*',
+        # ComfyUI's soft edge nodes and models are named for their method (HED, PiDiNet, TEED), not "softedge".
+        # The lookahead keeps scribble and sketch variants of those methods in Scribble and T2I-Adapter.
+        'preprocessor_pattern': r'(?i)softedge|^(?!.*(?:scribble|sketch)).*(?<![a-z])(?:hed|pidi|teed)',
+        'model_pattern': r'(?i)softedge|^(?!.*scribble).*(?<![a-z])(?:hed|pidi|teed)',
     },
     'T2I-Adapter': {
         'module_list': [NONE_VALUE, 't2ia_style_clipvision'],
