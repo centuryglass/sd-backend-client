@@ -6,9 +6,9 @@ from typing_extensions import TypedDict
 
 
 # FORGE/COMFYUI CONTROLNET CONSTANTS:
-# The Automatic1111 WebUI provides a useful endpoint for sorting preprocessors and ControlNet models into useful
-# categories.  ComfyUI only provides some basic preprocessor categories, and the Forge WebUI doesn't even have that.
-# To keep feature parity, these definitions will be used to categorize available preprocessors and models.
+# The WebUI's /controlnet/control_types endpoint sorts preprocessors and ControlNet models into control types.
+# ComfyUI has only its preprocessor node categories, so these definitions sort its options. On the WebUI they add to
+# the endpoint's lists, and replace them on a server without it.
 
 NONE_VALUE = 'None'
 
@@ -117,8 +117,9 @@ STATIC_CONTROL_TYPE_DEFS: dict[str, StaticControlTypeDef] = {
         'module_list': [NONE_VALUE, 'openpose'],
         'model_list': [NONE_VALUE, 'control_v11p_sd15_openpose [cab727d4]'],
         'default_option': 'openpose_full',
-        'default_model': 'ccontrol_v11p_sd15_openpose [cab727d4]',
-        'preprocessor_pattern': r'(?i).*(?:openpose_densepose).*',
+        'default_model': 'control_v11p_sd15_openpose [cab727d4]',
+        # DWPreprocessor and AnimalPosePreprocessor are ComfyUI's DWPose and animal pose nodes.
+        'preprocessor_pattern': r'(?i)openpose|densepose|animal_?pose|^DWPreprocessor$',
         'model_pattern': r'(?i).*openpose.*',
     },
     'PhotoMaker': {
@@ -173,7 +174,7 @@ STATIC_CONTROL_TYPE_DEFS: dict[str, StaticControlTypeDef] = {
     },
     'SoftEdge': {
         'module_list': [NONE_VALUE, 'softedge_pidinet'],
-        'model_list': ['control_v11e_sd15_shuffle [526bfdae]'],
+        'model_list': [NONE_VALUE, 'control_v11p_sd15_softedge [a8575a2a]'],
         'default_option': 'softedge_pidinet',
         'default_model': 'control_v11p_sd15_softedge [a8575a2a]',
         'preprocessor_pattern': r'(?i).*softedge.*',
