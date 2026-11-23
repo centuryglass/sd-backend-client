@@ -324,10 +324,14 @@ valid for the version it was generated with.
   the same script and adds only `index.md` to the system prompt. Read `closed.md` when looking for past work. The
   cache is generated and gitignored; never edit it or treat it as the source of truth. `scripts/issues.py`'s docstring
   covers the fetch paths and `SD_API_ISSUES_TOKEN`.
-- **When the hook produced nothing** (rate-limited, no token, or an agent with neither the hook nor the plugin), build
-  the cache by hand before concluding no issue covers something: fetch the issue list with whatever tool you have
-  (the GitHub MCP `list_issues`, `gh issue list --json ...`), save it as JSON, run
-  `python3 scripts/issues.py --from-json <path>`, then read `.claude/cache/issues/index.md`.
+- **If the hook produced nothing, build the cache by hand.** The hook can't run in a multi-repo session, one started
+  in a folder that holds several checkouts, since Claude Code loads hooks only from the start folder's
+  `.claude/settings.json`. Elsewhere the cause is a rate limit, a missing token, or an agent with neither the hook nor
+  the plugin.
+  1. From the repository root, run `python3 scripts/issues.py --fetch` if `gh` is installed and authenticated, and
+     `--fetch-api` otherwise, then read `.claude/cache/issues/index.md`. Unless this is a multi-repo session, tell the
+     maintainer the hook failed.
+  2. If the script fails too, report its error to the maintainer and wait for them to decide how to continue.
 
 ## Cloud sessions
 
