@@ -37,6 +37,7 @@ nav:
       - Generation parameters: reference/parameters.md
       - ControlNet: reference/controlnet.md
       - Discovery: reference/discovery.md
+      - Local detection: reference/detection.md
       - Generation handles: reference/generation.md
       - Errors: reference/errors.md
 

@@ -32,6 +32,9 @@ from sd_backend_client.api.webui.controlnet_webui_constants import CONTROL_MODE_
     PREPROCESSOR_RES_PARAM_KEY, RESIZE_MODE_PARAM_KEY
 from sd_backend_client.api.webui.diffusion_request_body import DiffusionRequestBody, InpaintFillOption, ResizeMode
 from sd_backend_client.api.webui.script_info_types import ScriptRequestData
+from sd_backend_client.discovery.backend_detector import SearchLocations, default_search_locations, detect
+from sd_backend_client.discovery.detected_backend import BackendKind, DetectedInstall, DetectedServer, \
+    DetectionResult, Finding, FindingCode, FindingSeverity, InstallOwner
 from sd_backend_client.errors import AuthError, BackendConnectionError, BackendTimeoutError, GenerationError, \
     SDBackendError, ServerError, UnexpectedResponseError, WorkflowValidationError
 
@@ -64,6 +67,18 @@ __all__ = [
     # Discovery
     'BackendOption',
     'BackendCapabilities',
+    # Local detection
+    'detect',
+    'SearchLocations',
+    'default_search_locations',
+    'DetectionResult',
+    'DetectedInstall',
+    'DetectedServer',
+    'Finding',
+    'FindingCode',
+    'FindingSeverity',
+    'BackendKind',
+    'InstallOwner',
     # Generation handles
     'GenerationHandle',
     'GenerationStatus',

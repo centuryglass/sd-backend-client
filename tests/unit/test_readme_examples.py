@@ -1,7 +1,8 @@
 """The Python examples in the README and the docs site, and the scripts in `examples/`, run against recorded servers.
 
 Each example runs offline with `connect_to_backend` and the client constructors patched to return a real client whose
-`get` replays a recording (see `recorded_replay`), so discovery calls parse real responses. The `submit_*` methods are
+`get` replays a recording (see `recorded_replay`), so discovery calls parse real responses. `detect` is patched to
+return a fixed result, so no example reads this machine's files or probes its ports. The `submit_*` methods are
 replaced by autospecced stand-ins that check the call signature and return an already-finished handle. A renamed
 export, method or parameter fails here.
 """
@@ -18,8 +19,9 @@ import pytest
 from PIL import Image
 
 import sd_backend_client
-from sd_backend_client import A1111Webservice, Backend, ComfyUiWebservice, GenerationHandle, GenerationProgress, \
-    GenerationResult, GenerationStatus, PreprocessorParams
+from sd_backend_client import A1111Webservice, Backend, BackendKind, ComfyUiWebservice, DetectedInstall, \
+    DetectedServer, DetectionResult, Finding, FindingCode, GenerationHandle, GenerationProgress, GenerationResult, \
+    GenerationStatus, InstallOwner, PreprocessorParams
 
 from .recorded_replay import recordings, replay
 
@@ -73,6 +75,19 @@ class _FinishedHandle(GenerationHandle):
         return True
 
 
+def _detection_result() -> DetectionResult:
+    """A result with a running ComfyUI install, a WebUI install with a finding, and an unlinked server."""
+    comfyui = DetectedInstall(kind=BackendKind.COMFYUI, owner=InstallOwner.NONE, path=Path('/sd/ComfyUI'),
+                              entry_point=Path('/sd/ComfyUI/main.py'),
+                              server=DetectedServer(url='http://localhost:8188', kind=BackendKind.COMFYUI))
+    webui = DetectedInstall(kind=BackendKind.WEBUI, owner=InstallOwner.STABILITY_MATRIX, path=Path('/sd/forge'),
+                            entry_point=Path('/sd/forge/launch.py'), webui_variant='forge',
+                            findings=[Finding(FindingCode.API_DISABLED, {'arguments': ''})])
+    server = DetectedServer(url='http://localhost:7861', kind=None,
+                            findings=[Finding(FindingCode.AUTH_REQUIRED, {'url': 'http://localhost:7861'})])
+    return DetectionResult(installs=[comfyui, webui], servers=[server])
+
+
 def _offline_backend(recording: dict[str, Any]) -> Backend:
     """A real client for the recording's backend that replays its responses and finishes every job at once."""
     service: A1111Webservice | ComfyUiWebservice
@@ -91,9 +106,12 @@ def _offline_backend(recording: dict[str, Any]) -> Backend:
 def fixture_connect_offline(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     """Run in an empty directory, and return a function that points the package's clients at a recording.
 
-    `connect_to_backend` and the constructor of the recording's client class return the offline client.
+    `connect_to_backend` and the constructor of the recording's client class return the offline client. `detect`
+    returns `_detection_result()` from the start.
     """
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(sd_backend_client, 'detect',
+                        create_autospec(sd_backend_client.detect, return_value=_detection_result()))
 
     def connect(recording: dict[str, Any]) -> Backend:
         backend = _offline_backend(recording)
