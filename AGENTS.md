@@ -148,6 +148,13 @@ The request body is a **node graph**, not JSON fields. This is the most involved
   `LatentUpscaleWorkflowBuilder.build_workflow`'s docstring notes a limit on the Ultimate SD Upscale path: a target
   aspect ratio different from the source's isn't honored, since both sides scale by the larger width/height ratio.
 
+### Local detection: `discovery/`
+
+`discovery/backend_detector.py`'s `detect` finds installs on disk and probes local ports, returning the
+`discovery/detected_backend.py` result model. It reads files only, and calls `connect_to_backend` to classify each
+URL. Its tests (`tests/unit/test_discovery_local.py`) build install layouts in a temporary folder and pass a fake
+`connect`.
+
 ### `util/`
 
 `geometry.py` (`Size`), `api_defaults.py` (defaults shared by the parameter models), and `visual/image_utils.py`

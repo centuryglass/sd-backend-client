@@ -17,5 +17,6 @@ only the public names.
 | [Generation parameters](parameters.md) | `DiffusionParams`, `DiffusionRequestBody`, `ResizeMode`, `InpaintFillOption`, `ScriptRequestData`, `ComfyUIDiffusionParams`, `DiffusionUpscalingParams` |
 | [ControlNet](controlnet.md) | `ControlNetUnit`, `ControlNetModel`, `ControlNetPreprocessor`, `PreprocessorParams`, `ParameterDef`, `ControlTypeDef` |
 | [Discovery](discovery.md) | `BackendOption`, `BackendCapabilities` |
+| [Local detection](detection.md) | `detect`, `SearchLocations`, `default_search_locations`, `DetectionResult`, `DetectedInstall`, `DetectedServer`, `Finding`, `FindingCode`, `FindingSeverity`, `BackendKind`, `InstallOwner` |
 | [Generation handles](generation.md) | `GenerationHandle`, `GenerationStatus`, `GenerationProgress`, `GenerationResult`, `ProgressCallback` |
 | [Errors](errors.md) | `SDBackendError` and its subclasses |

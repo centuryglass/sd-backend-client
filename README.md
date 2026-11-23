@@ -202,6 +202,32 @@ and scheduler names are ComfyUI's (`'euler_ancestral'`, `'dpmpp_2m'`, `'karras'`
 such as `'Euler a'` are also accepted. `get_capabilities()` reports optional features such as ControlNet, Ultimate SD
 Upscale, soft inpainting and scheduler support.
 
+## Finding backends on this machine
+
+```python
+from sd_backend_client import FindingSeverity, connect_to_backend, detect
+
+result = detect()  # Blocks on disk reads and port probes: run it off a UI thread.
+for install in result.installs:
+    blockers = [finding.code.value for finding in install.findings if finding.severity == FindingSeverity.BLOCKER]
+    print(install.kind.value, install.owner.value, install.path, blockers)
+    if install.server is not None:
+        print('  running at', install.server.url)
+
+running = [install.server for install in result.installs if install.server is not None] + result.servers
+url = next((server.url for server in running if server.kind is not None), None)
+if url is not None:
+    backend = connect_to_backend(url)
+```
+
+`detect` looks for ComfyUI, ComfyUI portable, A1111 and Forge installs in the home folder and its `Desktop`,
+`Documents` and `Downloads`, in `/opt` on Linux, and at each fixed drive's root on Windows. It also reads the records
+of Stability Matrix, Krita AI Diffusion and ComfyUI Desktop, and probes the default ports and any port an install is
+configured for. It only reads files and never runs anything. Each install and server carries `Finding`s, such as a
+missing interpreter, no checkpoints or a WebUI started without `--api`, as a `FindingCode` with a details dict for
+your app to word. `SearchLocations`, `extra_roots`, `extra_urls` and `own_install` change where it looks.
+`python scripts/detect_backends.py` prints what it finds on your machine.
+
 ## Backend-specific parameters
 
 `DiffusionParams` holds the parameters both backends support. Each backend has a subclass with extra fields, and the
