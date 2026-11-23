@@ -1,8 +1,19 @@
 id = "xinsir_canny_sdxl"
 label = "Xinsir SDXL Canny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "xinsir's SDXL Canny ControlNet, trained on over 10 million captioned images at 1024 pixels."
+description = """\
+An SDXL ControlNet for Canny edges aimed at Midjourney-like image quality. In its author's test on 300 prompts \
+it scored higher for aesthetics and control than the diffusers SDXL Canny model and MistoLine. For anime images, \
+its card switches to an anime base model such as CounterfeitXL.\n\n\
+xinsir later published a stronger model as "Canny V2" in the same repository; that file is the xinsir scribble \
+model."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. It was trained \
+in one stage at 1024 by 1024 on over 10 million images captioned with CogVLM, using Canny maps at random \
+thresholds with random parts masked out, so the model learns more from the prompt. Training used over 64 A100 \
+GPUs."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["canny"]
@@ -11,12 +22,18 @@ trainer = "xinsir"
 license = "apache-2.0"
 homepage = "https://huggingface.co/xinsir/controlnet-canny-sdxl-1.0"
 
-strengths = []
+strengths = [
+    "Higher aesthetic and control scores than diffusers SDXL Canny and MistoLine, per its card",
+]
 weaknesses = []
-good_for = []
+good_for = ["restyling while keeping outlines", "photographic and illustrated results"]
 
-sources = ["hf_xinsir_controlnet_canny_sdxl_1_0"]
-research_status = "stub"
+sources = [
+    "hf_xinsir_controlnet_canny_sdxl_1_0",
+    "hf_xinsir_scribble_discussion_2",
+    "paper_controlnet",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

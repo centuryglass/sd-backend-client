@@ -1,25 +1,29 @@
 id = "kohya_lllite_fake_scribble_anime_sdxl"
 label = "LLLite SDXL Fake Scribble Anime"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "kohya-ss's tiny SDXL ControlNet-LLLite for PiDiNet fake scribbles, trained on an anime model."
+description = """\
+A ControlNet-LLLite model for scribbles, trained with kohya-ss's own custom anime SDXL model on 921 generated \
+images with PiDiNet scribble preprocessing. At about 46 MB it is far smaller than a ControlNet.\n\n\
+lllyasviel's sd_control_collection mirrors it as kohya_controllllite_xl_scribble_anime."""
+how_it_works = """\
+ControlNet-LLLite is kohya-ss's lightweight alternative to ControlNet: small conditioning modules, about 46 MB \
+in all, attached to the SDXL U-Net. Its model card calls the structure highly experimental and subject to \
+change. This model was trained on PiDiNet-based fake scribbles of anime images."""
 base_models = ["sdxl"]
 adapter = "controlnet_lllite"
 control_types = ["scribble"]
-preprocessors = ["scribble_hed"]
+preprocessors = ["scribble_pidinet"]
 trainer = "kohya-ss"
 license = "apache-2.0"
 homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Very small"]
+weaknesses = ["Experimental architecture", "Small training set of 921 images"]
+good_for = ["anime images from scribbles"]
 
 sources = ["hf_kohya_ss_controlnet_lllite", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "The sd_control_collection copy is matched to the kohya-ss file by name only, and their sizes differ slightly. Confirm they hold the same network.",
-]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "controllllite_v01032064e_sdxl_fake_scribble_anime.safetensors"

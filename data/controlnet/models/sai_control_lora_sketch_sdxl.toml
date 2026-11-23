@@ -1,25 +1,32 @@
 id = "sai_control_lora_sketch_sdxl"
 label = "Stability Control-LoRA Sketch"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Stability AI's SDXL Control-LoRA that colors in white-on-black drawings."
+description = """\
+Stability AI's Sketch Control-LoRA is a colorizer: it fills in drawings given as white lines on black, either \
+hand-drawn or made with a PiDiNet edge model. Its card pairs it with Recolor, which colorizes black-and-white \
+photographs.\n\n\
+It comes at about 738 MB for rank 256 or 377 MB for the experimental rank 128 file, both described as reductions \
+of the original ControlNet. Stability trained the Control-LoRAs on a diverse range of image concepts and aspect \
+ratios."""
+how_it_works = """\
+A Control-LoRA is a ControlNet trained with low-rank adaptation: in place of full weight matrices it stores \
+small low-rank updates, which shrinks a 4.7 GB SDXL ControlNet to about 738 MB at rank 256 or 377 MB at rank \
+128. It is loaded and used like a ControlNet. This one was trained to color drawings."""
 base_models = ["sdxl"]
 adapter = "control_lora"
 control_types = ["scribble"]
-preprocessors = []
+preprocessors = ["pidinet"]
 trainer = "Stability AI"
 license = "other"
 homepage = "https://huggingface.co/stabilityai/control-lora"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Much smaller than a full SDXL ControlNet"]
+weaknesses = ["Rank 128 file is experimental"]
+good_for = ["coloring drawings", "coloring sketches"]
 
 sources = ["hf_stabilityai_control_lora", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "Confirm from the model card whether the rank 128 and rank 256 files are one training at two ranks (files of one record) or separate trainings.",
-]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "control-lora-sketch-rank128-metadata.safetensors"

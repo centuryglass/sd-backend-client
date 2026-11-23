@@ -1,19 +1,44 @@
 id = "mlsd"
 label = "MLSD Straight Lines"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Follows the straight lines of a scene, such as walls, furniture and buildings."
+description = """\
+MLSD keeps only the straight line segments of a reference image and drops every curve. That suits architecture \
+and interiors: walls, floors, windows, shelves and furniture edges stay in place, while people, plants and other \
+rounded things vanish from the map and are left to the prompt.\n\n\
+Two thresholds control how many segments survive. An image with few straight lines gives an almost empty map and \
+little control. The ControlNet 1.0 model card says hand-made straight lines, such as from a Hough transform, \
+also work."""
+how_it_works = """\
+The MLSD preprocessor runs M-LSD, a small, fast neural network that detects line segments and returns each as \
+two end points with a confidence score. The segments are drawn as white lines on black. The ControlNet 1.1 MLSD \
+model was trained on such maps, with 300,000 extra training images chosen because M-LSD found more than 16 \
+straight lines in them."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Black image with thin white straight line segments."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "cn11_readme",
+    "hf_lllyasviel_controlnet",
+    "paper_mlsd",
+    "sdwebui_cn_annotators",
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["MLSD"]
 forge = ["MLSD"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Redecorate a room"
+description = """\
+Extract the straight lines of a room photo and prompt for a new interior style. Walls, windows and furniture \
+outlines keep their positions."""
 
 [choosing]
 guide = ""

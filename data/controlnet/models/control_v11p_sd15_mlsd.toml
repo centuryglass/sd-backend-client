@@ -1,8 +1,16 @@
 id = "control_v11p_sd15_mlsd"
 label = "ControlNet 1.1 MLSD"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The SD1.5 ControlNet 1.1 model for M-LSD straight lines, for architecture and interiors."
+description = """\
+ControlNet 1.1 MLSD generates images that follow straight line segments detected by M-LSD. It suits rooms, \
+buildings and other scenes made of straight edges.\n\n\
+Resumed from MLSD 1.0, it was retrained on cleaned data plus 300,000 more images, chosen because M-LSD found \
+more than 16 straight lines in each, with random left-right flips, for 200 A100 GPU hours."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on M-LSD line maps."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["mlsd"]
@@ -11,16 +19,21 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "Trained on extra images rich in straight lines",
+    "Trained on a cleaned dataset that fixes the 1.0 grayscale, quality and caption problems",
+]
 weaknesses = []
-good_for = []
+good_for = ["architecture", "interiors"]
 
 sources = [
+    "cn11_readme",
     "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

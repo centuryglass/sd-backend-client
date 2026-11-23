@@ -1,19 +1,52 @@
 id = "canny"
 label = "Canny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Follows the sharp outlines of a reference image, traced by the Canny edge detector."
+description = """\
+Canny keeps the outlines of a reference image and leaves the rest to the prompt. The control image is black with \
+thin white lines wherever the reference has a sharp change in brightness: object borders, folds, printed text \
+and fine texture. The generated image places its own edges on those lines, while color, lighting, material and \
+style come from the prompt and the checkpoint.\n\n\
+A Canny map holds no depth, shading or color, only where edges are. Two thresholds set how many edges it keeps. \
+A black-on-white line drawing can be used once it is inverted, which is why WebUI lists "invert" under this \
+type."""
+how_it_works = """\
+Canny models are trained on pairs of images and the Canny edge maps detected from them, with a caption for each. \
+The ControlNet 1.1 Canny model was trained on maps made with random thresholds. During generation the model \
+reads the edge map alongside the noisy image at every step and nudges the result so its edges land where the map \
+has lines. Every model of this type expects white lines on a black background."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Black image with thin white lines, one pixel wide, along edges."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "cn11_readme",
+    "opencv_canny_tutorial",
+    "hf_tencentarc_t2i_adapter_canny_sdxl_1_0",
+    "sdwebui_cn_preprocessors",
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Canny"]
 forge = ["Canny"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Restyle a photo without moving anything"
+description = """\
+Run the photo through Canny and prompt for a new style or material. Outlines stay where they were; colors and \
+surfaces change."""
+
+[[uses]]
+kind = "creative"
+title = "Color a clean line drawing"
+description = """\
+Invert a black-on-white drawing so its lines become the white edges a Canny model reads, then describe the \
+finished picture in the prompt."""
 
 [choosing]
 guide = ""
@@ -30,7 +63,7 @@ models = [
     "diffusers_canny_sdxl_mid",
     "diffusers_canny_sdxl_small",
     "xinsir_canny_sdxl",
-    "xinsir_canny_v2_sdxl",
+    "xinsir_scribble_sdxl",
     "xinsir_union_sdxl",
     "xinsir_union_promax_sdxl",
     "sai_control_lora_canny_sdxl",

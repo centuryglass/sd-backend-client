@@ -100,6 +100,132 @@ url = "https://github.com/comfyanonymous/ComfyUI/tree/4c2b826d74a1827f5cc4a70660
 kind = "repo_code"
 accessed = "2026-11-22"
 
+[sdwebui_cn_annotators]
+title = "sd-webui-controlnet annotator implementations and weight downloads"
+url = "https://github.com/Mikubill/sd-webui-controlnet/tree/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/annotator"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "annotator/"
+
+[comfyui_controlnet_aux_src]
+title = "comfyui_controlnet_aux detector implementations"
+url = "https://github.com/Fannovel16/comfyui_controlnet_aux/tree/7e40019d777479445bdebfd0448792b2b2e2bc5b/src/custom_controlnet_aux"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "comfyui_controlnet_aux"
+commit = "7e40019d777479445bdebfd0448792b2b2e2bc5b"
+path = "src/custom_controlnet_aux/"
+
+[comfyui_controlnet_aux_readme]
+title = "comfyui_controlnet_aux README (preprocessor-to-model table, annotator downloads)"
+url = "https://github.com/Fannovel16/comfyui_controlnet_aux/blob/c2655d2970d810d8a3d71deed204cdf416b66132/README.md"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[cn11_readme]
+title = "ControlNet 1.1 README (model descriptions and naming rules)"
+url = "https://github.com/lllyasviel/ControlNet-v1-1-nightly/blob/e2b44154b72965c5e11b1ccee941d550682e4701/README.md"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[cn10_readme]
+title = "ControlNet 1.0 README"
+url = "https://github.com/lllyasviel/ControlNet/blob/ed85cd1e25a5ed592f7d8178495b4483de0331bf/README.md"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[t2i_adapter_readme]
+title = "T2I-Adapter README (SDXL branch)"
+url = "https://github.com/TencentARC/T2I-Adapter/blob/c408b059c36e3f9ce336b66746bd606edaa5483a/README.md"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[t2i_adapter_readme_sd]
+title = "T2I-Adapter README (SD1.x branch)"
+url = "https://github.com/TencentARC/T2I-Adapter/blob/16bba674b472121d5a86e3ed6b935f91d516bc74/README.md"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[t2i_adapter_zoo]
+title = "T2I-Adapter Adapter Zoo (SD1.x adapters)"
+url = "https://github.com/TencentARC/T2I-Adapter/blob/16bba674b472121d5a86e3ed6b935f91d516bc74/docs/AdapterZoo.md"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[hf_tencentarc_t2i_adapter_v2_commit]
+title = "TencentARC/T2I-Adapter commit \"add improved canny, sketch, depth models\""
+url = "https://huggingface.co/TencentARC/T2I-Adapter/commit/eed79026c3aaf41d9827f38cb7e1bd144e4e22c1"
+kind = "repo_code"
+accessed = "2026-11-22"
+
+[hf_blog_t2i_sdxl_adapters]
+title = "Efficient Controllable Generation for SDXL with T2I-Adapters (Hugging Face blog)"
+url = "https://github.com/huggingface/blog/blob/1f46819d70cad02df7ea96ec032fb0014dcf1c3e/t2i-sdxl-adapters.md"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[anyline_readme]
+title = "TheMistoAI ComfyUI-Anyline README"
+url = "https://github.com/TheMistoAI/ComfyUI-Anyline/blob/40d7b290fe829d50e4e12e7f34498c2d30913b53/README.md"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[hf_xinsir_scribble_discussion_2]
+title = "xinsir/controlnet-scribble-sdxl-1.0 discussion #2, \"Scribble and canny v2 have the same hash\" (author reply)"
+url = "https://huggingface.co/xinsir/controlnet-scribble-sdxl-1.0/discussions/2"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[opencv_canny_tutorial]
+title = "OpenCV tutorial: Canny Edge Detection"
+url = "https://github.com/opencv/opencv/blob/b8f5db3fa6a1218d41f98a505a352ae9c31ab27c/doc/py_tutorials/py_imgproc/py_canny/py_canny.markdown"
+kind = "official_docs"
+accessed = "2026-11-22"
+
+[paper_controlnet]
+title = "Zhang, Rao and Agrawala, Adding Conditional Control to Text-to-Image Diffusion Models (2023)"
+url = "https://arxiv.org/abs/2302.05543"
+kind = "paper"
+accessed = "2026-11-22"
+
+[paper_t2i_adapter]
+title = "Mou et al., T2I-Adapter: Learning Adapters to Dig out More Controllable Ability for Text-to-Image Diffusion Models (2023)"
+url = "https://arxiv.org/abs/2302.08453"
+kind = "paper"
+accessed = "2026-11-22"
+
+[paper_hed]
+title = "Xie and Tu, Holistically-Nested Edge Detection (2015)"
+url = "https://arxiv.org/abs/1504.06375"
+kind = "paper"
+accessed = "2026-11-22"
+
+[paper_pidinet]
+title = "Su et al., Pixel Difference Networks for Efficient Edge Detection (2021)"
+url = "https://arxiv.org/abs/2108.07009"
+kind = "paper"
+accessed = "2026-11-22"
+
+[paper_teed]
+title = "Soria et al., Tiny and Efficient Model for the Edge Detection Generalization (2023)"
+url = "https://arxiv.org/abs/2308.06468"
+kind = "paper"
+accessed = "2026-11-22"
+
+[paper_diffusion_edge]
+title = "Ye et al., DiffusionEdge: Diffusion Probabilistic Model for Crisp Edge Detection (2024)"
+url = "https://arxiv.org/abs/2401.02032"
+kind = "paper"
+accessed = "2026-11-22"
+
+[paper_mlsd]
+title = "Gu et al., Towards Light-weight and Real-time Line Segment Detection (2021)"
+url = "https://arxiv.org/abs/2106.00186"
+kind = "paper"
+accessed = "2026-11-22"
+
 [hf_crucibleai_controlnetmediapipeface]
 title = "CrucibleAI/ControlNetMediaPipeFace model card"
 url = "https://huggingface.co/CrucibleAI/ControlNetMediaPipeFace"
@@ -121,6 +247,12 @@ accessed = "2026-11-22"
 [hf_nacholmo_controlnet_qr_pattern_v2]
 title = "Nacholmo/controlnet-qr-pattern-v2 model card"
 url = "https://huggingface.co/Nacholmo/controlnet-qr-pattern-v2"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_sargezt_controlnet_sd_xl_1_0_softedge_dexined]
+title = "SargeZT/controlnet-sd-xl-1.0-softedge-dexined model card"
+url = "https://huggingface.co/SargeZT/controlnet-sd-xl-1.0-softedge-dexined"
 kind = "model_card"
 accessed = "2026-11-22"
 

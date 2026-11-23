@@ -1,26 +1,62 @@
 id = "lineart_realistic"
 label = "Lineart Realistic"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Redraws a photo as clean, detailed line art with a small neural network."
+description = """\
+Lineart Realistic turns a photo or render into a detailed line drawing: contours, folds, facial features and \
+some texture, drawn as lines of varying weight. It is the "detailed" extractor the ControlNet 1.1 lineart model \
+was demonstrated with.\n\n\
+WebUI calls it "lineart" in older versions and "lineart_realistic" in newer ones. In ComfyUI it is the Realistic \
+Lineart node with coarse disabled."""
+how_it_works = """\
+A small image-to-image generator network redraws the input as a line drawing. WebUI inverts its black-on-white \
+output into white lines on black. The coarse variant runs the same network architecture with a second set of \
+weights."""
 control_types = ["lineart"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Keeps contours and main interior lines with varying weight; drops color, shading and most texture."
+output = "Black image with white lines of varying weight."
+best_input = "Photos and realistic renders."
 weak_input = ""
-models = ["control_v11p_sd15_lineart", "t2i_adapter_lineart_sdxl"]
+models = ["control_v11p_sd15_lineart", "t2i_adapter_lineart_sdxl", "xinsir_scribble_sdxl"]
 
 sources = [
+    "cn11_readme",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_readme",
+    "hf_tencentarc_t2i_adapter_lineart_sdxl_1_0",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
-open_questions = []
+research_status = "drafted"
+open_questions = [
+    "Find where sk_model.pth and sk_model2.pth come from and what they were trained on. The LICENSE bundled with the annotator credits Caroline Chan (2022), author of Informative Drawings.",
+]
 
 [names]
 webui = ["lineart", "lineart_realistic"]
 forge = ["lineart_realistic"]
 comfyui = ["LineArtPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "sk_model.pth"
+size_bytes = 17173511
+sha256 = "c686ced2a666b4850b4bb6ccf0748031c3eda9f822de73a34b8979970d90f0c6"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/sk_model.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."

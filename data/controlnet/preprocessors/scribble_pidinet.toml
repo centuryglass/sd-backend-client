@@ -1,26 +1,74 @@
 id = "scribble_pidinet"
 label = "Scribble PiDiNet"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Turns an image into rough, thick scribble strokes, using PiDiNet edges."
+description = """\
+Scribble PiDiNet makes a scribble from an image like Scribble HED, starting from PiDiNet's edges. WebUI, Forge \
+and reForge make it the default preprocessor for the Scribble type. It keeps the main shapes as bold white \
+strokes and drops detail."""
+how_it_works = """\
+It runs PiDiNet, thins the soft edges down to their ridges, blurs them, and turns every pixel that is not almost \
+black into full white, leaving thick, hard-edged strokes."""
 control_types = ["scribble", "sparsectrl"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Keeps main shapes as thick strokes; drops all fine detail."
+output = "Black image with thick white strokes."
+best_input = "Photos and renders with clear main shapes."
 weak_input = ""
-models = ["control_v11p_sd15_scribble", "sparsectrl_scribble_sd15"]
+models = [
+    "control_v11p_sd15_scribble",
+    "control_sd15_scribble",
+    "sparsectrl_scribble_sd15",
+    "kohya_lllite_fake_scribble_anime_sdxl",
+]
 
 sources = [
+    "cn11_readme",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_readme",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["pidinet_scribble", "scribble_pidinet"]
 forge = ["scribble_pidinet"]
 comfyui = ["Scribble_PiDiNet_Preprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+speed = "fast: a lightweight network"
+
+[[hardware.files]]
+filename = "table5_pidinet.pth"
+size_bytes = 2871148
+sha256 = "80860ac267258b5f27486e0ef152a211d0b08120f62aeb185a050acc30da486c"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/table5_pidinet.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
+
+[[parameters]]
+id = "safe"
+label = "Safe"
+summary = "ComfyUI only: quantize the PiDiNet edges before turning them into strokes."
+names = { comfyui = "safe" }
+type = "enum"
+default = "enable"
+choices = ["enable", "disable"]
+effect = """\
+Quantizes the edge map into a few flat levels, which removes the faint grayscale copy of the source image hidden \
+in plain soft edge maps. WebUI always uses the plain map."""
+when_to_adjust = "Rarely matters: the stroke step flattens the map anyway."

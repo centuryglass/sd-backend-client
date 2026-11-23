@@ -1,26 +1,41 @@
 id = "control_v11p_sd15_scribble"
 label = "ControlNet 1.1 Scribble"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The SD1.5 ControlNet 1.1 model for scribbles, hand-drawn or synthesized, thin or thick."
+description = """\
+ControlNet 1.1 Scribble turns scribbles into images. It accepts hand-drawn scribbles and scribbles synthesized \
+from images by preprocessors such as Scribble HED and Scribble PiDiNet.\n\n\
+Because people often draw thick scribbles, it was trained with more aggressive random thickening than 1.0, on \
+strokes from 1 to 24 pixels wide on a 512 pixel canvas, and it handles somewhat wider strokes too. It was \
+resumed from Scribble 1.0 on cleaned data for 200 A100 GPU hours."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on synthesized scribbles."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["scribble"]
-preprocessors = ["scribble_hed", "scribble_pidinet"]
+preprocessors = ["scribble_hed", "scribble_pidinet", "scribble_xdog", "scribble_threshold"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "Handles thick strokes, up to 24 pixels on a 512 pixel canvas and somewhat beyond",
+    "Trained on a cleaned dataset that fixes the 1.0 grayscale, quality and caption problems",
+]
 weaknesses = []
-good_for = []
+good_for = ["turning doodles into images", "loose composition from a photo"]
 
 sources = [
+    "cn11_readme",
     "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

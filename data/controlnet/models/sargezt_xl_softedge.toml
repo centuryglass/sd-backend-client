@@ -1,25 +1,35 @@
 id = "sargezt_xl_softedge"
 label = "SargeZT SDXL Soft Edge"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SargeZT's SDXL ControlNet for soft edges, trained on DexiNed edge maps."
+description = """\
+An SDXL ControlNet trained on soft edge maps from DexiNed preprocessing. No backend ships a DexiNed \
+preprocessor; comfyui_controlnet_aux pairs this model with TEED.\n\n\
+lllyasviel's sd_control_collection mirrors it in fp16 as sargezt_xl_softedge. SargeZT's own release is fp32."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on DexiNed soft edge maps."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["softedge"]
-preprocessors = []
+preprocessors = ["teed"]
 trainer = "SargeZT"
-license = ""
-homepage = "https://huggingface.co/lllyasviel/sd_control_collection"
+license = "creativeml-openrail-m"
+homepage = "https://huggingface.co/SargeZT/controlnet-sd-xl-1.0-softedge-dexined"
 
 strengths = []
 weaknesses = []
 good_for = []
 
-sources = ["hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "Find the original SargeZT release this collection file was renamed from, and its model card.",
+sources = [
+    "hf_sargezt_controlnet_sd_xl_1_0_softedge_dexined",
+    "hf_lllyasviel_sd_control_collection",
+    "comfyui_controlnet_aux_readme",
+    "paper_controlnet",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "sargezt_xl_softedge.safetensors"
@@ -28,3 +38,21 @@ size_bytes = 2502139104
 sha256 = "24e0803a8f88377f5ec0ef1582b942266e8451bae559b6d91e3660fdd5729816"
 webui_hash = "b6f7415b"
 source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sargezt_xl_softedge.safetensors"
+
+[[files]]
+filename = "controlnet-sd-xl-1.0-softedge-dexined.safetensors"
+format = "safetensors"
+precision = "fp32"
+size_bytes = 5004167832
+sha256 = "441c403dba87219a5128a99c1a46d785fdf561bf05ed65569604682414492219"
+webui_hash = "82cb6cd1"
+source_url = "https://huggingface.co/SargeZT/controlnet-sd-xl-1.0-softedge-dexined/resolve/8d5a5ada1875299b771016abc6fa583245095b21/controlnet-sd-xl-1.0-softedge-dexined.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.bin"
+format = "bin"
+precision = "fp32"
+size_bytes = 5004438321
+sha256 = "1cd4fb7cc9d00baf715902f82c6d34216d9fdc9cdf389a8e889b86060e7ef805"
+webui_hash = "8268e4ab"
+source_url = "https://huggingface.co/SargeZT/controlnet-sd-xl-1.0-softedge-dexined/resolve/8d5a5ada1875299b771016abc6fa583245095b21/diffusion_pytorch_model.bin"

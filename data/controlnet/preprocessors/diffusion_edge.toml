@@ -1,20 +1,97 @@
 id = "diffusion_edge"
 label = "DiffusionEdge"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Finds crisp, thin edges with a diffusion model; slow, with a choice of indoor, urban or natural."
+description = """\
+DiffusionEdge, available in ComfyUI only, draws thin, crisp edges using a diffusion model, the same family of \
+network as Stable Diffusion itself. Its authors built it because learned edge detectors struggle to give edge \
+maps that are both correct and crisp.\n\n\
+Pick the checkpoint that matches the scene: indoor, urban or natural. Each is a 1.2 GB download. It is slower \
+and heavier than the other edge preprocessors; a larger patch batch size speeds it up at the cost of VRAM."""
+how_it_works = """\
+Starting from noise, a diffusion model refines its guess of the edge map over several steps, guided by the input \
+image. It works in a compressed latent space to save compute. The image is processed in patches, several at a \
+time."""
 control_types = ["lineart", "softedge"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Keeps object edges as thin, crisp lines."
+output = "Black image with thin white edge lines."
+best_input = "Photos of the scene type its checkpoint names."
 weak_input = ""
 models = []
 
-sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
-research_status = "stub"
-open_questions = []
+sources = [
+    "paper_diffusion_edge",
+    "comfyui_controlnet_aux_readme",
+    "recorded_fixtures",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "drafted"
+open_questions = [
+    "Find which datasets the indoor, urban and natural checkpoints were trained on, and whether any control model was trained on DiffusionEdge maps.",
+    "Confirm from comfyui_controlnet_aux code that patch_batch_size leaves the output unchanged.",
+]
 
 [names]
 webui = []
 forge = []
 comfyui = ["DiffusionEdge_Preprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+vram = "grows with patch_batch_size"
+speed = "slow: a multi-step diffusion model"
+
+[[hardware.files]]
+filename = "diffusion_edge_indoor.pt"
+variant = "indoor"
+size_bytes = 1192128970
+sha256 = "3e6e5a0db1b0b8a8c2422a4472f0d5093f70d25d07002302f07ae8498b515bf6"
+source_url = "https://huggingface.co/hr16/Diffusion-Edge/resolve/401c6cd441c2e7d75208f12881f6abef8f6da3b2/diffusion_edge_indoor.pt"
+
+[[hardware.files]]
+filename = "diffusion_edge_urban.pt"
+variant = "urban"
+size_bytes = 1192128970
+sha256 = "9b0dc9df7840c3724f29e4e7ab83817e5811aaea36ff187d8b0e7a09f9f5d67f"
+source_url = "https://huggingface.co/hr16/Diffusion-Edge/resolve/401c6cd441c2e7d75208f12881f6abef8f6da3b2/diffusion_edge_urban.pt"
+
+[[hardware.files]]
+filename = "diffusion_edge_natrual.pt"
+variant = "natural"
+size_bytes = 1192112522
+sha256 = "ad544682b61db079b386aae282c55728e6a044e8c0a0d2ecc996c234c08b6702"
+source_url = "https://huggingface.co/hr16/Diffusion-Edge/resolve/401c6cd441c2e7d75208f12881f6abef8f6da3b2/diffusion_edge_natrual.pt"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
+
+[[parameters]]
+id = "environment"
+label = "Environment"
+summary = "Which checkpoint to run: indoor, urban or natural scenes."
+names = { comfyui = "environment" }
+type = "enum"
+default = "indoor"
+choices = ["indoor", "urban", "natrual"]
+effect = "Loads diffusion_edge_<environment>.pt. ComfyUI spells the third choice \"natrual\"."
+when_to_adjust = "Match it to the kind of scene in the image."
+
+[[parameters]]
+id = "patch_batch_size"
+label = "Patch Batch Size"
+summary = "How many image patches are processed at once."
+names = { comfyui = "patch_batch_size" }
+type = "int"
+default = 4
+range = [1, 16]
+effect = "Higher values run faster and use more VRAM. The map itself does not change."
+when_to_adjust = "Raise it if VRAM allows. Lower it on out-of-memory errors."

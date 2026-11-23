@@ -1,26 +1,82 @@
 id = "mlsd"
 label = "M-LSD"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Finds straight line segments with the M-LSD network and draws them as thin white lines."
+description = """\
+MLSD keeps only straight line segments, which suits rooms, buildings and furniture. Curves, people and plants \
+mostly disappear from the map. Two thresholds trim the result: one drops weak detections, the other drops short \
+or doubtful segments."""
+how_it_works = """\
+M-LSD, mobile line segment detection, is a lightweight network built for real-time use on phones. It predicts \
+the center, direction and length of each line segment in one pass, and the segments that pass both thresholds \
+are drawn as one-pixel white lines."""
 control_types = ["mlsd"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Keeps straight line segments; drops curves, texture and everything else."
+output = "Black image with thin white straight lines."
+best_input = "Architecture, interiors and other scenes made of straight edges."
+weak_input = "Organic subjects such as people, animals and landscapes, which give a nearly empty map."
 models = ["control_sd15_mlsd", "control_v11p_sd15_mlsd"]
 
 sources = [
+    "paper_mlsd",
+    "cn11_readme",
+    "hf_lllyasviel_controlnet",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_readme",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["mlsd"]
 forge = ["mlsd"]
 comfyui = ["M-LSDPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+speed = "fast: a network built for real-time use on phones"
+
+[[hardware.files]]
+filename = "mlsd_large_512_fp32.pth"
+size_bytes = 6341481
+sha256 = "5696f168eb2c30d4374bbfd45436f7415bb4d88da29bea97eea0101520fba082"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/mlsd_large_512_fp32.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
+
+[[parameters]]
+id = "score_threshold"
+label = "MLSD Value Threshold"
+summary = "Minimum confidence for a detected segment."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "score_threshold" }
+type = "float"
+default = 0.1
+range = [0.01, 2.0]
+effect = "Higher values drop weak detections and keep the clearest lines."
+when_to_adjust = "Raise it to remove stray lines. Lower it if walls or edges go missing."
+
+[[parameters]]
+id = "distance_threshold"
+label = "MLSD Distance Threshold"
+summary = "Minimum length a segment needs to be kept."
+names = { webui = "threshold_b", forge = "threshold_b", comfyui = "dist_threshold" }
+type = "float"
+default = 0.1
+range = [0.01, 20.0]
+effect = "Higher values drop short segments."
+when_to_adjust = "Raise it to keep only long structural lines."

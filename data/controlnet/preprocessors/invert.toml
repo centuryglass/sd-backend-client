@@ -1,26 +1,37 @@
 id = "invert"
 label = "Invert"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Swaps black and white, turning a black-on-white drawing into the white-on-black lines models read."
+description = """\
+Invert flips every pixel to its opposite: black becomes white, white becomes black, and colors turn into their \
+complements. It does no detection. Its use is to turn an existing line drawing, scan or sketch, drawn dark on a \
+light background, into the white-on-black map that line models expect.\n\n\
+WebUI labels it "invert (from white bg & black line)" and lists it under Canny, Lineart, Scribble and MLSD. In \
+ComfyUI the core Invert Image node does the same thing."""
+how_it_works = """\
+Each color value is subtracted from the maximum, 255. Nothing is resized or filtered, so the map has the same \
+size and detail as the input. WebUI hides its resolution slider for this preprocessor."""
 control_types = ["canny", "lineart", "scribble", "mlsd"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Reverses brightness and color; keeps every line and detail as drawn."
+output = "The input image with black and white swapped."
+best_input = "Clean black-on-white line art, sketches and scans."
+weak_input = "Photos: inverting one gives a negative, not a line map."
 models = []
 
 sources = [
+    "sdwebui_cn_preprocessors",
+    "comfyui_core_nodes",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
-    "comfyui_core_nodes",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["invert", "invert (from white bg & black line)"]
 forge = ["invert (from white bg & black line)"]
 comfyui = ["ImageInvert"]
+
+[hardware]
+device = "none"
+speed = "fast: a per-pixel operation"

@@ -1,23 +1,40 @@
 id = "pidinet"
 label = "PiDiNet"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Finds object boundaries with a small, fast neural network and draws them as soft lines."
+description = """\
+PiDiNet draws soft boundary lines like HED, from a lightweight network. The ControlNet 1.1 README recommends it \
+as the default soft edge preprocessor: it ranks second for maximum quality and third for robustness, behind its \
+own safe variant and HED Safe.\n\n\
+Like HED, its plain maps carry a faint copy of the source image; PiDiNet Safe removes it."""
+how_it_works = """\
+PiDiNet, pixel difference network, builds the differences between neighboring pixels into its convolutions, the \
+cue that classic detectors such as Canny and Sobel rely on. That lets a lightweight network, trained on \
+hand-outlined photos, find boundaries without a large pretrained backbone."""
 control_types = ["softedge"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Keeps object boundaries as soft graded lines; drops most texture and noise."
+output = "Black image with soft white boundary lines."
+best_input = "Photos and renders."
 weak_input = ""
-models = ["control_v11p_sd15_softedge"]
+models = [
+    "control_v11p_sd15_softedge",
+    "control_sd15_scribble",
+    "t2i_adapter_sketch_sdxl",
+    "sai_control_lora_sketch_sdxl",
+    "xinsir_scribble_sdxl",
+]
 
 sources = [
+    "paper_pidinet",
+    "cn11_readme",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_readme",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -27,3 +44,26 @@ comfyui = ["PiDiNetPreprocessor"]
 
 [name_parameters]
 comfyui = { safe = "disable" }
+
+[hardware]
+device = "gpu_preferred"
+speed = "fast: a lightweight network"
+
+[[hardware.files]]
+filename = "table5_pidinet.pth"
+size_bytes = 2871148
+sha256 = "80860ac267258b5f27486e0ef152a211d0b08120f62aeb185a050acc30da486c"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/table5_pidinet.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."

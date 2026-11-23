@@ -1,8 +1,15 @@
 id = "t2iadapter_canny_sd14v1"
 label = "T2I-Adapter Canny v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC T2I-Adapter for Canny edges on SD1.x; small and fast, trained on SD 1.4."
+description = """\
+The first T2I-Adapter for Canny edges, released in March 2023. It is a small add-on, about 300 MB at full \
+precision, that steers generation to follow a Canny edge map. TencentARC trained it on SD 1.4 and says it works \
+with any model fine-tuned from SD 1.4 or 1.5, such as Anything 4.0.\n\n\
+An improved version, t2iadapter_canny_sd15v2, followed later that month."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. This adapter was trained on Canny edge maps."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["canny"]
@@ -11,19 +18,21 @@ trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
+strengths = ["Small and fast compared with a ControlNet"]
 weaknesses = []
-good_for = []
+good_for = ["restyling while keeping outlines"]
 
 sources = [
+    "t2i_adapter_zoo",
+    "t2i_adapter_readme_sd",
+    "paper_t2i_adapter",
+    "hf_blog_t2i_sdxl_adapters",
     "hf_tencentarc_t2i_adapter",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
 ]
-research_status = "stub"
-open_questions = [
-    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
-]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "t2iadapter_canny_sd14v1.pth"

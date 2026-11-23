@@ -1,19 +1,44 @@
 id = "softedge"
 label = "Soft Edge"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Follows the soft, shaded boundaries of a reference image, keeping shapes but not every fine line."
+description = """\
+Soft Edge keeps the main boundaries of a reference image as blurry, graded lines rather than one-pixel edges. \
+The model gets the shapes and their rough weight rather than exact one-pixel lines, which suits restyling and \
+recoloring where the layout matters more than every outline.\n\n\
+Its preprocessors are learned edge detectors: HED, PiDiNet and TEED. Their "safe" variants quantize the map into \
+a few levels, which removes a faint grayscale copy of the source image that the plain maps tend to carry."""
+how_it_works = """\
+Soft edge maps come from neural edge detectors trained on images that people outlined by hand, so they mark the \
+boundaries a person would draw and fade off with uncertainty. The ControlNet 1.1 Soft Edge model was trained on \
+HED and PiDiNet maps, 75 percent of them through the "safe" filter, which its author reports makes it far more \
+robust than the 1.0 HED model. During generation the model reads the map at every step and keeps the image close \
+to those boundaries."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Black image with soft white boundary lines that fade from bright to dark."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "cn11_readme",
+    "cn10_readme",
+    "paper_hed",
+    "sdwebui_cn_annotators",
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["SoftEdge"]
 forge = ["SoftEdge"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Recolor or restyle while keeping the composition"
+description = """\
+Soft edges hold the layout of the source image but leave room for new colors, materials and lighting. ControlNet \
+1.0 described its HED model as suited to recoloring and stylizing."""
 
 [choosing]
 guide = ""
