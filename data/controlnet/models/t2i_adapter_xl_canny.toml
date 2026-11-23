@@ -1,8 +1,16 @@
 id = "t2i_adapter_xl_canny"
 label = "T2I-Adapter XL Canny Original"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC's first SDXL T2I-Adapter for Canny edges, from August 2023; later replaced."
+description = """\
+TencentARC's first Canny adapter for SDXL, released on 21 August 2023 with sketch and keypose adapters. It kept \
+the original 77 million parameter recipe, and TencentARC noted that, due to limited computing resources, these \
+adapters still needed improvement.\n\n\
+Its successor, TencentARC/t2i-adapter-canny-sdxl-1.0, came out of a collaboration with Hugging Face in September \
+2023 and was trained from scratch, so the two are separate networks."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. This adapter takes Canny edge maps."""
 base_models = ["sdxl"]
 adapter = "t2i_adapter"
 control_types = ["canny"]
@@ -12,14 +20,18 @@ license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
 strengths = []
-weaknesses = []
+weaknesses = ["Its authors said it still needed improvement"]
 good_for = []
 
-sources = ["hf_tencentarc_t2i_adapter", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "Confirm that these original-format SDXL adapters are separate trainings from the diffusers TencentARC/t2i-adapter-*-sdxl-1.0 releases.",
+sources = [
+    "t2i_adapter_readme",
+    "hf_blog_t2i_sdxl_adapters",
+    "hf_tencentarc_t2i_adapter",
+    "hf_lllyasviel_sd_control_collection",
+    "paper_t2i_adapter",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "adapter-xl-canny.pth"

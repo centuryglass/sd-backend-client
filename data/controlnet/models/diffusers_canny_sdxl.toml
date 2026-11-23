@@ -1,8 +1,16 @@
 id = "diffusers_canny_sdxl"
 label = "Diffusers SDXL Canny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Hugging Face's full-size SDXL ControlNet for Canny edges, trained on LAION in two stages."
+description = """\
+The diffusers team's SDXL ControlNet for Canny edges, at full ControlNet size: 2.5 GB in fp16. It is mirrored in \
+lllyasviel's sd_control_collection as diffusers_xl_canny_full.\n\n\
+Its Mid and Small siblings trade quality on complex maps for size."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. It was trained \
+for 20,000 steps on LAION 6a images at 384 pixels, then 20,000 more on images at least 1024 pixels, which its \
+authors found necessary for image quality."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["canny"]
@@ -15,8 +23,13 @@ strengths = []
 weaknesses = []
 good_for = []
 
-sources = ["hf_diffusers_controlnet_canny_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_diffusers_controlnet_canny_sdxl_1_0",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_blog_t2i_sdxl_adapters",
+    "paper_controlnet",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

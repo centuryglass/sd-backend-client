@@ -1,8 +1,16 @@
 id = "t2iadapter_sketch_sd14v1"
 label = "T2I-Adapter Sketch v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC T2I-Adapter for sketches on SD1.x; small and fast, trained on SD 1.4."
+description = """\
+One of the first T2I-Adapters, from TencentARC's initial SD1.x release. It turns a white-on-black sketch, or \
+edges extracted from an image, into a picture. TencentARC trained it on SD 1.4 and says it works with any model \
+fine-tuned from SD 1.4 or 1.5.\n\n\
+WebUI lists it under the T2I-Adapter type with the t2ia_sketch_pidi preprocessor. An improved version, \
+t2iadapter_sketch_sd15v2, followed in March 2023."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. This adapter takes sketches and sketch-like edge maps."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["scribble", "t2i_adapter"]
@@ -11,19 +19,22 @@ trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
+strengths = ["Small and fast compared with a ControlNet"]
 weaknesses = []
-good_for = []
+good_for = ["turning sketches into images"]
 
 sources = [
+    "t2i_adapter_zoo",
+    "t2i_adapter_readme_sd",
+    "paper_t2i_adapter",
+    "hf_blog_t2i_sdxl_adapters",
     "hf_tencentarc_t2i_adapter",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "sdwebui_cn_preprocessors",
 ]
-research_status = "stub"
-open_questions = [
-    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
-]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "t2iadapter_sketch_sd14v1.pth"

@@ -1,30 +1,63 @@
 id = "scribble_hed"
 label = "Scribble HED"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Turns an image into rough, thick scribble strokes, using HED edges."
+description = """\
+Scribble HED, called Fake Scribble in ComfyUI and in ControlNet 1.0, makes a scribble from an image so the \
+scribble models can use it without anyone drawing. It keeps the main shapes as bold, uneven white strokes and \
+drops all detail, which leaves the model free to reinterpret what is inside each shape."""
+how_it_works = """\
+It runs HED, thins the soft edges down to their ridges, blurs them, and then turns every pixel that is not \
+almost black into full white. The result is a set of thick, hard-edged strokes. ControlNet 1.0 introduced it as \
+"a simple algorithm to synthesize scribbles from input images"."""
 control_types = ["scribble", "sparsectrl"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Keeps main shapes as thick strokes; drops all fine detail."
+output = "Black image with thick white strokes."
+best_input = "Photos and renders with clear main shapes."
 weak_input = ""
 models = [
     "control_v11p_sd15_scribble",
-    "kohya_lllite_fake_scribble_anime_sdxl",
+    "control_sd15_scribble",
     "sparsectrl_scribble_sd15",
+    "xinsir_scribble_sdxl",
 ]
 
 sources = [
+    "cn10_readme",
+    "cn11_readme",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_readme",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["scribble_hed"]
 forge = ["scribble_hed"]
 comfyui = ["FakeScribblePreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "ControlNetHED.pth"
+size_bytes = 29444406
+sha256 = "5ca93762ffd68a29fee1af9d495bf6aab80ae86f08905fb35472a083a4c7a8fa"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/ControlNetHED.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."

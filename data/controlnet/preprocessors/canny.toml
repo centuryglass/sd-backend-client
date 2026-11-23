@@ -1,13 +1,22 @@
 id = "canny"
 label = "Canny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Traces every sharp change in brightness as a thin white line on black."
+description = """\
+Canny draws the outlines of an image as one-pixel white lines on black: object borders, folds, text, patterns \
+and fine texture. It reads only contrast, so a line appears wherever brightness jumps, whether or not that marks \
+a real boundary, and soft gradients leave no line at all.\n\n\
+Busy textures such as grass, hair or film grain can fill the map with clutter. Raise the thresholds to keep only \
+strong edges, or lower them to pick up faint ones. Canny needs no model download."""
+how_it_works = """\
+Canny is a classic image filter from 1986, not a neural network. It blurs the image slightly to suppress noise, \
+measures how steeply brightness changes at each pixel and in which direction, and thins each change down to its \
+sharpest pixel. Two thresholds then decide what stays: changes above the high threshold are kept, changes below \
+the low threshold are dropped, and changes in between are kept only where they connect to a kept line."""
 control_types = ["canny"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Keeps one-pixel outlines of sharp brightness changes and drops color, shading and gradients."
+output = "Black image with white one-pixel edge lines."
+best_input = "Images with clear outlines: photos, renders, product shots, text and line drawings."
+weak_input = "Noisy or low-contrast images, where edges vanish or turn into speckle."
 models = [
     "control_sd15_canny",
     "control_v11p_sd15_canny",
@@ -19,24 +28,69 @@ models = [
     "diffusers_canny_sdxl_mid",
     "diffusers_canny_sdxl_small",
     "xinsir_canny_sdxl",
-    "xinsir_canny_v2_sdxl",
+    "xinsir_scribble_sdxl",
     "sai_control_lora_canny_sdxl",
     "kohya_lllite_canny_sdxl",
     "kohya_lllite_canny_anime_sdxl",
 ]
 
 sources = [
+    "opencv_canny_tutorial",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_src",
+    "comfyui_core_nodes",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
-    "comfyui_core_nodes",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["canny"]
 forge = ["canny"]
 comfyui = ["CannyEdgePreprocessor", "Canny"]
+
+[hardware]
+device = "none"
+speed = "fast: an image filter with no network"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
+
+[[parameters]]
+id = "low_threshold"
+label = "Low Threshold"
+summary = "Edges weaker than this are dropped unless they connect to a strong edge."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "low_threshold" }
+type = "int"
+default = 100
+range = [1, 255]
+effect = """\
+Lower values keep more faint edges connected to strong ones. ComfyUI's core Canny node takes this as a fraction \
+from 0.01 to 0.99, default 0.4, and has no resolution input."""
+when_to_adjust = "Lower it to recover faint outlines. Raise it to clear texture and noise."
+
+[[parameters]]
+id = "high_threshold"
+label = "High Threshold"
+summary = "Edges stronger than this are always kept and anchor the weaker edges they touch."
+names = { webui = "threshold_b", forge = "threshold_b", comfyui = "high_threshold" }
+type = "int"
+default = 200
+range = [1, 255]
+effect = """\
+Higher values keep fewer starting edges, so the whole map thins out. ComfyUI's core Canny node takes this as a \
+fraction from 0.01 to 0.99, default 0.8."""
+when_to_adjust = "Raise it to keep only the strongest outlines. Keep it above the low threshold."

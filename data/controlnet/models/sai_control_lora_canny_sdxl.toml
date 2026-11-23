@@ -1,25 +1,37 @@
 id = "sai_control_lora_canny_sdxl"
 label = "Stability Control-LoRA Canny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Stability AI's SDXL Control-LoRA for Canny edges, a ControlNet compressed to 377 or 738 MB."
+description = """\
+Stability AI's Control-LoRA for Canny edges on SDXL. It brings ControlNet-style Canny control to consumer GPUs \
+at a fraction of a full ControlNet's size: about 738 MB at rank 256, or 377 MB for the experimental rank 128 \
+file. The card describes both as reductions of the original ControlNet, so this record treats them as one \
+network at two ranks. Stability trained the Control-LoRAs on a diverse range of image concepts and aspect \
+ratios.\n\n\
+comfyui_controlnet_aux's PyraCanny source says this model seems to have been trained on Canny maps at \
+non-standard resolutions, and builds multi-scale maps to match."""
+how_it_works = """\
+A Control-LoRA is a ControlNet trained with low-rank adaptation: in place of full weight matrices it stores \
+small low-rank updates, which shrinks a 4.7 GB SDXL ControlNet to about 738 MB at rank 256 or 377 MB at rank \
+128. It is loaded and used like a ControlNet. This one was trained on Canny edges."""
 base_models = ["sdxl"]
 adapter = "control_lora"
 control_types = ["canny"]
-preprocessors = ["canny"]
+preprocessors = ["canny", "pyracanny"]
 trainer = "Stability AI"
 license = "other"
 homepage = "https://huggingface.co/stabilityai/control-lora"
 
-strengths = []
-weaknesses = []
+strengths = ["Much smaller than a full SDXL ControlNet"]
+weaknesses = ["Rank 128 file is experimental"]
 good_for = []
 
-sources = ["hf_stabilityai_control_lora", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "Confirm from the model card whether the rank 128 and rank 256 files are one training at two ranks (files of one record) or separate trainings.",
+sources = [
+    "hf_stabilityai_control_lora",
+    "hf_lllyasviel_sd_control_collection",
+    "comfyui_controlnet_aux_src",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "control-lora-canny-rank128.safetensors"

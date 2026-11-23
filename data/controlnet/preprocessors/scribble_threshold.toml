@@ -1,20 +1,49 @@
 id = "scribble_threshold"
 label = "Scribble Threshold"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ComfyUI only: splits the image into black and white at a fixed brightness of 127."
+description = """\
+Scribble Threshold, the Scribble Lines node in comfyui_controlnet_aux, turns every pixel whose darkest color \
+channel is below 127 black and every other pixel white. That nearly matches WebUI's threshold module at its \
+default setting. It keeps light shapes light, so a dark-on-light drawing stays dark lines on white, which \
+scribble models read as inverted; invert it first for those models.\n\n\
+Its source notes it is not to be confused with HED-based Fake Scribble."""
+how_it_works = "One fixed comparison per pixel, with no network and no adjustable threshold."
 control_types = ["scribble"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
-models = []
+effect = "Keeps light and dark masses as flat white and black at a fixed threshold."
+output = "Black and white image, light areas white."
+best_input = "High-contrast images: silhouettes and scans of ink drawings."
+weak_input = "Photos with soft lighting."
+models = ["control_v11p_sd15_scribble", "control_sd15_scribble"]
 
-sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
-research_status = "stub"
-open_questions = []
+sources = [
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "recorded_fixtures",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "drafted"
+open_questions = [
+    "comfyui_controlnet_aux maps this node to the scribble models, but its output keeps dark strokes dark on white. Confirm by running it whether ComfyUI users need an invert step.",
+]
 
 [names]
 webui = []
 forge = []
 comfyui = ["ScribblePreprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: a per-pixel operation"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."

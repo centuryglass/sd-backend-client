@@ -1,8 +1,13 @@
 id = "diffusers_canny_sdxl_mid"
 label = "Diffusers SDXL Canny Mid"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "A mid-size SDXL Canny ControlNet from Hugging Face, five times smaller than the full model."
+description = """\
+An experimental, smaller SDXL ControlNet for Canny edges from the diffusers team, five times smaller than the \
+full model at 545 MB in fp16. Its card says it works well on most control images, but for more complex ones the \
+bigger checkpoints may do better, and suggests adjusting the conditioning scale and guidance scale."""
+how_it_works = """\
+A smaller ControlNet, initialized from the SDXL U-Net without distillation and with no attention blocks. It was \
+trained on 3 million images from the LAION Aesthetics 6+ subset, batch size 256, for 50,000 steps."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["canny"]
@@ -11,12 +16,12 @@ trainer = "Hugging Face diffusers"
 license = "openrail++"
 homepage = "https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0-mid"
 
-strengths = []
-weaknesses = []
+strengths = ["Five times smaller than the full SDXL Canny ControlNet"]
+weaknesses = ["Experimental", "Complex control images may need a bigger checkpoint"]
 good_for = []
 
 sources = ["hf_diffusers_controlnet_canny_sdxl_1_0_mid", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

@@ -1,8 +1,16 @@
 id = "t2i_adapter_lineart_sdxl"
 label = "T2I-Adapter SDXL Lineart"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC and Hugging Face SDXL T2I-Adapter for line art; small, about 158 MB in fp16."
+description = """\
+An SDXL adapter for line art, white outlines on black, trained by TencentARC and Hugging Face and released in \
+September 2023. Its model card makes the control image with the lineart detector, the one WebUI calls \
+lineart_realistic.\n\n\
+At 79 million parameters it is a small fraction of the size of an SDXL ControlNet."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. The SDXL adapters were trained from scratch on 3 million high-resolution image and \
+caption pairs from LAION-Aesthetics V2, for 20,000 to 35,000 steps at batch size 128."""
 base_models = ["sdxl"]
 adapter = "t2i_adapter"
 control_types = ["lineart"]
@@ -11,12 +19,18 @@ trainer = "TencentARC"
 license = "apache-2.0"
 homepage = "https://huggingface.co/TencentARC/t2i-adapter-lineart-sdxl-1.0"
 
-strengths = []
+strengths = ["About 94 percent smaller than an SDXL ControlNet", "Fast"]
 weaknesses = []
-good_for = []
+good_for = ["coloring line art", "redrawing photos as illustrations"]
 
-sources = ["hf_tencentarc_t2i_adapter_lineart_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_tencentarc_t2i_adapter_lineart_sdxl_1_0",
+    "hf_blog_t2i_sdxl_adapters",
+    "t2i_adapter_readme",
+    "paper_t2i_adapter",
+    "hf_lllyasviel_sd_control_collection",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

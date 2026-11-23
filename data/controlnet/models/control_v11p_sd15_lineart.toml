@@ -1,26 +1,37 @@
 id = "control_v11p_sd15_lineart"
 label = "ControlNet 1.1 Lineart"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The SD1.5 ControlNet 1.1 model for line art, extracted from images or drawn by hand."
+description = """\
+ControlNet 1.1 Lineart generates images that follow a line drawing. Its README demonstrates three inputs: \
+detailed lineart extracted from a photo, coarse lineart, and lines drawn by hand.\n\n\
+It was trained on the awacke1/Image-to-Line-Drawings dataset with enough data augmentation to accept manually \
+drawn lines."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on line drawings paired with images."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["lineart"]
-preprocessors = ["lineart_realistic", "lineart_coarse"]
+preprocessors = ["lineart_realistic", "lineart_coarse", "lineart_standard", "anyline"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = ["Accepts hand-drawn lines as well as extracted ones"]
 weaknesses = []
-good_for = []
+good_for = ["coloring line art", "redrawing photos as illustrations"]
 
 sources = [
+    "cn11_readme",
     "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

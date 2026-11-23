@@ -1,26 +1,78 @@
 id = "lineart_standard"
 label = "Lineart Standard"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Pulls the dark lines out of an existing drawing with a blur filter, no neural network."
+description = """\
+Lineart Standard extracts the lines already drawn in an image: each dark stroke on a light background becomes a \
+white line on black, at a weight matching how dark it was. It does not invent lines, so it suits clean line art, \
+manga pages and sketches, where it keeps the artist's own strokes. On a photo it picks up dark edges and shadows \
+only.\n\n\
+WebUI labels it "lineart_standard (from white bg & black line)" and gives it top priority among the lineart \
+preprocessors. AnyLine builds on it."""
+how_it_works = """\
+The image is blurred, and each pixel is compared with its blurred surroundings. A pixel darker than its \
+neighborhood counts as line, with strength set by how much darker it is. The strengths are scaled by their \
+median and clipped, so typical lines come out mid-gray to white whatever the drawing's contrast."""
 control_types = ["lineart"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
-models = []
+effect = "Keeps existing dark strokes at their drawn weight; flat areas become black."
+output = "Black image with white to gray lines where the input had dark strokes."
+best_input = "Black-on-white line art, inked drawings, manga and pencil sketches."
+weak_input = "Photos, where it keeps only dark edges and shadows."
+models = ["control_v11p_sd15_lineart"]
 
 sources = [
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["lineart_standard", "lineart_standard (from white bg & black line)"]
 forge = ["lineart_standard (from white bg & black line)"]
 comfyui = ["LineartStandardPreprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: a blur and arithmetic, no network"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
+
+[[parameters]]
+id = "gaussian_sigma"
+label = "Gaussian Sigma"
+summary = "How wide the blur is that each pixel is compared against."
+names = { comfyui = "guassian_sigma" }
+type = "float"
+default = 6.0
+range = [0, 100]
+effect = """\
+Wider blurs pick up thicker strokes; narrower ones keep only thin lines. WebUI fixes it at 6. ComfyUI spells the \
+input "guassian_sigma"."""
+when_to_adjust = "Raise it for drawings with heavy strokes. Lower it for fine pen work."
+
+[[parameters]]
+id = "intensity_threshold"
+label = "Intensity Threshold"
+summary = "How much darker than its surroundings a pixel must be to count when scaling lines."
+names = { comfyui = "intensity_threshold" }
+type = "int"
+default = 8
+range = [0, 16]
+effect = "Sets which pixels set the median that line strength is scaled by. WebUI fixes it at 8."
+when_to_adjust = "Rarely needed. Raise it if paper texture or noise makes the lines come out faint."

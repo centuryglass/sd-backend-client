@@ -1,8 +1,18 @@
 id = "control_sd15_canny"
 label = "ControlNet 1.0 Canny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The original SD1.5 ControlNet for Canny edges, superseded by ControlNet 1.1 Canny."
+description = """\
+ControlNet 1.0 Canny was released with the ControlNet paper in February 2023. It generates images whose edges \
+follow a Canny edge map, and its README demonstrates adjusting the Canny thresholds for more or fewer edges.\n\n\
+The ControlNet 1.1 README lists problems in the 1.0 training set: a small group of grayscale human images \
+duplicated thousands of times, which made 1.0 models somewhat likely to generate grayscale people, plus blurry \
+or JPEG-damaged images and some mismatched captions. ControlNet 1.1 Canny was resumed from this model and \
+retrained on cleaned data."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on Canny edge maps."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["canny"]
@@ -12,15 +22,18 @@ license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet"
 
 strengths = []
-weaknesses = []
-good_for = []
+weaknesses = ["Training-set flaws fixed in ControlNet 1.1, such as a pull toward grayscale people"]
+good_for = ["reproducing older ControlNet 1.0 results"]
 
 sources = [
     "hf_lllyasviel_controlnet",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

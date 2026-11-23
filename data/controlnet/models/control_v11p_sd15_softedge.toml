@@ -1,26 +1,41 @@
 id = "control_v11p_sd15_softedge"
 label = "ControlNet 1.1 Soft Edge"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The SD1.5 ControlNet 1.1 model for soft edges from HED or PiDiNet; far more robust than 1.0 HED."
+description = """\
+ControlNet 1.1 Soft Edge follows soft boundary maps from HED or PiDiNet, plain or "safe". It replaces ControlNet \
+1.0 HED, and its README urges all users to update.\n\n\
+The 1.0 model learned to restore a hidden grayscale copy of the image inside HED maps. This one was trained with \
+75 percent of its maps passed through the safe filter, which removes that copy, and its author reports it as \
+usable as the depth model. The README recommends PiDiNet as the default preprocessor."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on HED and PiDiNet maps, most of them quantized by the safe filter."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["softedge"]
-preprocessors = ["hed", "hed_safe", "pidinet", "pidinet_safe"]
+preprocessors = ["pidinet", "pidinet_safe", "hed", "hed_safe", "teed"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "Much more robust than ControlNet 1.0 HED, per its README",
+    "Trained on a cleaned dataset that fixes the 1.0 grayscale, quality and caption problems",
+]
 weaknesses = []
-good_for = []
+good_for = ["restyling", "recoloring", "keeping composition loosely"]
 
 sources = [
+    "cn11_readme",
     "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

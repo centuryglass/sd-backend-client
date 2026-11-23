@@ -1,28 +1,67 @@
 id = "binary"
 label = "Binary Threshold"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Turns the image into pure black and white: pixels above a brightness threshold become white."
+description = """\
+Binary Threshold reduces an image to two values. Pixels brighter than the threshold become white and the rest \
+become black, which gives a hard-edged silhouette or stencil of the source. It keeps light shapes light, so a \
+dark-on-light drawing stays dark lines on white; invert it, or use Invert, for models that read white lines.\n\n\
+The two backends differ. WebUI compares the darkest of the three color channels with the threshold, default 127, \
+and lists the preprocessor under All rather than any control type. comfyui_controlnet_aux converts to grayscale \
+first, defaults to 100, and picks a threshold automatically when it is set to 0 or 255."""
+how_it_works = """\
+Each pixel is compared with one threshold value and set to full white or full black. No network is involved. \
+ComfyUI's automatic mode uses Otsu's method, which picks the threshold that best separates the image's light and \
+dark pixels."""
 control_types = ["scribble"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
-models = []
+effect = "Keeps the light and dark masses of the image as flat white and black; drops all gradients."
+output = "Black and white image, light areas white."
+best_input = "High-contrast images: silhouettes, logos, scans of ink drawings."
+weak_input = "Photos with soft lighting, which break into blotches."
+models = ["control_sd15_scribble"]
 
 sources = [
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
-open_questions = [
-    "Confirm that comfyui_controlnet_aux BinaryPreprocessor and the WebUI \"threshold\" module apply the same binarization.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["threshold"]
 forge = ["threshold"]
 comfyui = ["BinaryPreprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: a per-pixel operation"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
+
+[[parameters]]
+id = "threshold"
+label = "Binarization Threshold"
+summary = "Brightness above which a pixel becomes white."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "bin_threshold" }
+type = "int"
+default = 127
+range = [0, 255]
+effect = """\
+Lower values turn more of the image white. ComfyUI defaults to 100 and uses Otsu's automatic threshold at 0 or \
+255."""
+when_to_adjust = "Move it until the shapes you want separate cleanly from the background."

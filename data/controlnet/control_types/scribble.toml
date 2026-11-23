@@ -1,21 +1,52 @@
 id = "scribble"
 label = "Scribble"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Turns rough strokes or doodles into a finished image that follows their shapes."
+description = """\
+Scribble follows rough, thick strokes, such as a quick doodle or a sketch made with a mouse. It keeps the \
+placement and general shapes of the strokes but not their exact paths, and the prompt fills in what the strokes \
+stand for. Its preprocessors make scribble-like maps from images, which turns a photo into a loose composition \
+guide.\n\n\
+Draw white strokes on black, or invert a black-on-white sketch. Thick strokes are fine: the ControlNet 1.1 model \
+was trained on strokes up to 24 pixels wide on a 512 pixel canvas. Forge lists this type twice, as Scribble and \
+Sketch, with the same preprocessors and models."""
+how_it_works = """\
+Scribble models are trained on synthetic scribbles: edge maps from HED, PiDiNet or similar detectors that are \
+thinned, blurred, thresholded and randomly thickened until they look hand drawn. Learning from these loose maps \
+teaches the model to treat lines as rough placement rather than exact outlines. During generation it reads the \
+strokes at every step and steers the image so its shapes sit where the strokes are."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Black image with white strokes of any thickness."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
-open_questions = [
-    "Forge, reForge and Forge Neo list \"Scribble\" and \"Sketch\" as separate types with overlapping preprocessors and models. Is Sketch a distinct control type, or an alias kept for T2I-Adapter sketch models?",
+sources = [
+    "cn11_readme",
+    "hf_lllyasviel_controlnet",
+    "cn10_readme",
+    "sdwebui_cn_preprocessors",
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
 ]
+research_status = "drafted"
+open_questions = []
 
 [names]
 webui = ["Scribble"]
 forge = ["Scribble", "Sketch"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Sketch a composition, then render it"
+description = """\
+Block out shapes with a few strokes and describe them in the prompt. The model keeps the layout and fills in the \
+detail."""
+
+[[uses]]
+kind = "creative"
+title = "Loosen a photo into a new picture"
+description = """\
+Run a photo through scribble_hed or scribble_pidinet to keep only its rough shapes, then prompt for a different \
+scene with the same layout."""
 
 [choosing]
 guide = ""

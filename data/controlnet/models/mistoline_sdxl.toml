@@ -1,8 +1,18 @@
 id = "mistoline_sdxl"
 label = "MistoLine"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TheMistoAI's SDXL ControlNet for any kind of line art, made to pair with the AnyLine preprocessor."
+description = """\
+MistoLine is an SDXL ControlNet that adapts to any kind of line art: hand-drawn sketches, the output of the \
+various ControlNet line preprocessors, and model-generated outlines. Its authors made it so one model can \
+replace separate models for each line preprocessor, and it pairs with their AnyLine preprocessor. It generates \
+best at a short side above 1024 pixels.\n\n\
+It works with most SDXL checkpoints, but not PlaygroundV2.5 or CosXL, and possibly not SDXL-Lightning. Its card \
+says the rank 256 control-LoRA version performs better than the fp16 file."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. MistoLine keeps \
+lllyasviel's ControlNet architecture and was retrained from the SDXL base U-Net on maps from AnyLine."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["lineart", "softedge", "scribble"]
@@ -11,13 +21,21 @@ trainer = "TheMistoAI"
 license = "openrail++"
 homepage = "https://huggingface.co/TheMistoAI/MistoLine"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "One model for many line styles",
+    "Rank 256 file performs better than fp16, per its card",
+]
+weaknesses = ["Not compatible with PlaygroundV2.5 or CosXL"]
+good_for = ["line art of any style", "sketch to image"]
 
-sources = ["hf_themistoai_mistoline"]
-research_status = "stub"
-open_questions = ["List the control types the model card names, and check them against control_types."]
+sources = [
+    "hf_themistoai_mistoline",
+    "anyline_readme",
+    "comfyui_controlnet_aux_readme",
+    "paper_controlnet",
+]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "mistoLine_fp16.safetensors"

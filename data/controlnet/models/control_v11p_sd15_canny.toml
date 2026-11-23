@@ -1,8 +1,17 @@
 id = "control_v11p_sd15_canny"
 label = "ControlNet 1.1 Canny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The SD1.5 ControlNet 1.1 model for Canny edge maps; a production-ready update of 1.0 Canny."
+description = """\
+ControlNet 1.1 Canny generates images whose edges follow a Canny edge map. It is one of the 11 production-ready \
+ControlNet 1.1 models.\n\n\
+Resumed from Canny 1.0, it was retrained on a cleaned dataset with Canny maps at random thresholds and random \
+left-right flips, for three days on eight A100 GPUs. Its author finds it a bit more robust and a bit higher in \
+visual quality than 1.0. comfyanonymous hosts fp16 and rank 128 control-LoRA copies."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on Canny maps made with random thresholds."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["canny"]
@@ -11,16 +20,21 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "A bit more robust and higher quality than ControlNet 1.0 Canny, per its README",
+    "Trained on a cleaned dataset that fixes the 1.0 grayscale, quality and caption problems",
+]
 weaknesses = []
-good_for = []
+good_for = ["restyling photos while keeping outlines", "line art coloring after inverting"]
 
 sources = [
+    "cn11_readme",
     "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

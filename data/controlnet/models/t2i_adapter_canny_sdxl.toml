@@ -1,8 +1,16 @@
 id = "t2i_adapter_canny_sdxl"
 label = "T2I-Adapter SDXL Canny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC and Hugging Face SDXL T2I-Adapter for Canny edges; small, about 158 MB in fp16."
+description = """\
+An SDXL adapter for Canny edge maps, white edges on black, trained by TencentARC and Hugging Face and released \
+in September 2023. At 79 million parameters and 158 MB it is about 6 percent of the size of the diffusers SDXL \
+Canny ControlNet.\n\n\
+It replaces TencentARC's first SDXL Canny adapter."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. The SDXL adapters were trained from scratch on 3 million high-resolution image and \
+caption pairs from LAION-Aesthetics V2, for 20,000 to 35,000 steps at batch size 128."""
 base_models = ["sdxl"]
 adapter = "t2i_adapter"
 control_types = ["canny"]
@@ -11,12 +19,18 @@ trainer = "TencentARC"
 license = "apache-2.0"
 homepage = "https://huggingface.co/TencentARC/t2i-adapter-canny-sdxl-1.0"
 
-strengths = []
+strengths = ["About 94 percent smaller than an SDXL ControlNet", "Fast"]
 weaknesses = []
-good_for = []
+good_for = ["restyling while keeping outlines"]
 
-sources = ["hf_tencentarc_t2i_adapter_canny_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_tencentarc_t2i_adapter_canny_sdxl_1_0",
+    "hf_blog_t2i_sdxl_adapters",
+    "t2i_adapter_readme",
+    "paper_t2i_adapter",
+    "hf_lllyasviel_sd_control_collection",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

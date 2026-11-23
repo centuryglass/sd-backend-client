@@ -1,20 +1,68 @@
 id = "pyracanny"
 label = "PyraCanny"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Canny run at nine scales and blended, giving graded edges that mark structure at every size."
+description = """\
+PyraCanny is a ComfyUI-only Canny variant. Instead of one map of one-pixel lines, it blends Canny edges found at \
+nine image sizes into a gray-to-white map, where an edge that shows up at many sizes is brighter. Large shapes \
+and fine detail both survive, and the map looks softer than plain Canny.\n\n\
+Its source code says it was written for the Stability AI Canny control-LoRA, which appears to have been trained \
+on Canny maps of varied resolutions. Its default thresholds, 64 and 128, are lower than plain Canny's."""
+how_it_works = """\
+PyraCanny shrinks the image to nine sizes, from 20 to 100 percent, and runs Canny separately on each color \
+channel at each size. Starting from the smallest, it enlarges the running result to the next size and blends in \
+that size's edges at one quarter weight. The three channels are then summed and stretched so the darkest 1 \
+percent becomes black and the brightest 1 percent white."""
 control_types = ["canny"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
-models = []
+effect = "Keeps edges from coarse to fine as graded brightness, softer than a plain Canny map."
+output = "Black image with gray to white edge lines."
+best_input = "Photos and renders where both large shapes and fine detail matter."
+weak_input = "Noisy images: each scale adds its own speckle."
+models = ["sai_control_lora_canny_sdxl"]
 
-sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
-research_status = "stub"
+sources = ["comfyui_controlnet_aux_src", "recorded_fixtures", "comfyui_controlnet_aux_nodes"]
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = []
 forge = []
 comfyui = ["PyraCannyPreprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: nine passes of an image filter, no network"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value before the pyramid is built. Larger values keep finer \
+detail."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
+
+[[parameters]]
+id = "low_threshold"
+label = "Low Threshold"
+summary = "Canny low threshold used at every scale."
+names = { comfyui = "low_threshold" }
+type = "int"
+default = 64
+range = [0, 255]
+effect = "Lower values keep more faint edges at every scale."
+when_to_adjust = "Lower it to recover faint outlines. Raise it to clear texture."
+
+[[parameters]]
+id = "high_threshold"
+label = "High Threshold"
+summary = "Canny high threshold used at every scale."
+names = { comfyui = "high_threshold" }
+type = "int"
+default = 128
+range = [0, 255]
+effect = "Higher values keep fewer starting edges at every scale."
+when_to_adjust = "Raise it to keep only strong outlines."

@@ -1,8 +1,17 @@
 id = "control_sd15_mlsd"
 label = "ControlNet 1.0 MLSD"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The original SD1.5 ControlNet for M-LSD straight lines, superseded by ControlNet 1.1 MLSD."
+description = """\
+ControlNet 1.0 MLSD follows maps of straight line segments detected by M-LSD. Its model card says it also works \
+with lines from a traditional Hough transform.\n\n\
+The ControlNet 1.1 README lists problems in the 1.0 training set: a small group of grayscale human images \
+duplicated thousands of times, which made 1.0 models somewhat likely to generate grayscale people, plus blurry \
+or JPEG-damaged images and some mismatched captions."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on M-LSD line maps."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["mlsd"]
@@ -11,16 +20,19 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Accepts Hough-transform lines as well as M-LSD lines"]
+weaknesses = ["Training-set flaws fixed in ControlNet 1.1"]
+good_for = ["architecture", "interiors"]
 
 sources = [
     "hf_lllyasviel_controlnet",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

@@ -1,25 +1,129 @@
 id = "anyline"
 label = "AnyLine"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Combines TEED soft edges with Lineart Standard for crisp, detailed lines, made for MistoLine."
+description = """\
+AnyLine, from the makers of MistoLine, extracts object edges, fine detail and text from most images as clean \
+lines. It runs at 1280 pixels by default, higher than other line preprocessors, and its authors report better \
+contour accuracy and text, and less noise, than common line preprocessors. They also report trouble with blurry \
+or soft-focus images.\n\n\
+It forms a pair with the MistoLine SDXL model and also works with SD1.5 lineart models. WebUI lists it as \
+softedge_anyline; ComfyUI ships it in comfyui_controlnet_aux."""
+how_it_works = """\
+AnyLine runs the TEED edge network with its own weights, MTEED, and merges in a detail layer from Lineart \
+Standard after removing specks smaller than 36 pixels. ComfyUI runs that Lineart Standard pass with a narrower \
+blur, sigma 2, and can take the detail layer from another lineart preprocessor instead."""
 control_types = ["lineart", "softedge"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
-models = ["mistoline_sdxl"]
+effect = "Keeps edges, fine detail and text as crisp lines; removes small specks."
+output = "Black image with white lines."
+best_input = "Photos and illustrations with clear structure and text."
+weak_input = "Blurry or soft-focus images."
+models = ["mistoline_sdxl", "control_v11p_sd15_lineart", "control_v11p_sd15s2_lineart_anime"]
 
 sources = [
+    "anyline_readme",
+    "hf_themistoai_mistoline",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_readme",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
-open_questions = []
+research_status = "drafted"
+open_questions = [
+    "WebUI keeps detail-layer pixels between 0 and 1 on a 0 to 255 scale, where ComfyUI uses the same bounds on a 0 to 1 scale. Check by running both whether WebUI drops the Lineart Standard layer.",
+]
 
 [names]
 webui = ["softedge_anyline"]
 forge = []
 comfyui = ["AnyLineArtPreprocessor_aux"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "MTEED.pth"
+size_bytes = 248298
+sha256 = "a3c2d8a8ce9422555c787160bd46362d761325a565333c0e3f6a53e0bae2abdb"
+source_url = "https://huggingface.co/TheMistoAI/MistoLine/resolve/1d9d0b3d48b295cf70d80a0f839a3055672f8393/Anyline/MTEED.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 1280
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value before processing. AnyLine's authors compare \
+preprocessors at 1280. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
+
+[[parameters]]
+id = "safe_steps"
+label = "Safe Steps"
+summary = "Number of flat levels the TEED edges are quantized into; 0 turns quantizing off."
+names = { webui = "threshold_a", forge = "threshold_a" }
+type = "int"
+default = 2
+range = [0, 10]
+effect = """\
+Quantizes the edge map into a few flat levels, which removes the faint grayscale copy of the source image hidden \
+in plain soft edge maps. Higher values keep more gradation."""
+when_to_adjust = "Leave it at 2 unless faint edges are missing."
+
+[[parameters]]
+id = "merge_with_lineart"
+label = "Merge With Lineart"
+summary = "Which lineart preprocessor supplies the detail layer."
+names = { comfyui = "merge_with_lineart" }
+type = "enum"
+default = "lineart_standard"
+choices = ["lineart_standard", "lineart_realisitic", "lineart_anime", "manga_line"]
+effect = "WebUI always uses lineart_standard. ComfyUI spells the second choice \"lineart_realisitic\"."
+when_to_adjust = "Try the anime or manga options on illustrations."
+
+[[parameters]]
+id = "lineart_lower_bound"
+label = "Lineart Lower Bound"
+summary = "Darkest detail-layer value kept, as a fraction."
+names = { comfyui = "lineart_lower_bound" }
+type = "float"
+default = 0
+range = [0, 1]
+effect = "Detail-layer pixels outside the bounds are dropped before merging."
+when_to_adjust = "Narrow the bounds to keep fewer detail lines."
+
+[[parameters]]
+id = "lineart_upper_bound"
+label = "Lineart Upper Bound"
+summary = "Brightest detail-layer value kept, as a fraction."
+names = { comfyui = "lineart_upper_bound" }
+type = "float"
+default = 1
+range = [0, 1]
+effect = "Detail-layer pixels outside the bounds are dropped before merging."
+when_to_adjust = "Narrow the bounds to keep fewer detail lines."
+
+[[parameters]]
+id = "object_min_size"
+label = "Object Min Size"
+summary = "Detail-layer specks smaller than this many pixels are removed."
+names = { comfyui = "object_min_size" }
+type = "int"
+default = 36
+range = [1, 16384]
+effect = "Larger values remove more small marks. WebUI fixes it at 36."
+when_to_adjust = "Raise it if the map shows noise specks. Lower it if small detail disappears."
+
+[[parameters]]
+id = "object_connectivity"
+label = "Object Connectivity"
+summary = "How pixels are grouped when measuring speck size."
+names = { comfyui = "object_connectivity" }
+type = "int"
+default = 1
+range = [1, 16384]
+effect = "At 1 only side-touching pixels form one speck; higher values also join diagonal neighbors."
+when_to_adjust = "Rarely needed."

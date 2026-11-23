@@ -1,19 +1,51 @@
 id = "lineart"
 label = "Lineart"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Follows a clean line drawing: either one you drew or one extracted from an image."
+description = """\
+Lineart follows a line drawing of the subject, the kind an illustrator inks before coloring. Its preprocessors \
+turn a photo, render or illustration into clean lines, keeping contours and the main interior lines while \
+dropping most texture. Lineart models also accept lines drawn by hand.\n\n\
+Choose the preprocessor by the source image: realistic or coarse for photos, anime or manga for illustrations, \
+and standard for an existing black-on-white drawing. The SD1.5 anime lineart model is a separate network that \
+pairs with the anime preprocessors and anime checkpoints."""
+how_it_works = """\
+Lineart preprocessors are small image-to-image networks trained to redraw a picture as lines, except \
+lineart_standard, which is a plain image filter. The ControlNet 1.1 lineart model was trained on the \
+awacke1/Image-to-Line-Drawings dataset with heavy data augmentation, so it accepts hand-drawn lines as well as \
+extracted ones. As with every line control, the model reads white lines on black and steers each denoising step \
+so the image keeps those lines."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Black image with white lines of varying weight, like inverted ink line art."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "cn11_readme",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_readme",
+    "hf_tencentarc_t2i_adapter_lineart_sdxl_1_0",
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Lineart"]
 forge = ["Lineart"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Color and render your own line art"
+description = """\
+Use lineart_standard or invert on a black-on-white drawing, then prompt for colors, lighting and style."""
+
+[[uses]]
+kind = "creative"
+title = "Redraw a photo as an illustration"
+description = """\
+Extract lineart from a photo and generate with an illustration checkpoint, keeping the photo's shapes in a drawn \
+style."""
 
 [choosing]
 guide = ""

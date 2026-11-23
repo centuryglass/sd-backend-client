@@ -1,24 +1,35 @@
 id = "lineart_coarse"
 label = "Lineart Coarse"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Redraws a photo as bold, simplified line art, keeping main shapes and dropping small detail."
+description = """\
+Lineart Coarse is the rougher sibling of Lineart Realistic: it draws thicker, fewer lines and leaves out small \
+detail, closer to a quick ink sketch than a careful tracing. That gives the model more freedom inside each \
+shape. The ControlNet 1.1 lineart model accepts both, and its README demonstrates each.\n\n\
+In ComfyUI it is the Realistic Lineart node with coarse enabled."""
+how_it_works = """\
+It runs the same generator network as Lineart Realistic with a second set of weights, sk_model2.pth, that \
+produces coarser lines. WebUI inverts the result into white lines on black."""
 control_types = ["lineart"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Keeps major contours as bold lines; drops fine detail and texture."
+output = "Black image with thick white lines."
+best_input = "Photos and renders where only the main shapes matter."
 weak_input = ""
 models = ["control_v11p_sd15_lineart"]
 
 sources = [
+    "cn11_readme",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_readme",
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
-open_questions = []
+research_status = "drafted"
+open_questions = [
+    "Find where sk_model2.pth comes from and what it was trained on (see lineart_realistic).",
+]
 
 [names]
 webui = ["lineart_coarse"]
@@ -27,3 +38,25 @@ comfyui = ["LineArtPreprocessor"]
 
 [name_parameters]
 comfyui = { coarse = "enable" }
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "sk_model2.pth"
+size_bytes = 17173511
+sha256 = "30a534781061f34e83bb9406b4335da4ff2616c95d22a585c1245aa8363e74e0"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/sk_model2.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it toward the generation's short side for finer lines. Lower it for bolder, simpler maps."
