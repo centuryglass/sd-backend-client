@@ -1,0 +1,45 @@
+id = "diffusers_depth_sdxl_small"
+label = "Diffusers SDXL Depth Small"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["depth"]
+preprocessors = ["depth_midas"]
+trainer = "Hugging Face diffusers"
+license = "openrail++"
+homepage = "https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0-small"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_diffusers_controlnet_depth_sdxl_1_0_small", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 640459467
+sha256 = "a8e62b40b28f8a444a778c9d4afd11183778cec03916afe07a959d0601053b85"
+webui_hash = "c63f0d9a"
+source_url = "https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0-small/resolve/daf3835d036574dff7c158882e8e77b75b024ee5/diffusion_pytorch_model.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 320237179
+sha256 = "6f23c58fd632f52238a7b35ebdc02f9f596fd13dbaa121f9b37b9f4689c2b1e9"
+webui_hash = "45c68551"
+source_url = "https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0-small/resolve/daf3835d036574dff7c158882e8e77b75b024ee5/diffusion_pytorch_model.fp16.safetensors"
+
+[[files]]
+filename = "diffusers_xl_depth_small.safetensors"
+format = "safetensors"
+size_bytes = 320237152
+sha256 = "21d185b6b3c5f49e6e3418be4cd6e06dbae5479b85ab37d79e6a08c40ffdea36"
+webui_hash = "c95f3c5c"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/diffusers_xl_depth_small.safetensors"

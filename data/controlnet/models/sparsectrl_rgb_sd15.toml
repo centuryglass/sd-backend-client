@@ -1,0 +1,28 @@
+id = "sparsectrl_rgb_sd15"
+label = "SparseCtrl RGB"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "other"
+control_types = ["sparsectrl"]
+preprocessors = []
+trainer = "guoyww"
+license = "apache-2.0"
+homepage = "https://huggingface.co/guoyww/animatediff"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_guoyww_animatediff"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "v3_sd15_sparsectrl_rgb.ckpt"
+format = "ckpt"
+size_bytes = 1988040333
+sha256 = "c93f27a3cd15edf99bbddf4522509f2e831f515cc7db9c820d955037ddafbe45"
+webui_hash = "a38c0f9b"
+source_url = "https://huggingface.co/guoyww/animatediff/resolve/fdfe36afa161e51b3e9c24022b0e368d59e7345e/v3_sd15_sparsectrl_rgb.ckpt"

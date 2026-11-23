@@ -1,0 +1,36 @@
+id = "qrcode_monster_v2_sd15"
+label = "QR Code Monster V2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["qr_code"]
+preprocessors = []
+trainer = "monster-labs"
+license = "openrail++"
+homepage = "https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_monster_labs_control_v1p_sd15_qrcode_monster"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v1p_sd15_qrcode_monster_v2.safetensors"
+format = "safetensors"
+size_bytes = 722596344
+sha256 = "fc985da5850a03033c9e28032532f406ae04bd127178ae5bc6d3ec0502b25253"
+webui_hash = "5e5778cb"
+source_url = "https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster/resolve/560fb7b15d0badb409f8cd578a2bfe63bd4b8046/v2/control_v1p_sd15_qrcode_monster_v2.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 1445157120
+sha256 = "a95dc35dfff997bd9c751a97db4959db1235f5776ef5e453d468c602c7998794"
+webui_hash = "46725ab4"
+source_url = "https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster/resolve/560fb7b15d0badb409f8cd578a2bfe63bd4b8046/v2/diffusion_pytorch_model.safetensors"

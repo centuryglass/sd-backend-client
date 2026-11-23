@@ -1,0 +1,48 @@
+id = "openpose"
+label = "OpenPose"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["OpenPose"]
+forge = ["OpenPose"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = [
+    "openpose",
+    "openpose_face",
+    "openpose_faceonly",
+    "openpose_full",
+    "openpose_hand",
+    "dw_openpose_full",
+    "animal_openpose",
+    "densepose",
+    "densepose_parula",
+    "mediapipe_face",
+]
+models = [
+    "control_sd15_openpose",
+    "control_v11p_sd15_openpose",
+    "t2iadapter_keypose_sd14v1",
+    "t2iadapter_openpose_sd14v1",
+    "t2i_adapter_openpose_sdxl",
+    "t2i_adapter_xl_openpose",
+    "xinsir_openpose_sdxl",
+    "xinsir_openpose_twins_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+    "thibaud_openpose_xl2",
+    "kohya_lllite_pose_anime_sdxl",
+    "kohya_lllite_pose_anime_v2_sdxl",
+    "crucibleai_mediapipe_face_sd15",
+]

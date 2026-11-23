@@ -1,0 +1,58 @@
+id = "sai_control_lora_sketch_sdxl"
+label = "Stability Control-LoRA Sketch"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "control_lora"
+control_types = ["scribble"]
+preprocessors = []
+trainer = "Stability AI"
+license = "other"
+homepage = "https://huggingface.co/stabilityai/control-lora"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_stabilityai_control_lora", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "Confirm from the model card whether the rank 128 and rank 256 files are one training at two ranks (files of one record) or separate trainings.",
+]
+
+[[files]]
+filename = "control-lora-sketch-rank128-metadata.safetensors"
+format = "safetensors"
+size_bytes = 395738399
+sha256 = "679c616807aec73c47bb7281a24a76ddfe52fa5b5d68532f542ab813347b2eae"
+webui_hash = "6ca161b8"
+source_url = "https://huggingface.co/stabilityai/control-lora/resolve/75590eb0e7868d3d0f1581b5126d487b33c7fdb4/control-LoRAs-rank128/control-lora-sketch-rank128-metadata.safetensors"
+variant = "rank 128"
+
+[[files]]
+filename = "control-lora-sketch-rank256.safetensors"
+format = "safetensors"
+size_bytes = 774454911
+sha256 = "cf741a672fc3f753956260cb16101250f16c3c5bb3690a3d736bef66eafa7515"
+webui_hash = "759a4f90"
+source_url = "https://huggingface.co/stabilityai/control-lora/resolve/75590eb0e7868d3d0f1581b5126d487b33c7fdb4/control-LoRAs-rank256/control-lora-sketch-rank256.safetensors"
+variant = "rank 256"
+
+[[files]]
+filename = "sai_xl_sketch_128lora.safetensors"
+format = "safetensors"
+size_bytes = 395706528
+sha256 = "1828f7c14e4dbc252f6a101b27542695a31911defd44c457817a80f8a53b73b6"
+webui_hash = "b06d459a"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sai_xl_sketch_128lora.safetensors"
+variant = "rank 128"
+
+[[files]]
+filename = "sai_xl_sketch_256lora.safetensors"
+format = "safetensors"
+size_bytes = 774423040
+sha256 = "0e06faf9a2df1a0d62c72c7f968282f45c34fb562eecb193beca5eb964ccb13e"
+webui_hash = "cd3389b1"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sai_xl_sketch_256lora.safetensors"
+variant = "rank 256"

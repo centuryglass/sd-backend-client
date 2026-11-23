@@ -1,0 +1,51 @@
+id = "control_v11p_sd15_softedge"
+label = "ControlNet 1.1 Soft Edge"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["softedge"]
+preprocessors = ["hed", "hed_safe", "pidinet", "pidinet_safe"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v11p_sd15_softedge.pth"
+format = "pth"
+size_bytes = 1445235707
+sha256 = "20759ef71a109c4796e637d86eea8db492ec9772b6d5cb7a9afd077847b403f3"
+webui_hash = "a8575a2a"
+source_url = "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/69fc48b9cbd98661f6d0288dc59b59a5ccb32a6b/control_v11p_sd15_softedge.pth"
+
+[[files]]
+filename = "control_v11p_sd15_softedge_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601100
+sha256 = "e78fea5b4599fec2ecd7e3f14b171feb290b88200c95d569ec0ff59a19bc3478"
+webui_hash = "f616a34f"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11p_sd15_softedge_fp16.safetensors"
+
+[[files]]
+filename = "control_lora_rank128_v11p_sd15_softedge_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 135722816
+sha256 = "010892aca91ec3028eb66b34b6ba3079a6db54da85ed4b08f172e0d06af9b17d"
+webui_hash = "918f47aa"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_lora_rank128_v11p_sd15_softedge_fp16.safetensors"
+variant = "rank 128 control-LoRA extraction"

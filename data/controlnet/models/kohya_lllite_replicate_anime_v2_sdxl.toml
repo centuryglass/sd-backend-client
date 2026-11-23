@@ -1,0 +1,28 @@
+id = "kohya_lllite_replicate_anime_v2_sdxl"
+label = "LLLite SDXL Replicate Anime V2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet_lllite"
+control_types = []
+preprocessors = []
+trainer = "kohya-ss"
+license = "apache-2.0"
+homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_kohya_ss_controlnet_lllite"]
+research_status = "stub"
+open_questions = ["Find what control image the \"replicate\" models take, and which control type they fit."]
+
+[[files]]
+filename = "controllllite_v01032064e_sdxl_replicate_anime_v2.safetensors"
+format = "safetensors"
+size_bytes = 46174136
+sha256 = "6ac9be7cd6ea7b857cd62604ebcc7acc625bf9feb6e78ce387a9dba6dc78fa3c"
+webui_hash = "558d0645"
+source_url = "https://huggingface.co/kohya-ss/controlnet-lllite/resolve/d14d1353be5a2326229d83e14f9b3c11f3a671bd/controllllite_v01032064e_sdxl_replicate_anime_v2.safetensors"

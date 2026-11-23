@@ -1,0 +1,26 @@
+id = "instant_id_face_embedding"
+label = "InstantID Face Embedding"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["instant_id"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["instantid_ip_adapter_sdxl"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["instant_id_face_embedding"]
+forge = ["InsightFace (InstantID)", "instant_id_face_embedding"]
+comfyui = []

@@ -1,0 +1,28 @@
+id = "sparsectrl_scribble_sd15"
+label = "SparseCtrl Scribble"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "other"
+control_types = ["sparsectrl"]
+preprocessors = ["scribble_pidinet", "scribble_xdog", "scribble_hed"]
+trainer = "guoyww"
+license = "apache-2.0"
+homepage = "https://huggingface.co/guoyww/animatediff"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_guoyww_animatediff"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "v3_sd15_sparsectrl_scribble.ckpt"
+format = "ckpt"
+size_bytes = 1992335697
+sha256 = "148399d3267e104bee1b1171100af0ad7e125c4f99aacada21342d778eaf3896"
+webui_hash = "f5b726de"
+source_url = "https://huggingface.co/guoyww/animatediff/resolve/fdfe36afa161e51b3e9c24022b0e368d59e7345e/v3_sd15_sparsectrl_scribble.ckpt"

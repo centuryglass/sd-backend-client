@@ -1,0 +1,30 @@
+id = "xinsir_scribble_sdxl"
+label = "Xinsir SDXL Scribble"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["scribble"]
+preprocessors = []
+trainer = "xinsir"
+license = "apache-2.0"
+homepage = "https://huggingface.co/xinsir/controlnet-scribble-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_xinsir_controlnet_scribble_sdxl_1_0"]
+research_status = "stub"
+open_questions = [
+    "xinsir/controlnet-canny-sdxl-1.0 diffusion_pytorch_model_V2.safetensors and xinsir/controlnet-scribble-sdxl-1.0 diffusion_pytorch_model.safetensors have the same sha256. Find out which network the file is, and drop it from the other record.",
+]
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "b3e4ac47bc814019d50dc842f579301440deb6d8f09ee1b91a30f527ace1b852"
+webui_hash = "ab7dc06d"
+source_url = "https://huggingface.co/xinsir/controlnet-scribble-sdxl-1.0/resolve/0bed4973b80c2329f76e0abf4196c51dfbf9108c/diffusion_pytorch_model.safetensors"

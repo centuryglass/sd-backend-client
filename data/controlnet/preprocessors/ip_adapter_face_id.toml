@@ -1,0 +1,35 @@
+id = "ip_adapter_face_id"
+label = "IP-Adapter FaceID"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["ip_adapter"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = [
+    "ip_adapter_faceid_sd15",
+    "ip_adapter_faceid_portrait_sd15",
+    "ip_adapter_faceid_portrait_v11_sd15",
+    "ip_adapter_faceid_sdxl",
+    "ip_adapter_faceid_portrait_sdxl",
+    "ip_adapter_faceid_portrait_sdxl_unnorm",
+]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+]
+research_status = "stub"
+open_questions = [
+    "Forge has no native FaceID-only preprocessor name. Confirm whether \"InsightFace+CLIP-H (IPAdapter)\" also drives the non-plus FaceID models there.",
+]
+
+[names]
+webui = ["ip-adapter_face_id"]
+forge = ["ip-adapter_face_id_variant"]
+comfyui = []

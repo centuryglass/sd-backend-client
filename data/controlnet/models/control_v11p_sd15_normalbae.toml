@@ -1,0 +1,47 @@
+id = "control_v11p_sd15_normalbae"
+label = "ControlNet 1.1 Normal BAE"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["normal_map"]
+preprocessors = ["normal_bae"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_lllyasviel_controlnet_v1_1", "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v11p_sd15_normalbae.pth"
+format = "pth"
+size_bytes = 1445236049
+sha256 = "9608158c204261259f4b5a7815ced8f5c15e5de4e30a9403d07f68f29f81e941"
+webui_hash = "316696f1"
+source_url = "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/69fc48b9cbd98661f6d0288dc59b59a5ccb32a6b/control_v11p_sd15_normalbae.pth"
+
+[[files]]
+filename = "control_v11p_sd15_normalbae_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601100
+sha256 = "79864bfc3a1df58ed35bd92fc8dd1e4d7b85cac424cc427b9049ddc7647cceec"
+webui_hash = "592a19d8"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11p_sd15_normalbae_fp16.safetensors"
+
+[[files]]
+filename = "control_lora_rank128_v11p_sd15_normalbae_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 135722816
+sha256 = "ca84010a8e832d3d2e671c7664ff345f645f3ef7e8359cbca3e2b36d86bcff30"
+webui_hash = "586bcefe"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_lora_rank128_v11p_sd15_normalbae_fp16.safetensors"
+variant = "rank 128 control-LoRA extraction"

@@ -1,0 +1,51 @@
+id = "control_v11p_sd15_inpaint"
+label = "ControlNet 1.1 Inpaint"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["inpaint"]
+preprocessors = ["inpaint_global_harmonious", "inpaint_only", "inpaint_only_lama"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v11p_sd15_inpaint.pth"
+format = "pth"
+size_bytes = 1445235365
+sha256 = "a2a0ff91882a0fbacbded5edeca7babdb6d1bd8f770880a91c177bd44cd58633"
+webui_hash = "ebff9138"
+source_url = "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/69fc48b9cbd98661f6d0288dc59b59a5ccb32a6b/control_v11p_sd15_inpaint.pth"
+
+[[files]]
+filename = "control_v11p_sd15_inpaint_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601100
+sha256 = "677a4fe351edecd40cd0d7cc210a8686b59d4e55207317f12319ef746a7a5a89"
+webui_hash = "be8bc0ed"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11p_sd15_inpaint_fp16.safetensors"
+
+[[files]]
+filename = "control_lora_rank128_v11p_sd15_inpaint_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 135722816
+sha256 = "b0dbe399683f8579a8c0922c859832a27239bd7b22473fc8e7b21f1f163342c6"
+webui_hash = "44faa710"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_lora_rank128_v11p_sd15_inpaint_fp16.safetensors"
+variant = "rank 128 control-LoRA extraction"

@@ -1,0 +1,38 @@
+id = "t2i_adapter_xl_sketch"
+label = "T2I-Adapter XL Sketch Original"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "t2i_adapter"
+control_types = ["scribble"]
+preprocessors = []
+trainer = "TencentARC"
+license = ""
+homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "Confirm that these original-format SDXL adapters are separate trainings from the diffusers TencentARC/t2i-adapter-*-sdxl-1.0 releases.",
+]
+
+[[files]]
+filename = "adapter-xl-sketch.pth"
+format = "pth"
+size_bytes = 310227547
+sha256 = "336da8af97a0291fb6dd4c6421becaea148af7fc9749a4c5b6a20cdaf5b44c37"
+webui_hash = "f55481bd"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models_XL/adapter-xl-sketch.pth"
+
+[[files]]
+filename = "t2i-adapter_xl_sketch.safetensors"
+format = "safetensors"
+size_bytes = 155110672
+sha256 = "dfa631f30aacd09238aebed3875d70cc288f79880f82a1df394bd141e5f93159"
+webui_hash = "ff9b22fb"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_xl_sketch.safetensors"

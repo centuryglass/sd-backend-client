@@ -1,0 +1,24 @@
+id = "photomaker"
+label = "PhotoMaker"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "forge_preprocessors"]
+research_status = "stub"
+open_questions = [
+    "Only reForge presents PhotoMaker. Confirm whether Forge or Forge Neo support it some other way.",
+]
+
+[names]
+webui = []
+forge = ["PhotoMaker"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["photomaker_clipvision"]
+models = ["photomaker_v1_sdxl", "photomaker_v2_sdxl"]

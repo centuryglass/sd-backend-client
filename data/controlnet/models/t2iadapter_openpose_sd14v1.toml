@@ -1,0 +1,43 @@
+id = "t2iadapter_openpose_sd14v1"
+label = "T2I-Adapter OpenPose v1"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "t2i_adapter"
+control_types = ["openpose"]
+preprocessors = ["openpose"]
+trainer = "TencentARC"
+license = ""
+homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_tencentarc_t2i_adapter",
+    "hf_webui_controlnet_modules_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = [
+    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
+]
+
+[[files]]
+filename = "t2iadapter_openpose_sd14v1.pth"
+format = "pth"
+size_bytes = 309487667
+sha256 = "f8d8027cbeae188dcae57b7475243b7dec20f2620c3c0fe7778319c56bf1ec6b"
+webui_hash = "7e267e5e"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models/t2iadapter_openpose_sd14v1.pth"
+
+[[files]]
+filename = "t2iadapter_openpose-fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 154742029
+sha256 = "fb8f87894f65f5b8736de6aaed9db84be6640c0bad2d56867768c38016bfec1e"
+webui_hash = "4286314e"
+source_url = "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/8148814d89be1b115ae02db98b440aa83b8c0d78/t2iadapter_openpose-fp16.safetensors"

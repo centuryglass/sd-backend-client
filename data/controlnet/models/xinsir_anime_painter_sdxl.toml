@@ -1,0 +1,28 @@
+id = "xinsir_anime_painter_sdxl"
+label = "Xinsir SDXL Anime Painter"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["scribble", "lineart"]
+preprocessors = []
+trainer = "xinsir"
+license = "apache-2.0"
+homepage = "https://huggingface.co/xinsir/anime-painter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_xinsir_anime_painter"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "053e9427d3936ac2f1ed766d43cfc119a49a44938aa2e3475c7f01e4a0c476f3"
+webui_hash = "03d5f754"
+source_url = "https://huggingface.co/xinsir/anime-painter/resolve/18185a73b6e7fe49f2f2de1bb9d7db0b74a41773/diffusion_pytorch_model.safetensors"

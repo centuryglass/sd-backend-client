@@ -1,0 +1,28 @@
+id = "segmentation"
+label = "Segmentation"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Segmentation"]
+forge = ["Segmentation"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["seg_ofade20k", "seg_ofcoco", "seg_ufade20k", "seg_anime_face", "mobile_sam"]
+models = [
+    "control_sd15_seg",
+    "control_v11p_sd15_seg",
+    "t2iadapter_seg_sd14v1",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+]

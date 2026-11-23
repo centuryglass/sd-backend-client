@@ -1,0 +1,36 @@
+id = "ip_adapter_plus_face_sdxl_vit_h"
+label = "IP-Adapter Plus Face SDXL"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_clip_h"]
+trainer = "h94 (Tencent AI Lab)"
+license = "apache-2.0"
+homepage = "https://huggingface.co/h94/IP-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "ip-adapter-plus-face_sdxl_vit-h.safetensors"
+format = "safetensors"
+size_bytes = 847517512
+sha256 = "677ad8860204f7d0bfba12d29e6c31ded9beefdf3e4bbd102518357d31a292c1"
+webui_hash = "368cf551"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors"
+
+[[files]]
+filename = "ip-adapter-plus-face_sdxl_vit-h.bin"
+format = "bin"
+size_bytes = 1013454761
+sha256 = "50e886d82940b3c5873d80c2b06d8a4b0d0fccec70bc44fd53f16ac3cfd7fc36"
+webui_hash = "c60d7d48"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.bin"

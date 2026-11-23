@@ -1,0 +1,39 @@
+id = "ip_adapter_faceid_plusv2_sdxl"
+label = "IP-Adapter FaceID Plus V2 SDXL"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_face_id_plus"]
+trainer = "h94 (Tencent AI Lab)"
+license = ""
+homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter_faceid"]
+research_status = "stub"
+open_questions = [
+    "The companion LoRA is listed as a file of this record. Decide whether it needs its own record, since it loads as a LoRA, not as a ControlNet unit.",
+]
+
+[[files]]
+filename = "ip-adapter-faceid-plusv2_sdxl.bin"
+format = "bin"
+size_bytes = 1487555181
+sha256 = "c6945d82b543700cc3ccbb98d363b837e9c596281607857c74b713a876daf5fb"
+webui_hash = "187cb962"
+source_url = "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/43907e6f44d079bf1a9102d9a6e56aef7a219bae/ip-adapter-faceid-plusv2_sdxl.bin"
+
+[[files]]
+filename = "ip-adapter-faceid-plusv2_sdxl_lora.safetensors"
+format = "safetensors"
+size_bytes = 371842896
+sha256 = "f24b4bb2dad6638a09c00f151cde84991baf374409385bcbab53c1871a30cb7b"
+webui_hash = "e462a57c"
+source_url = "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/43907e6f44d079bf1a9102d9a6e56aef7a219bae/ip-adapter-faceid-plusv2_sdxl_lora.safetensors"
+variant = "companion LoRA, loaded alongside the adapter"

@@ -1,0 +1,29 @@
+id = "inpaint"
+label = "Inpaint"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Inpaint"]
+forge = ["Inpaint"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["inpaint_global_harmonious", "inpaint_only", "inpaint_only_lama", "inpaint_noobai"]
+models = [
+    "control_v11p_sd15_inpaint",
+    "xinsir_union_promax_sdxl",
+    "ecomxl_inpaint_sdxl",
+    "destitech_inpaint_dreamer_sdxl",
+    "destitech_inpaint_dreamer_v2_sdxl",
+    "noobai_inpaint_sdxl",
+]

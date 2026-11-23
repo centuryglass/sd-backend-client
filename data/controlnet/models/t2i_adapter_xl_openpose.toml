@@ -1,0 +1,38 @@
+id = "t2i_adapter_xl_openpose"
+label = "T2I-Adapter XL OpenPose Original"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "t2i_adapter"
+control_types = ["openpose"]
+preprocessors = ["openpose"]
+trainer = "TencentARC"
+license = ""
+homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "Confirm that these original-format SDXL adapters are separate trainings from the diffusers TencentARC/t2i-adapter-*-sdxl-1.0 releases.",
+]
+
+[[files]]
+filename = "adapter-xl-openpose.pth"
+format = "pth"
+size_bytes = 316125787
+sha256 = "0a379405bb2544e82f4bc87e0ae001f38da3c3fdf7b02a85fa638c8a3d6ef71f"
+webui_hash = "28e0c170"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models_XL/adapter-xl-openpose.pth"
+
+[[files]]
+filename = "t2i-adapter_xl_openpose.safetensors"
+format = "safetensors"
+size_bytes = 158059792
+sha256 = "a5abadd721608e74717cd2e83751e983fd98a4bf1489f1667f52c3b585841cb3"
+webui_hash = "18cb12c1"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_xl_openpose.safetensors"

@@ -1,0 +1,51 @@
+id = "control_v11p_sd15_seg"
+label = "ControlNet 1.1 Segmentation"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["segmentation"]
+preprocessors = ["seg_ofade20k", "seg_ofcoco", "seg_ufade20k"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v11p_sd15_seg.pth"
+format = "pth"
+size_bytes = 1445233933
+sha256 = "bad6d753886c0edc978e79dfb06083737ab1bd9702e5b7c0f81b1e16a5ed12cc"
+webui_hash = "e1f51eb9"
+source_url = "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/69fc48b9cbd98661f6d0288dc59b59a5ccb32a6b/control_v11p_sd15_seg.pth"
+
+[[files]]
+filename = "control_v11p_sd15_seg_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601100
+sha256 = "acd4dd3df2da2f1f2b9dd00f4504cc0d98b20afb608e25f1789a95c0ccdba14a"
+webui_hash = "ab613144"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11p_sd15_seg_fp16.safetensors"
+
+[[files]]
+filename = "control_lora_rank128_v11p_sd15_seg_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 135722816
+sha256 = "11937941597a67150ef0f74aa30f082b1634431080dee609d0231a9a59b7fa4f"
+webui_hash = "758a54ec"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_lora_rank128_v11p_sd15_seg_fp16.safetensors"
+variant = "rank 128 control-LoRA extraction"

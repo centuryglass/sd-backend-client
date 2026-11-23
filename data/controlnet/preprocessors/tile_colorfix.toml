@@ -1,0 +1,26 @@
+id = "tile_colorfix"
+label = "Tile Color Fix"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["tile"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["control_v11f1e_sd15_tile"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["tile_colorfix"]
+forge = ["tile_colorfix", "tile_colorfix_variant"]
+comfyui = []

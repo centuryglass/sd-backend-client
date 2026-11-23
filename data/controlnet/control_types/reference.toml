@@ -1,0 +1,22 @@
+id = "reference"
+label = "Reference"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Reference"]
+forge = ["Reference"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["reference_only", "reference_adain", "reference_adain_attn"]
+models = []

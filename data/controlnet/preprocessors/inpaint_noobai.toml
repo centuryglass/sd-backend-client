@@ -1,0 +1,22 @@
+id = "inpaint_noobai"
+label = "Inpaint NoobAI"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["inpaint"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["noobai_inpaint_sdxl"]
+
+sources = ["recorded_fixtures", "reforge_preprocessors", "forge_neo_controlnet"]
+research_status = "stub"
+open_questions = [
+    "reForge calls this inpaint_noobai_xl and Forge Neo calls it inpaint_noobai. Confirm they are the same preprocessor.",
+]
+
+[names]
+webui = []
+forge = ["inpaint_noobai", "inpaint_noobai_xl"]
+comfyui = []

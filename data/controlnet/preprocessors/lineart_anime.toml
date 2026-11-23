@@ -1,0 +1,26 @@
+id = "lineart_anime"
+label = "Lineart Anime"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["lineart"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["control_v11p_sd15s2_lineart_anime"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["lineart_anime"]
+forge = ["lineart_anime"]
+comfyui = ["AnimeLineArtPreprocessor"]

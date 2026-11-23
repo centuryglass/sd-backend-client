@@ -1,0 +1,32 @@
+id = "qr_code"
+label = "QR Code and Illusion"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures"]
+research_status = "stub"
+open_questions = [
+    "No backend presents this type; QR and illusion models land under \"All\". Keep it as a reference-only grouping, or fold the models into Tile or Recolor?",
+]
+
+[names]
+webui = []
+forge = []
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = []
+models = [
+    "qrcode_monster_sd15",
+    "qrcode_monster_v2_sd15",
+    "qrcode_monster_sdxl",
+    "diontimmer_qrcode_sd15",
+    "nacholmo_qr_pattern_v2_sd15",
+    "latentcat_brightness_sd15",
+    "latentcat_illumination_sd15",
+]

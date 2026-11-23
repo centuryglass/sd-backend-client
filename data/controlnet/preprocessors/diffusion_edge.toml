@@ -1,0 +1,20 @@
+id = "diffusion_edge"
+label = "DiffusionEdge"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["lineart", "softedge"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = []
+
+sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = []
+forge = []
+comfyui = ["DiffusionEdge_Preprocessor"]

@@ -1,0 +1,58 @@
+id = "sai_control_lora_recolor_sdxl"
+label = "Stability Control-LoRA Recolor"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "control_lora"
+control_types = ["recolor"]
+preprocessors = ["recolor_luminance", "recolor_intensity"]
+trainer = "Stability AI"
+license = "other"
+homepage = "https://huggingface.co/stabilityai/control-lora"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_stabilityai_control_lora", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "Confirm from the model card whether the rank 128 and rank 256 files are one training at two ranks (files of one record) or separate trainings.",
+]
+
+[[files]]
+filename = "control-lora-recolor-rank128.safetensors"
+format = "safetensors"
+size_bytes = 395730106
+sha256 = "d6c01d588550d41ab47ff2534ae135441ed8e614b72b316787e8b7916ce08e61"
+webui_hash = "c0bf9b31"
+source_url = "https://huggingface.co/stabilityai/control-lora/resolve/75590eb0e7868d3d0f1581b5126d487b33c7fdb4/control-LoRAs-rank128/control-lora-recolor-rank128.safetensors"
+variant = "rank 128"
+
+[[files]]
+filename = "control-lora-recolor-rank256.safetensors"
+format = "safetensors"
+size_bytes = 774446618
+sha256 = "b0bf3c163b6f578b3a73e9cf61c3e4219ae9c2a06903663205d1251cf2498925"
+webui_hash = "77f1cf44"
+source_url = "https://huggingface.co/stabilityai/control-lora/resolve/75590eb0e7868d3d0f1581b5126d487b33c7fdb4/control-LoRAs-rank256/control-lora-recolor-rank256.safetensors"
+variant = "rank 256"
+
+[[files]]
+filename = "sai_xl_recolor_128lora.safetensors"
+format = "safetensors"
+size_bytes = 395706528
+sha256 = "3921b1b6ff24f3296276db91417ee97fa37fb33f77487d9dd9a257c02a3b6922"
+webui_hash = "4198a181"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sai_xl_recolor_128lora.safetensors"
+variant = "rank 128"
+
+[[files]]
+filename = "sai_xl_recolor_256lora.safetensors"
+format = "safetensors"
+size_bytes = 774423040
+sha256 = "ce3722939e4030428818aeeabe2b5db245b8ffed3a2d7edf15653a9ed3f206d4"
+webui_hash = "43f2f36a"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sai_xl_recolor_256lora.safetensors"
+variant = "rank 256"

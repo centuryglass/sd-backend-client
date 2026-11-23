@@ -1,0 +1,389 @@
+[recorded_fixtures]
+title = "Recorded server responses (sd-backend-client test fixtures)"
+url = "https://github.com/centuryglass/sd-backend-client/tree/20be17a61191caf80c820bd3088125fa3b286b49/tests/unit/fixtures/recorded"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "sd-backend-client"
+commit = "20be17a61191caf80c820bd3088125fa3b286b49"
+path = "tests/unit/fixtures/recorded/"
+
+[sdwebui_cn_legacy_preprocessors]
+title = "sd-webui-controlnet legacy preprocessor table"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/preprocessor/legacy/preprocessor_compiled.py"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/preprocessor/legacy/preprocessor_compiled.py"
+
+[sdwebui_cn_preprocessors]
+title = "sd-webui-controlnet preprocessor classes"
+url = "https://github.com/Mikubill/sd-webui-controlnet/tree/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/preprocessor"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/preprocessor/"
+
+[sdwebui_cn_supported_preprocessor]
+title = "sd-webui-controlnet preprocessor registry and control type filters"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/supported_preprocessor.py"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/supported_preprocessor.py"
+
+[sdwebui_cn_global_state]
+title = "sd-webui-controlnet model list and name hashing"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/global_state.py"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/global_state.py"
+
+[a1111_model_hash]
+title = "stable-diffusion-webui legacy model hash (model_hash)"
+url = "https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/82a973c04367123ae98bd9abdf80d9eda9b910e2/modules/sd_models.py"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "stable-diffusion-webui"
+commit = "82a973c04367123ae98bd9abdf80d9eda9b910e2"
+path = "modules/sd_models.py"
+
+[forge_preprocessors]
+title = "Stable Diffusion WebUI Forge built-in preprocessors"
+url = "https://github.com/lllyasviel/stable-diffusion-webui-forge/tree/dfdcbab685e57677014f05a3309b48cc87383167/extensions-builtin"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "stable-diffusion-webui-forge"
+commit = "dfdcbab685e57677014f05a3309b48cc87383167"
+path = "extensions-builtin/"
+
+[forge_controlnet_global_state]
+title = "Forge ControlNet model list and name hashing"
+url = "https://github.com/lllyasviel/stable-diffusion-webui-forge/blob/dfdcbab685e57677014f05a3309b48cc87383167/extensions-builtin/sd_forge_controlnet/lib_controlnet/global_state.py"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "stable-diffusion-webui-forge"
+commit = "dfdcbab685e57677014f05a3309b48cc87383167"
+path = "extensions-builtin/sd_forge_controlnet/lib_controlnet/global_state.py"
+
+[reforge_preprocessors]
+title = "Stable Diffusion WebUI reForge built-in preprocessors"
+url = "https://github.com/Panchovix/stable-diffusion-webui-reForge/tree/739b2e1d9ab63160eaff9c8f73172c8da68424e1/extensions-builtin"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "stable-diffusion-webui-reForge"
+commit = "739b2e1d9ab63160eaff9c8f73172c8da68424e1"
+path = "extensions-builtin/"
+
+[forge_neo_controlnet]
+title = "Forge Neo ControlNet extension"
+url = "https://github.com/Haoming02/sd-webui-forge-classic/tree/46af880c003d31846bbea984ce00fc7be247ce5b/extensions-builtin/sd_forge_controlnet"
+kind = "local_code"
+accessed = "2026-11-22"
+project = "sd-webui-forge-classic (Forge Neo)"
+commit = "46af880c003d31846bbea984ce00fc7be247ce5b"
+path = "extensions-builtin/sd_forge_controlnet/"
+
+[comfyui_controlnet_aux_nodes]
+title = "comfyui_controlnet_aux node wrappers"
+url = "https://github.com/Fannovel16/comfyui_controlnet_aux/tree/c2655d2970d810d8a3d71deed204cdf416b66132/node_wrappers"
+kind = "repo_code"
+accessed = "2026-11-22"
+
+[comfyui_core_nodes]
+title = "ComfyUI core image nodes (Canny, ImageInvert, ImageBlur)"
+url = "https://github.com/comfyanonymous/ComfyUI/tree/4c2b826d74a1827f5cc4a706608fc4653ed12972"
+kind = "repo_code"
+accessed = "2026-11-22"
+
+[hf_crucibleai_controlnetmediapipeface]
+title = "CrucibleAI/ControlNetMediaPipeFace model card"
+url = "https://huggingface.co/CrucibleAI/ControlNetMediaPipeFace"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_diontimmer_controlnet_qrcode_control_v1p_sd15]
+title = "DionTimmer/controlnet_qrcode-control_v1p_sd15 model card"
+url = "https://huggingface.co/DionTimmer/controlnet_qrcode-control_v1p_sd15"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_instantx_instantid]
+title = "InstantX/InstantID model card"
+url = "https://huggingface.co/InstantX/InstantID"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_nacholmo_controlnet_qr_pattern_v2]
+title = "Nacholmo/controlnet-qr-pattern-v2 model card"
+url = "https://huggingface.co/Nacholmo/controlnet-qr-pattern-v2"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic]
+title = "TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic model card"
+url = "https://huggingface.co/TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_photomaker]
+title = "TencentARC/PhotoMaker model card"
+url = "https://huggingface.co/TencentARC/PhotoMaker"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_photomaker_v2]
+title = "TencentARC/PhotoMaker-V2 model card"
+url = "https://huggingface.co/TencentARC/PhotoMaker-V2"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_t2i_adapter]
+title = "TencentARC/T2I-Adapter model card"
+url = "https://huggingface.co/TencentARC/T2I-Adapter"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_t2i_adapter_canny_sdxl_1_0]
+title = "TencentARC/t2i-adapter-canny-sdxl-1.0 model card"
+url = "https://huggingface.co/TencentARC/t2i-adapter-canny-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_t2i_adapter_depth_midas_sdxl_1_0]
+title = "TencentARC/t2i-adapter-depth-midas-sdxl-1.0 model card"
+url = "https://huggingface.co/TencentARC/t2i-adapter-depth-midas-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_t2i_adapter_depth_zoe_sdxl_1_0]
+title = "TencentARC/t2i-adapter-depth-zoe-sdxl-1.0 model card"
+url = "https://huggingface.co/TencentARC/t2i-adapter-depth-zoe-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_t2i_adapter_lineart_sdxl_1_0]
+title = "TencentARC/t2i-adapter-lineart-sdxl-1.0 model card"
+url = "https://huggingface.co/TencentARC/t2i-adapter-lineart-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_t2i_adapter_openpose_sdxl_1_0]
+title = "TencentARC/t2i-adapter-openpose-sdxl-1.0 model card"
+url = "https://huggingface.co/TencentARC/t2i-adapter-openpose-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_tencentarc_t2i_adapter_sketch_sdxl_1_0]
+title = "TencentARC/t2i-adapter-sketch-sdxl-1.0 model card"
+url = "https://huggingface.co/TencentARC/t2i-adapter-sketch-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_themistoai_mistoline]
+title = "TheMistoAI/MistoLine model card"
+url = "https://huggingface.co/TheMistoAI/MistoLine"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_alimama_creative_ecomxl_controlnet_inpaint]
+title = "alimama-creative/EcomXL_controlnet_inpaint model card"
+url = "https://huggingface.co/alimama-creative/EcomXL_controlnet_inpaint"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_comfyanonymous_controlnet_v1_1_fp16_safetensors]
+title = "comfyanonymous/ControlNet-v1-1_fp16_safetensors model card"
+url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_destitech_controlnet_inpaint_dreamer_sdxl]
+title = "destitech/controlnet-inpaint-dreamer-sdxl model card"
+url = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_diffusers_controlnet_canny_sdxl_1_0]
+title = "diffusers/controlnet-canny-sdxl-1.0 model card"
+url = "https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_diffusers_controlnet_canny_sdxl_1_0_mid]
+title = "diffusers/controlnet-canny-sdxl-1.0-mid model card"
+url = "https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0-mid"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_diffusers_controlnet_canny_sdxl_1_0_small]
+title = "diffusers/controlnet-canny-sdxl-1.0-small model card"
+url = "https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0-small"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_diffusers_controlnet_depth_sdxl_1_0]
+title = "diffusers/controlnet-depth-sdxl-1.0 model card"
+url = "https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_diffusers_controlnet_depth_sdxl_1_0_mid]
+title = "diffusers/controlnet-depth-sdxl-1.0-mid model card"
+url = "https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0-mid"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_diffusers_controlnet_depth_sdxl_1_0_small]
+title = "diffusers/controlnet-depth-sdxl-1.0-small model card"
+url = "https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0-small"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_diffusers_controlnet_zoe_depth_sdxl_1_0]
+title = "diffusers/controlnet-zoe-depth-sdxl-1.0 model card"
+url = "https://huggingface.co/diffusers/controlnet-zoe-depth-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_guoyww_animatediff]
+title = "guoyww/animatediff model card"
+url = "https://huggingface.co/guoyww/animatediff"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_guozinan_pulid]
+title = "guozinan/PuLID model card"
+url = "https://huggingface.co/guozinan/PuLID"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_h94_ip_adapter]
+title = "h94/IP-Adapter model card"
+url = "https://huggingface.co/h94/IP-Adapter"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_h94_ip_adapter_faceid]
+title = "h94/IP-Adapter-FaceID model card"
+url = "https://huggingface.co/h94/IP-Adapter-FaceID"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_huchenlei_ipadapter_pulid]
+title = "huchenlei/ipadapter_pulid model card"
+url = "https://huggingface.co/huchenlei/ipadapter_pulid"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_kohya_ss_controlnet_lllite]
+title = "kohya-ss/controlnet-lllite model card"
+url = "https://huggingface.co/kohya-ss/controlnet-lllite"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_latentcat_control_v1p_sd15_brightness]
+title = "latentcat/control_v1p_sd15_brightness model card"
+url = "https://huggingface.co/latentcat/control_v1p_sd15_brightness"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_latentcat_latentcat_controlnet]
+title = "latentcat/latentcat-controlnet model card"
+url = "https://huggingface.co/latentcat/latentcat-controlnet"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_lllyasviel_controlnet]
+title = "lllyasviel/ControlNet model card"
+url = "https://huggingface.co/lllyasviel/ControlNet"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_lllyasviel_controlnet_v1_1]
+title = "lllyasviel/ControlNet-v1-1 model card"
+url = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_lllyasviel_sd_control_collection]
+title = "lllyasviel/sd_control_collection model card"
+url = "https://huggingface.co/lllyasviel/sd_control_collection"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_monster_labs_control_v1p_sd15_qrcode_monster]
+title = "monster-labs/control_v1p_sd15_qrcode_monster model card"
+url = "https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_monster_labs_control_v1p_sdxl_qrcode_monster]
+title = "monster-labs/control_v1p_sdxl_qrcode_monster model card"
+url = "https://huggingface.co/monster-labs/control_v1p_sdxl_qrcode_monster"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_stabilityai_control_lora]
+title = "stabilityai/control-lora model card"
+url = "https://huggingface.co/stabilityai/control-lora"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_thibaud_controlnet_openpose_sdxl_1_0]
+title = "thibaud/controlnet-openpose-sdxl-1.0 model card"
+url = "https://huggingface.co/thibaud/controlnet-openpose-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_webui_controlnet_modules_safetensors]
+title = "webui/ControlNet-modules-safetensors model card"
+url = "https://huggingface.co/webui/ControlNet-modules-safetensors"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_xinsir_anime_painter]
+title = "xinsir/anime-painter model card"
+url = "https://huggingface.co/xinsir/anime-painter"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_xinsir_controlnet_canny_sdxl_1_0]
+title = "xinsir/controlnet-canny-sdxl-1.0 model card"
+url = "https://huggingface.co/xinsir/controlnet-canny-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_xinsir_controlnet_depth_sdxl_1_0]
+title = "xinsir/controlnet-depth-sdxl-1.0 model card"
+url = "https://huggingface.co/xinsir/controlnet-depth-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_xinsir_controlnet_openpose_sdxl_1_0]
+title = "xinsir/controlnet-openpose-sdxl-1.0 model card"
+url = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_xinsir_controlnet_scribble_sdxl_1_0]
+title = "xinsir/controlnet-scribble-sdxl-1.0 model card"
+url = "https://huggingface.co/xinsir/controlnet-scribble-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_xinsir_controlnet_tile_sdxl_1_0]
+title = "xinsir/controlnet-tile-sdxl-1.0 model card"
+url = "https://huggingface.co/xinsir/controlnet-tile-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"
+
+[hf_xinsir_controlnet_union_sdxl_1_0]
+title = "xinsir/controlnet-union-sdxl-1.0 model card"
+url = "https://huggingface.co/xinsir/controlnet-union-sdxl-1.0"
+kind = "model_card"
+accessed = "2026-11-22"

@@ -1,0 +1,32 @@
+id = "destitech_inpaint_dreamer_v2_sdxl"
+label = "Inpaint Dreamer V2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["inpaint"]
+preprocessors = []
+trainer = "destitech"
+license = "openrail"
+homepage = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_destitech_controlnet_inpaint_dreamer_sdxl"]
+research_status = "stub"
+open_questions = [
+    "controlnetxlCNXL_destitechInpaint-inpainting.safetensors (a Civitai download) appears in the recorded ComfyUI fixture. Hash a copy to find which destitech release it is.",
+    "The repo's full-precision v2 file has a newline at the end of its path, so it is left out of files. Check whether upstream has fixed the name.",
+]
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 2502139104
+sha256 = "e829938de2b6cd700e57dece4ad0e3e33018c1b5a95fdab780c3c99b12e0867d"
+webui_hash = "e799aa20"
+source_url = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl/resolve/e37388101f7f551a0ed5a621c0d7da434f0e0124/v2/diffusion_pytorch_model.fp16.safetensors"

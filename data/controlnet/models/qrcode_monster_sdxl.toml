@@ -1,0 +1,28 @@
+id = "qrcode_monster_sdxl"
+label = "QR Code Monster SDXL"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["qr_code"]
+preprocessors = []
+trainer = "monster-labs"
+license = "openrail++"
+homepage = "https://huggingface.co/monster-labs/control_v1p_sdxl_qrcode_monster"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_monster_labs_control_v1p_sdxl_qrcode_monster"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 5004167864
+sha256 = "11e49b4e272fabda60094b35be6fd3e215e551211210938e381d27497fd2215c"
+webui_hash = "1c44f547"
+source_url = "https://huggingface.co/monster-labs/control_v1p_sdxl_qrcode_monster/resolve/1ec5dea263b28ba2925151ab5007dfbf9147ad75/diffusion_pytorch_model.safetensors"

@@ -1,0 +1,43 @@
+id = "control_sd15_canny"
+label = "ControlNet 1.0 Canny"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["canny"]
+preprocessors = ["canny"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet",
+    "hf_webui_controlnet_modules_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_sd15_canny.pth"
+format = "pth"
+size_bytes = 5710753329
+sha256 = "4de384b16bc2d7a1fb258ca0cbd941d7dd0a721ae996aff89f905299d6923f45"
+webui_hash = "fef5e48e"
+source_url = "https://huggingface.co/lllyasviel/ControlNet/resolve/e78a8c4a5052a238198043ee5c0cb44e22abb9f7/models/control_sd15_canny.pth"
+variant = "full checkpoint with SD 1.5 weights"
+
+[[files]]
+filename = "control_canny-fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722596338
+sha256 = "f2549278df9a7b3d7a6058f6cedb0ccf2ff09118054a0f7e6940bd6bcfa98557"
+webui_hash = "e3fe7712"
+source_url = "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/8148814d89be1b115ae02db98b440aa83b8c0d78/control_canny-fp16.safetensors"
+variant = "ControlNet weights only"

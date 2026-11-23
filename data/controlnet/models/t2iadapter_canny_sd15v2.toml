@@ -1,0 +1,28 @@
+id = "t2iadapter_canny_sd15v2"
+label = "T2I-Adapter Canny v2"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "t2i_adapter"
+control_types = ["canny"]
+preprocessors = ["canny"]
+trainer = "TencentARC"
+license = ""
+homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "t2iadapter_canny_sd15v2.pth"
+format = "pth"
+size_bytes = 308015219
+sha256 = "a5ec162813b3997a925d39dc546ff696c42f877fec55ef2e6afa3a4aa642018e"
+webui_hash = "cecee02b"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models/t2iadapter_canny_sd15v2.pth"

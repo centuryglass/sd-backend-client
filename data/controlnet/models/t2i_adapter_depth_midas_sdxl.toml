@@ -1,0 +1,45 @@
+id = "t2i_adapter_depth_midas_sdxl"
+label = "T2I-Adapter SDXL Depth MiDaS"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "t2i_adapter"
+control_types = ["depth"]
+preprocessors = ["depth_midas"]
+trainer = "TencentARC"
+license = "apache-2.0"
+homepage = "https://huggingface.co/TencentARC/t2i-adapter-depth-midas-sdxl-1.0"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter_depth_midas_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 316116778
+sha256 = "434f84d6e08dd2c96fe10b831941e1f0d29826d5903673e346a047df815309b6"
+webui_hash = "8b4552d9"
+source_url = "https://huggingface.co/TencentARC/t2i-adapter-depth-midas-sdxl-1.0/resolve/c3307da33f4e7f0f9b30a92c3161c75897cff190/diffusion_pytorch_model.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 158060440
+sha256 = "00992515291c902430d78ecece8a936406338faa54fd06c26da277d96a171fa4"
+webui_hash = "5752dddf"
+source_url = "https://huggingface.co/TencentARC/t2i-adapter-depth-midas-sdxl-1.0/resolve/c3307da33f4e7f0f9b30a92c3161c75897cff190/diffusion_pytorch_model.fp16.safetensors"
+
+[[files]]
+filename = "t2i-adapter_diffusers_xl_depth_midas.safetensors"
+format = "safetensors"
+size_bytes = 158060416
+sha256 = "44d1b9d4c04c1228aada2162ed7489119ed11f12a2bbf1d307fbb1d4bbacba51"
+webui_hash = "9c183166"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_diffusers_xl_depth_midas.safetensors"

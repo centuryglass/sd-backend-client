@@ -1,0 +1,22 @@
+id = "sparsectrl"
+label = "SparseCtrl"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["SparseCtrl"]
+forge = []
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["scribble_hed", "scribble_pidinet", "scribble_xdog"]
+models = ["sparsectrl_rgb_sd15", "sparsectrl_scribble_sd15"]

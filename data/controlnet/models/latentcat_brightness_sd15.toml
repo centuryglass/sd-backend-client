@@ -1,0 +1,38 @@
+id = "latentcat_brightness_sd15"
+label = "Brightness"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["recolor", "qr_code"]
+preprocessors = []
+trainer = "ioclab (latentcat)"
+license = "creativeml-openrail-m"
+homepage = "https://huggingface.co/latentcat/control_v1p_sd15_brightness"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_latentcat_control_v1p_sd15_brightness", "hf_latentcat_latentcat_controlnet"]
+research_status = "stub"
+open_questions = [
+    "The ioclab Hugging Face repos redirect to latentcat. Confirm the two brightness files are one network, and which control types the model card names.",
+]
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 1445157124
+sha256 = "9b0696ebf86ab5c87ce553d87f4b62a48dba1add4ee314b6f7ee98e778145f7f"
+webui_hash = "1cf9248a"
+source_url = "https://huggingface.co/latentcat/control_v1p_sd15_brightness/resolve/8509361eb1ba89c03839040ed8c75e5f11bbd9c5/diffusion_pytorch_model.safetensors"
+
+[[files]]
+filename = "control_v1p_sd15_brightness.safetensors"
+format = "safetensors"
+size_bytes = 1445154814
+sha256 = "9161c3825216e6baa45806fe9763df13ee7c60f0e12e693b7d4a00f039b1ba86"
+webui_hash = "5f6aa6ed"
+source_url = "https://huggingface.co/latentcat/latentcat-controlnet/resolve/e4f51c7df7c42514faeb600345d287c27f305086/models/control_v1p_sd15_brightness.safetensors"

@@ -1,0 +1,26 @@
+id = "color"
+label = "Color Grid"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["t2i_adapter"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["t2iadapter_color_sd14v1"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["color", "t2ia_color_grid"]
+forge = ["t2ia_color_grid"]
+comfyui = ["ColorPreprocessor"]

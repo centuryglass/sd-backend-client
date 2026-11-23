@@ -1,0 +1,25 @@
+id = "anyline"
+label = "AnyLine"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["lineart", "softedge"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["mistoline_sdxl"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["softedge_anyline"]
+forge = []
+comfyui = ["AnyLineArtPreprocessor_aux"]

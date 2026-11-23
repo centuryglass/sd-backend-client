@@ -1,0 +1,30 @@
+id = "ip_adapter_face_id_plus"
+label = "IP-Adapter FaceID Plus"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["ip_adapter"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = [
+    "ip_adapter_faceid_plus_sd15",
+    "ip_adapter_faceid_plusv2_sd15",
+    "ip_adapter_faceid_plusv2_sdxl",
+]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["ip-adapter_face_id_plus"]
+forge = ["InsightFace+CLIP-H (IPAdapter)", "ip-adapter_face_id_plus_variant"]
+comfyui = []

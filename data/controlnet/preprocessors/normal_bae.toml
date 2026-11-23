@@ -1,0 +1,27 @@
+id = "normal_bae"
+label = "Normal BAE"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["normal_map"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["control_v11p_sd15_normalbae"]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["normal_bae"]
+forge = ["normalbae", "normal_bae_variant"]
+comfyui = ["BAE-NormalMapPreprocessor"]

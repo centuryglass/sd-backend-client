@@ -1,0 +1,45 @@
+id = "diontimmer_qrcode_sd15"
+label = "DionTimmer QR Code"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["qr_code"]
+preprocessors = []
+trainer = "DionTimmer"
+license = "openrail++"
+homepage = "https://huggingface.co/DionTimmer/controlnet_qrcode-control_v1p_sd15"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_diontimmer_controlnet_qrcode_control_v1p_sd15"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v1p_sd15_qrcode.safetensors"
+format = "safetensors"
+size_bytes = 1445154814
+sha256 = "5d8059dfffccfcaee5b827c4f0f126baf4d6ab66f9a80b2ec4ef0ed451a62ead"
+webui_hash = "9c780d03"
+source_url = "https://huggingface.co/DionTimmer/controlnet_qrcode-control_v1p_sd15/resolve/4ca3cf8d9c50c4ac3b9d860f09a9d94b7a384e82/control_v1p_sd15_qrcode.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 1445157120
+sha256 = "5b5a1379389660462b7b2c093d3a1b934ea410dc0275f68db1bd4cdf0f031e53"
+webui_hash = "15b95218"
+source_url = "https://huggingface.co/DionTimmer/controlnet_qrcode-control_v1p_sd15/resolve/4ca3cf8d9c50c4ac3b9d860f09a9d94b7a384e82/diffusion_pytorch_model.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722598648
+sha256 = "ca419d6e83c160a34d0af035a868ec39dc5c371142a41cd735ca15ada4145fd9"
+webui_hash = "60e81549"
+source_url = "https://huggingface.co/DionTimmer/controlnet_qrcode-control_v1p_sd15/resolve/4ca3cf8d9c50c4ac3b9d860f09a9d94b7a384e82/diffusion_pytorch_model.fp16.safetensors"

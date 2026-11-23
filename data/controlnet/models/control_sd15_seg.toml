@@ -1,0 +1,43 @@
+id = "control_sd15_seg"
+label = "ControlNet 1.0 Segmentation"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["segmentation"]
+preprocessors = ["seg_ufade20k"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet",
+    "hf_webui_controlnet_modules_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_sd15_seg.pth"
+format = "pth"
+size_bytes = 5710750165
+sha256 = "2c772486812fdd5331a86ee7135f5146dab91f78e6676fab3ec94420708f3a37"
+webui_hash = "fef5e48e"
+source_url = "https://huggingface.co/lllyasviel/ControlNet/resolve/e78a8c4a5052a238198043ee5c0cb44e22abb9f7/models/control_sd15_seg.pth"
+variant = "full checkpoint with SD 1.5 weights"
+
+[[files]]
+filename = "control_seg-fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722596338
+sha256 = "a8c735dccfafcacfc9a0d6c99783895ef8b70244b85170c4ac70f34077189f2e"
+webui_hash = "b9c1cc12"
+source_url = "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/8148814d89be1b115ae02db98b440aa83b8c0d78/control_seg-fp16.safetensors"
+variant = "ControlNet weights only"

@@ -1,0 +1,24 @@
+id = "region"
+label = "Region"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = []
+control_image = ""
+
+sources = ["recorded_fixtures", "forge_preprocessors"]
+research_status = "stub"
+open_questions = [
+    "Forge Neo adds \"Region\" to its type list as a canvas-editor mode with no preprocessors or models. What does it do, and does it belong in this reference at all?",
+]
+
+[names]
+webui = []
+forge = ["Region"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = []
+models = []

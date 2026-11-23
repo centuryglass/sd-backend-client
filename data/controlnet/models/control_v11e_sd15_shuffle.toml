@@ -1,0 +1,51 @@
+id = "control_v11e_sd15_shuffle"
+label = "ControlNet 1.1 Shuffle"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["shuffle"]
+preprocessors = ["shuffle"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v11e_sd15_shuffle.pth"
+format = "pth"
+size_bytes = 1445235365
+sha256 = "657f632c35176c467e71c471b55b1a0e94ae1a49d739e1b705624f454e638e1d"
+webui_hash = "526bfdae"
+source_url = "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/69fc48b9cbd98661f6d0288dc59b59a5ccb32a6b/control_v11e_sd15_shuffle.pth"
+
+[[files]]
+filename = "control_v11e_sd15_shuffle_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601100
+sha256 = "8cc77ae071888abefd6e80bafce3d2574f9f6f8aac7ab205db98fb12a53c1132"
+webui_hash = "04a71f87"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11e_sd15_shuffle_fp16.safetensors"
+
+[[files]]
+filename = "control_lora_rank128_v11e_sd15_shuffle_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 135722816
+sha256 = "f4abc3edee9440b5166e3ad956bf04aa3134e2736644be2f2627e98c9e14edb3"
+webui_hash = "d9191741"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_lora_rank128_v11e_sd15_shuffle_fp16.safetensors"
+variant = "rank 128 control-LoRA extraction"

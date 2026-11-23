@@ -1,0 +1,43 @@
+id = "t2iadapter_style_sd14v1"
+label = "T2I-Adapter Style v1"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "t2i_adapter"
+control_types = ["t2i_adapter"]
+preprocessors = ["t2ia_style_clipvision"]
+trainer = "TencentARC"
+license = ""
+homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = [
+    "hf_tencentarc_t2i_adapter",
+    "hf_webui_controlnet_modules_safetensors",
+    "recorded_fixtures",
+]
+research_status = "stub"
+open_questions = [
+    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
+]
+
+[[files]]
+filename = "t2iadapter_style_sd14v1.pth"
+format = "pth"
+size_bytes = 154363687
+sha256 = "b41febaddb32c4338272b9ad78b7d2b2584749ca5750d6b1d972766eb2fb731b"
+webui_hash = "202e85cc"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models/t2iadapter_style_sd14v1.pth"
+
+[[files]]
+filename = "t2iadapter_style-fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 77179015
+sha256 = "3fccd0af0e8889baa5e0042cb7ddfc48d8e5d243609d8a9a27c97635802e09b8"
+webui_hash = "0e2e8330"
+source_url = "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/8148814d89be1b115ae02db98b440aa83b8c0d78/t2iadapter_style-fp16.safetensors"

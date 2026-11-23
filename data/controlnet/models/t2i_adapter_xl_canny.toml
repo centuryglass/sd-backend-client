@@ -1,0 +1,38 @@
+id = "t2i_adapter_xl_canny"
+label = "T2I-Adapter XL Canny Original"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "t2i_adapter"
+control_types = ["canny"]
+preprocessors = ["canny"]
+trainer = "TencentARC"
+license = ""
+homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_tencentarc_t2i_adapter", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "Confirm that these original-format SDXL adapters are separate trainings from the diffusers TencentARC/t2i-adapter-*-sdxl-1.0 releases.",
+]
+
+[[files]]
+filename = "adapter-xl-canny.pth"
+format = "pth"
+size_bytes = 310227547
+sha256 = "5a22002d1e943a5714565f852788d999b107ccb382543167b1e00a1e5c990c14"
+webui_hash = "8e23e487"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models_XL/adapter-xl-canny.pth"
+
+[[files]]
+filename = "t2i-adapter_xl_canny.safetensors"
+format = "safetensors"
+size_bytes = 155110672
+sha256 = "58383ed789fdbdabb4847595d205685850d99e9e4be1f09db6901f4a03461673"
+webui_hash = "ff8b24b1"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_xl_canny.safetensors"

@@ -1,0 +1,29 @@
+id = "ecomxl_inpaint_sdxl"
+label = "EcomXL Inpaint"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["inpaint"]
+preprocessors = []
+trainer = "alimama-creative"
+license = "apache-2.0"
+homepage = "https://huggingface.co/alimama-creative/EcomXL_controlnet_inpaint"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_alimama_creative_ecomxl_controlnet_inpaint", "recorded_fixtures"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+also_seen_as = ["EcomXL_controlnet_inpaint.safetensors"]
+format = "safetensors"
+size_bytes = 2502139136
+sha256 = "fa14b93d5d35340d114834468b45a6069ddb0a445964af8838fee4c447d9a4f6"
+webui_hash = "ad895a99"
+source_url = "https://huggingface.co/alimama-creative/EcomXL_controlnet_inpaint/resolve/de990c34dbb2da48fbdb16b649793fb0db88f115/diffusion_pytorch_model.safetensors"

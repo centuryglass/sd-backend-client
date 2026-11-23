@@ -1,0 +1,22 @@
+id = "revision"
+label = "Revision"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Revision"]
+forge = ["Revision"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["revision_clipvision", "revision_ignore_prompt"]
+models = []

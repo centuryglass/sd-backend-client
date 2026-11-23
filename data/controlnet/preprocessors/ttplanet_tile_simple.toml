@@ -1,0 +1,20 @@
+id = "ttplanet_tile_simple"
+label = "TTPlanet Tile Simple"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["tile"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = ["ttplanet_tile_realistic_v1_sdxl", "ttplanet_tile_realistic_v2_sdxl"]
+
+sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = []
+forge = []
+comfyui = ["TTPlanet_TileSimple_Preprocessor"]

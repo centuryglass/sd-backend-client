@@ -1,0 +1,30 @@
+id = "sargezt_xl_depth_faid_vidit"
+label = "SargeZT SDXL Depth Faid Vidit"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["depth"]
+preprocessors = []
+trainer = "SargeZT"
+license = ""
+homepage = "https://huggingface.co/lllyasviel/sd_control_collection"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "Find the original SargeZT release this collection file was renamed from, and its model card.",
+]
+
+[[files]]
+filename = "sargezt_xl_depth_faid_vidit.safetensors"
+format = "safetensors"
+size_bytes = 2502139104
+sha256 = "d369c14eb63f62a7fd94312baca47bf235b356982fca331654def8e13d237eef"
+webui_hash = "07494a9b"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sargezt_xl_depth_faid_vidit.safetensors"

@@ -1,0 +1,39 @@
+id = "lineart"
+label = "Lineart"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["Lineart"]
+forge = ["Lineart"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = [
+    "invert",
+    "lineart_realistic",
+    "lineart_coarse",
+    "lineart_standard",
+    "lineart_anime",
+    "lineart_anime_denoise",
+    "anyline",
+    "diffusion_edge",
+]
+models = [
+    "control_v11p_sd15_lineart",
+    "control_v11p_sd15s2_lineart_anime",
+    "t2i_adapter_lineart_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+    "xinsir_anime_painter_sdxl",
+    "mistoline_sdxl",
+]

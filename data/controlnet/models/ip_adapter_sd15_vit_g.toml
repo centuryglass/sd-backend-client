@@ -1,0 +1,36 @@
+id = "ip_adapter_sd15_vit_g"
+label = "IP-Adapter SD1.5 ViT-G"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_clip_g"]
+trainer = "h94 (Tencent AI Lab)"
+license = "apache-2.0"
+homepage = "https://huggingface.co/h94/IP-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "ip-adapter_sd15_vit-G.safetensors"
+format = "safetensors"
+size_bytes = 46215640
+sha256 = "a26f736af07bb341a83dfea23713531d0575760e8ed947c68cb31a4c62d9c90b"
+webui_hash = "d3a31fee"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/ip-adapter_sd15_vit-G.safetensors"
+
+[[files]]
+filename = "ip-adapter_sd15_vit-G.bin"
+format = "bin"
+size_bytes = 46215689
+sha256 = "1398e9ae37cb65553a8525871830a283914dafd9ec3039716344a826399ec474"
+webui_hash = "40fee50f"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/ip-adapter_sd15_vit-G.bin"

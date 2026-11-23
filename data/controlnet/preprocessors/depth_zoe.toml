@@ -1,0 +1,31 @@
+id = "depth_zoe"
+label = "Depth ZoeDepth"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["depth"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = [
+    "control_v11f1p_sd15_depth",
+    "t2iadapter_zoedepth_sd15v1",
+    "t2i_adapter_depth_zoe_sdxl",
+    "diffusers_zoe_depth_sdxl",
+]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["depth_zoe"]
+forge = ["depth_zoe"]
+comfyui = ["Zoe-DepthMapPreprocessor"]

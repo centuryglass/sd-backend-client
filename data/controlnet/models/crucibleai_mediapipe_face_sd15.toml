@@ -1,0 +1,45 @@
+id = "crucibleai_mediapipe_face_sd15"
+label = "MediaPipe Face"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["openpose"]
+preprocessors = ["mediapipe_face"]
+trainer = "CrucibleAI"
+license = "openrail"
+homepage = "https://huggingface.co/CrucibleAI/ControlNetMediaPipeFace"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_crucibleai_controlnetmediapipeface"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v2p_sd15_mediapipe_face.safetensors"
+format = "safetensors"
+size_bytes = 1445154814
+sha256 = "5be501156709895f0b14a7ec76faae7cf0a105f76895252a2c69db541629628f"
+webui_hash = "9c7784a9"
+source_url = "https://huggingface.co/CrucibleAI/ControlNetMediaPipeFace/resolve/f6ed75cc495674bea8bf7409ef3d0e5bfb7d8c90/control_v2p_sd15_mediapipe_face.safetensors"
+
+[[files]]
+filename = "control_v2p_sd15_mediapipe_face.pth"
+format = "pth"
+size_bytes = 1445239863
+sha256 = "2f2ccead3a8c0b9fbf9cad7b8eaa29834983ced916c766a92fb84db34ff29e43"
+webui_hash = "0653d983"
+source_url = "https://huggingface.co/CrucibleAI/ControlNetMediaPipeFace/resolve/f6ed75cc495674bea8bf7409ef3d0e5bfb7d8c90/control_v2p_sd15_mediapipe_face.pth"
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722598642
+sha256 = "9fb50465b4fd7e15f0dc7df8031767e57309cfda2917082485bcf6c11bedb540"
+webui_hash = "3e6cbad3"
+source_url = "https://huggingface.co/CrucibleAI/ControlNetMediaPipeFace/resolve/f6ed75cc495674bea8bf7409ef3d0e5bfb7d8c90/diffusion_sd15/diffusion_pytorch_model.fp16.safetensors"

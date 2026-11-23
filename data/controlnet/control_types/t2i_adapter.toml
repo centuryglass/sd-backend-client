@@ -1,0 +1,27 @@
+id = "t2i_adapter"
+label = "T2I-Adapter"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["T2I-Adapter"]
+forge = ["T2I-Adapter"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["t2ia_sketch_pidi", "color", "t2ia_style_clipvision"]
+models = [
+    "t2iadapter_color_sd14v1",
+    "t2iadapter_sketch_sd14v1",
+    "t2iadapter_style_sd14v1",
+    "t2iadapter_sketch_sd15v2",
+]

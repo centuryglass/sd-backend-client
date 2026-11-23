@@ -1,0 +1,38 @@
+id = "pulid_v1_sdxl"
+label = "PuLID V1"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_pulid", "facexlib"]
+trainer = "guozinan (ByteDance)"
+license = "apache-2.0"
+homepage = "https://huggingface.co/guozinan/PuLID"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_guozinan_pulid", "hf_huchenlei_ipadapter_pulid"]
+research_status = "stub"
+open_questions = ["Confirm which PuLID release huchenlei/ipadapter_pulid converted."]
+
+[[files]]
+filename = "pulid_v1.bin"
+format = "bin"
+size_bytes = 1582858505
+sha256 = "245d05d8f11cd030d52562282332f912a2d5001b111873a40214163f33ab3f5d"
+webui_hash = "36efcfb9"
+source_url = "https://huggingface.co/guozinan/PuLID/resolve/492b1451255dc9d9bc3c857259690b5f8b998d4a/pulid_v1.bin"
+
+[[files]]
+filename = "ip-adapter_pulid_sdxl_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 791372856
+sha256 = "b258a5cd2c0c7d35f4d3e59909d7648498686afae4d0c74917e9c47d7704fbf5"
+webui_hash = "d86d05ea"
+source_url = "https://huggingface.co/huchenlei/ipadapter_pulid/resolve/810eab2a6746efb73ed7f2502bf46b1c453d5cf1/ip-adapter_pulid_sdxl_fp16.safetensors"
+variant = "sd-webui-controlnet conversion"

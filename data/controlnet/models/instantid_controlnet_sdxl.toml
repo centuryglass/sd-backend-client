@@ -1,0 +1,29 @@
+id = "instantid_controlnet_sdxl"
+label = "InstantID ControlNet"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["instant_id"]
+preprocessors = ["instant_id_face_keypoints"]
+trainer = "InstantX"
+license = "apache-2.0"
+homepage = "https://huggingface.co/InstantX/InstantID"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_instantx_instantid"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+also_seen_as = ["control_instant_id_sdxl.safetensors"]
+format = "safetensors"
+size_bytes = 2502139136
+sha256 = "c8127be9f174101ebdafee9964d856b49b634435cf6daa396d3f593cf0bbbb05"
+webui_hash = "c5c25a50"
+source_url = "https://huggingface.co/InstantX/InstantID/resolve/57b32dfee076092ad2930c71fd6d439c2c3b1820/ControlNetModel/diffusion_pytorch_model.safetensors"

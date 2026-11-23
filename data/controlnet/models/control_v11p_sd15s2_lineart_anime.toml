@@ -1,0 +1,47 @@
+id = "control_v11p_sd15s2_lineart_anime"
+label = "ControlNet 1.1 Anime Lineart"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["lineart"]
+preprocessors = ["lineart_anime"]
+trainer = "lllyasviel"
+license = "openrail"
+homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_lllyasviel_controlnet_v1_1", "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "control_v11p_sd15s2_lineart_anime.pth"
+format = "pth"
+size_bytes = 1445238101
+sha256 = "59169ab86e8ae15ad50208cc5832f1cc598b95391d4482ba742b344c8f7f6904"
+webui_hash = "3825e83e"
+source_url = "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/69fc48b9cbd98661f6d0288dc59b59a5ccb32a6b/control_v11p_sd15s2_lineart_anime.pth"
+
+[[files]]
+filename = "control_v11p_sd15s2_lineart_anime_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601100
+sha256 = "067bf845109afdd1049bd9553d44faed1ad53691bd6b5ac9ee31c87466ef7c27"
+webui_hash = "c58f338b"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_v11p_sd15s2_lineart_anime_fp16.safetensors"
+
+[[files]]
+filename = "control_lora_rank128_v11p_sd15s2_lineart_anime_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 135722816
+sha256 = "ab6b9cf7c910b85218c041728b0f02cd2ac2f2155abb96a228032252b878afd6"
+webui_hash = "b42ea22a"
+source_url = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/ab830a51c5c573a5b85bfdbaa3ae0ab7e1baf5f7/control_lora_rank128_v11p_sd15s2_lineart_anime_fp16.safetensors"
+variant = "rank 128 control-LoRA extraction"

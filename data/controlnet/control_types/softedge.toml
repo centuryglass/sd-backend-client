@@ -1,0 +1,29 @@
+id = "softedge"
+label = "Soft Edge"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sd15", "sdxl"]
+control_image = ""
+
+sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["SoftEdge"]
+forge = ["SoftEdge"]
+comfyui = []
+
+[choosing]
+guide = ""
+# Unordered until a follow-up session ranks them.
+preprocessors = ["anyline", "hed", "hed_safe", "pidinet", "pidinet_safe", "teed", "diffusion_edge"]
+models = [
+    "control_sd15_hed",
+    "control_v11p_sd15_softedge",
+    "sargezt_xl_softedge",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+    "mistoline_sdxl",
+]

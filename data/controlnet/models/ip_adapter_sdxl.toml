@@ -1,0 +1,44 @@
+id = "ip_adapter_sdxl"
+label = "IP-Adapter SDXL"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_clip_g"]
+trainer = "h94 (Tencent AI Lab)"
+license = "apache-2.0"
+homepage = "https://huggingface.co/h94/IP-Adapter"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_h94_ip_adapter", "hf_lllyasviel_sd_control_collection", "recorded_fixtures"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "ip-adapter_sdxl.safetensors"
+format = "safetensors"
+size_bytes = 702585376
+sha256 = "ba1002529e783604c5f326d49f0122025392d1d20ac8d573b3eeb3e6dea4ebb6"
+webui_hash = "af81326a"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/sdxl_models/ip-adapter_sdxl.safetensors"
+
+[[files]]
+filename = "ip-adapter_sdxl.bin"
+format = "bin"
+size_bytes = 702585097
+sha256 = "7525f2731e9e86d1368e0b68467615d55dda459691965bdd7d37fa3d7fd84c12"
+webui_hash = "d5d53548"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/sdxl_models/ip-adapter_sdxl.bin"
+
+[[files]]
+filename = "ip-adapter_xl.pth"
+format = "pth"
+size_bytes = 702585021
+sha256 = "c2e9f1ed4ff231b9f78de8158d63ac4b031e599d26d524e9171ccb9c16305fc3"
+webui_hash = "4209e9f7"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/ip-adapter_xl.pth"

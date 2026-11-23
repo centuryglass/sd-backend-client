@@ -1,0 +1,30 @@
+id = "blur_gaussian"
+label = "Gaussian Blur"
+summary = ""
+description = ""
+how_it_works = ""
+control_types = ["tile"]
+effect = ""
+output = ""
+best_input = ""
+weak_input = ""
+models = [
+    "kohya_lllite_blur_sdxl",
+    "kohya_lllite_blur_anime_sdxl",
+    "kohya_lllite_blur_anime_beta_sdxl",
+]
+
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_preprocessors",
+    "comfyui_core_nodes",
+]
+research_status = "stub"
+open_questions = []
+
+[names]
+webui = ["blur_gaussian"]
+forge = ["blur_gaussian"]
+comfyui = ["ImageBlur"]

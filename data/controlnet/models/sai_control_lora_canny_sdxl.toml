@@ -1,0 +1,58 @@
+id = "sai_control_lora_canny_sdxl"
+label = "Stability Control-LoRA Canny"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "control_lora"
+control_types = ["canny"]
+preprocessors = ["canny"]
+trainer = "Stability AI"
+license = "other"
+homepage = "https://huggingface.co/stabilityai/control-lora"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_stabilityai_control_lora", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = [
+    "Confirm from the model card whether the rank 128 and rank 256 files are one training at two ranks (files of one record) or separate trainings.",
+]
+
+[[files]]
+filename = "control-lora-canny-rank128.safetensors"
+format = "safetensors"
+size_bytes = 395733680
+sha256 = "56389dbb245ca44de91d662529bd4298abc55ce2318f60bc19454fb72ff68247"
+webui_hash = "c910cde9"
+source_url = "https://huggingface.co/stabilityai/control-lora/resolve/75590eb0e7868d3d0f1581b5126d487b33c7fdb4/control-LoRAs-rank128/control-lora-canny-rank128.safetensors"
+variant = "rank 128"
+
+[[files]]
+filename = "control-lora-canny-rank256.safetensors"
+format = "safetensors"
+size_bytes = 774450192
+sha256 = "21f79f7368eff07f57bcd507ca91c0fc89070d7da182960ff24ed1d58310c3a7"
+webui_hash = "ec2dbbe4"
+source_url = "https://huggingface.co/stabilityai/control-lora/resolve/75590eb0e7868d3d0f1581b5126d487b33c7fdb4/control-LoRAs-rank256/control-lora-canny-rank256.safetensors"
+variant = "rank 256"
+
+[[files]]
+filename = "sai_xl_canny_128lora.safetensors"
+format = "safetensors"
+size_bytes = 395706528
+sha256 = "503851da8626b2682f079ecbabfa87ccaa53333a664eed6ba5fc3b33006f2a09"
+webui_hash = "19804483"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sai_xl_canny_128lora.safetensors"
+variant = "rank 128"
+
+[[files]]
+filename = "sai_xl_canny_256lora.safetensors"
+format = "safetensors"
+size_bytes = 774423040
+sha256 = "c9269721b1f7043625e75b7de2f65a6116b2ad99895965494616f3f2c8548f54"
+webui_hash = "566f20af"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/sai_xl_canny_256lora.safetensors"
+variant = "rank 256"

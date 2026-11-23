@@ -1,0 +1,45 @@
+id = "diffusers_canny_sdxl_small"
+label = "Diffusers SDXL Canny Small"
+summary = ""
+description = ""
+how_it_works = ""
+base_models = ["sdxl"]
+adapter = "controlnet"
+control_types = ["canny"]
+preprocessors = ["canny"]
+trainer = "Hugging Face diffusers"
+license = "openrail++"
+homepage = "https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0-small"
+
+strengths = []
+weaknesses = []
+good_for = []
+
+sources = ["hf_diffusers_controlnet_canny_sdxl_1_0_small", "hf_lllyasviel_sd_control_collection"]
+research_status = "stub"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+size_bytes = 640459467
+sha256 = "97b75ce51fae5cfc4d5ea98445292d482d911b241b9a82fd8260dbaa2269031a"
+webui_hash = "2c547a63"
+source_url = "https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0-small/resolve/edd85f64c5f87dfb6d73762949d9daca16389518/diffusion_pytorch_model.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 320237179
+sha256 = "fde4888a5f0a5648118991cc50e0ac4d60a2356dbaddf5e0649dd69c1119a2f9"
+webui_hash = "2a78b57c"
+source_url = "https://huggingface.co/diffusers/controlnet-canny-sdxl-1.0-small/resolve/edd85f64c5f87dfb6d73762949d9daca16389518/diffusion_pytorch_model.fp16.safetensors"
+
+[[files]]
+filename = "diffusers_xl_canny_small.safetensors"
+format = "safetensors"
+size_bytes = 320237152
+sha256 = "65a3169af8b29de6a2b37771d6da41d29509dfb1ad0116ec98adfb22204bd571"
+webui_hash = "e7fd4a83"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/diffusers_xl_canny_small.safetensors"
