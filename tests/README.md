@@ -41,6 +41,11 @@ pytest tests/
 pytest tests/ --run-generation
 # or
 RUN_SD_GENERATION=1 pytest tests/
+
+# Start the stub ComfyUI in tests/stub_comfyui/ as a real child process (no backend needed):
+pytest tests/ --run-process
+# or
+RUN_SD_PROCESS=1 pytest tests/
 ```
 
 Generation tests run on `deliberate_v3` when the server has it, or on the next SD1.5 checkpoint

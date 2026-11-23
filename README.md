@@ -228,6 +228,26 @@ missing interpreter, no checkpoints or a WebUI started without `--api`, as a `Fi
 your app to word. `SearchLocations`, `extra_roots`, `extra_urls` and `own_install` change where it looks.
 `python scripts/detect_backends.py` prints what it finds on your machine.
 
+## Running a local ComfyUI install
+
+```python
+from sd_backend_client import ManagedComfyUI, detect
+
+install = next(install for install in detect().installs if install.launch_command is not None)
+comfyui = ManagedComfyUI(install.launch_command, install.path, port=8189, on_log=print)
+comfyui.start()
+comfyui.wait_until_ready(timeout=300)  # Blocks: run it off a UI thread.
+backend = comfyui.connect()
+...
+comfyui.stop()
+```
+
+`ManagedComfyUI` starts the install with `--listen` and `--port` set, and counts it as ready only when the server on
+that port reports its own arguments, so a ComfyUI something else started there never counts. It raises
+`BackendLaunchError`, with the exit code and last output lines, if the process exits first. `on_log` and `on_state`
+run on a reader thread, so a GUI app hands them over to its own thread. `stop` only ever ends the process this
+instance started.
+
 ## Backend-specific parameters
 
 `DiffusionParams` holds the parameters both backends support. Each backend has a subclass with extra fields, and the
