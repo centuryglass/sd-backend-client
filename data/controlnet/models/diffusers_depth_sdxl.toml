@@ -1,8 +1,17 @@
 id = "diffusers_depth_sdxl"
 label = "Diffusers SDXL Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The full-size SDXL depth ControlNet from the Hugging Face diffusers team, trained on MiDaS-style depth."
+description = """\
+The diffusers team's depth ControlNet for SDXL 1.0, the largest of three depth sizes. Its card's example makes \
+depth maps with Intel's dpt-hybrid-midas, the same MiDaS family as the preprocessor. The card's license is \
+openrail++.\n\n\
+The mid and small checkpoints are the same idea at a fifth and a seventh of the size."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. It was trained \
+on 3 million image and caption pairs from LAION-Aesthetics V2, for about 700 GPU hours on 80 GB A100s, at batch \
+size 256 and a constant learning rate of 1e-5, in fp16."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["depth"]
@@ -11,12 +20,20 @@ trainer = "Hugging Face diffusers"
 license = "openrail++"
 homepage = "https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Larger than the mid and small checkpoints, whose cards say bigger ones may do better on complex maps",
+]
+weaknesses = ["Large: about 2.5 GB in fp16"]
+good_for = ["restyling while keeping scene layout"]
 
-sources = ["hf_diffusers_controlnet_depth_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_diffusers_controlnet_depth_sdxl_1_0",
+    "hf_lllyasviel_sd_control_collection",
+    "paper_controlnet",
+    "paper_midas",
+    "paper_dpt",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

@@ -1,25 +1,90 @@
 id = "normal_dsine"
 label = "Normal DSINE"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates a surface normal map with DSINE, which uses the camera's field of view to sharpen the result."
+description = """\
+Normal DSINE draws each surface's facing direction as a color map. Unlike most normal estimators it takes the \
+camera's field of view, because the direction a surface faces depends on where it sits in the camera's view. A \
+rough value is enough; the default is 60 degrees. A second setting controls how many refinement passes run.\n\n\
+The comfyui_controlnet_aux table pairs it with the ControlNet 1.1 normal model. The weights file the backends \
+fetch comes from a third-party repository whose card is licensed CC-BY-NC-SA 4.0."""
+how_it_works = """\
+DSINE argues that normal estimation needs different assumptions from other image tasks. It feeds the direction \
+of the camera ray through each pixel to the network, because a surface seen head-on looks different from the \
+same surface seen at an angle. It also learns how each pixel's direction rotates relative to its neighbors, \
+which keeps results crisp but smooth within a flat area. The network refines its answer over several passes, and \
+the iterations setting chooses how many."""
 control_types = ["normal_map"]
-effect = ""
-output = ""
+effect = "Replaces the image with a sharp color map of the direction each surface faces."
+output = "RGB normal map."
 best_input = ""
 weak_input = ""
-models = []
+models = ["control_v11p_sd15_normalbae"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "paper_dsine",
+    "gh_dsine_readme",
+    "hf_bdsqlsz_qinglong_lllite",
+    "comfyui_controlnet_aux_readme",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
-open_questions = []
+research_status = "drafted"
+open_questions = [
+    "Confirm that DSINE's color convention matches the ControlNet 1.1 normal model's: blue front, red left, green top.",
+]
 
 [names]
 webui = ["normal_dsine"]
 forge = []
 comfyui = ["DSINE-NormalMapPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "dsine.pt"
+size_bytes = 291298581
+sha256 = "629472c66ea9ec83bab6ba7c957ad7d983bb9c91063a54ad74ff5b8229cbf22f"
+source_url = "https://huggingface.co/bdsqlsz/qinglong_controlnet-lllite/resolve/67006a35a5955437d118490bfec822402eff09f5/Annotators/dsine.pt"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""
+
+[[parameters]]
+id = "fov"
+label = "Field of View"
+summary = "The camera's field of view in degrees."
+names = { webui = "threshold_a", comfyui = "fov" }
+type = "float"
+default = 60.0
+range = [0.0, 360.0]
+effect = """\
+The model assumes known camera intrinsics, and an approximate value still gives good results, per its README. \
+ComfyUI accepts up to 365."""
+when_to_adjust = "Raise it for wide-angle shots and lower it for telephoto shots."
+
+[[parameters]]
+id = "iterations"
+label = "Iterations"
+summary = "How many refinement passes the network runs."
+names = { webui = "threshold_b", comfyui = "iterations" }
+type = "int"
+default = 5
+range = [1, 20]
+effect = "More passes refine the prediction further and take longer."
+when_to_adjust = "Lower it for speed or raise it to chase detail."

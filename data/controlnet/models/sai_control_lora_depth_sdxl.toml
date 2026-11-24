@@ -1,25 +1,37 @@
 id = "sai_control_lora_depth_sdxl"
 label = "Stability Control-LoRA Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Stability AI's SDXL Control-LoRA for depth, a ControlNet compressed to 377 or 738 MB."
+description = """\
+Stability AI's Control-LoRA for depth on SDXL. It reads a grayscale depth map and was trained on the output of \
+MiDaS dpt_beit_large_512, then fine-tuned on the Portrait Depth Estimation model in Stability's ClipDrop API. \
+Files come at rank 256 (about 738 MB) and an experimental rank 128 (about 377 MB). The card describes both as \
+reductions of the original ControlNet.\n\n\
+Stability trained the Control-LoRAs on a diverse range of image concepts and aspect ratios. The card's license \
+is other."""
+how_it_works = """\
+A Control-LoRA is a ControlNet trained with low-rank adaptation: in place of full weight matrices it stores \
+small low-rank updates, which shrinks a 4.7 GB SDXL ControlNet to about 738 MB at rank 256 or 377 MB at rank \
+128. It is loaded and used like a ControlNet. This one was trained on depth maps from MiDaS and ClipDrop."""
 base_models = ["sdxl"]
 adapter = "control_lora"
 control_types = ["depth"]
-preprocessors = []
+preprocessors = ["depth_midas"]
 trainer = "Stability AI"
 license = "other"
 homepage = "https://huggingface.co/stabilityai/control-lora"
 
-strengths = []
-weaknesses = []
+strengths = ["Much smaller than a full SDXL ControlNet", "Fine-tuned for portrait depth"]
+weaknesses = ["Rank 128 file is experimental"]
 good_for = []
 
-sources = ["hf_stabilityai_control_lora", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "Confirm from the model card whether the rank 128 and rank 256 files are one training at two ranks (files of one record) or separate trainings.",
+sources = [
+    "hf_stabilityai_control_lora",
+    "hf_lllyasviel_sd_control_collection",
+    "paper_midas",
+    "paper_controlnet",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "control-lora-depth-rank128.safetensors"

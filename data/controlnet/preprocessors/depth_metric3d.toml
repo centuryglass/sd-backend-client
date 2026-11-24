@@ -1,20 +1,115 @@
 id = "depth_metric3d"
 label = "Metric3D Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates depth with Metric3D, a model built to predict real-world distances from one photo."
+description = """\
+Metric3D Depth predicts metric depth, meaning real distances, from a single image, and the ComfyUI node turns it \
+into a grayscale control map. Three model sizes are available, from 150 MB to 5.5 GB. The node takes the \
+camera's focal length in pixels, which the model needs to judge scale; both values default to 1000.\n\n\
+The comfyui_controlnet_aux table pairs it with the standard depth ControlNets. It is not available in WebUI or \
+Forge."""
+how_it_works = """\
+The main difficulty with metric depth is that the same picture can come from a small scene close up or a large \
+one far away, depending on the camera. Metric3D resolves this with a canonical camera space: it transforms \
+training images, or the predicted labels, to one standard focal length, so a single model can train on many \
+cameras at once. At inference the known focal length converts the output back to real distances. Version 2 also \
+predicts surface normals."""
 control_types = ["depth"]
-effect = ""
-output = ""
+effect = "Replaces color and texture with a grayscale map of distance."
+output = "Grayscale depth map."
 best_input = ""
 weak_input = ""
-models = []
+models = ["control_v11f1p_sd15_depth"]
 
-sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
-research_status = "stub"
-open_questions = []
+sources = [
+    "recorded_fixtures",
+    "comfyui_controlnet_aux_nodes",
+    "paper_metric3d",
+    "paper_metric3dv2",
+    "gh_metric3d_readme",
+    "hf_jugghm_metric3d",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+]
+research_status = "drafted"
+open_questions = [
+    "Confirm which end of the gray range is near in the output.",
+    "Confirm how focal length changes the normalized 8-bit map the node returns.",
+]
 
 [names]
 webui = []
 forge = []
 comfyui = ["Metric3D-DepthMapPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "metric_depth_vit_small_800k.pth"
+variant = "vit-small"
+size_bytes = 150120967
+sha256 = "b34b2a2be9148054991cef7e417930e1320602ba7bc503b0ee4e7888543728f6"
+source_url = "https://huggingface.co/JUGGHM/Metric3D/resolve/80d2d1410afb4b23cd9d18c6be9144483d4b70b6/metric_depth_vit_small_800k.pth"
+
+[[hardware.files]]
+filename = "metric_depth_vit_large_800k.pth"
+variant = "vit-large"
+size_bytes = 1647972663
+sha256 = "15328ffc42b528b95f188687418f6f03b3f123eb34ccdbd686c112abbea6d972"
+source_url = "https://huggingface.co/JUGGHM/Metric3D/resolve/80d2d1410afb4b23cd9d18c6be9144483d4b70b6/metric_depth_vit_large_800k.pth"
+
+[[hardware.files]]
+filename = "metric_depth_vit_giant2_800k.pth"
+variant = "vit-giant2"
+size_bytes = 5510989187
+sha256 = "22d64c4dec098fa56eb17b6f22b1fb7d16b4742c66a9c8ee73e7dae61c0d2a1b"
+source_url = "https://huggingface.co/JUGGHM/Metric3D/resolve/80d2d1410afb4b23cd9d18c6be9144483d4b70b6/metric_depth_vit_giant2_800k.pth"
+
+[[parameters]]
+id = "backbone"
+label = "Backbone"
+summary = "Which model size to run."
+names = { comfyui = "backbone" }
+type = "enum"
+default = "vit-small"
+choices = ["vit-small", "vit-large", "vit-giant2"]
+effect = "Loads metric_depth_<backbone>_800k.pth. The files are 150 MB, 1.6 GB and 5.5 GB."
+when_to_adjust = "Raise it for a better depth map if the download and memory are affordable."
+
+[[parameters]]
+id = "fx"
+label = "Focal Length X"
+summary = "The camera's horizontal focal length in pixels."
+names = { comfyui = "fx" }
+type = "int"
+default = 1000
+range = [1, 16384]
+effect = """\
+Metric3D uses the camera focal length to resolve the scale of its metric prediction. The README notes that a \
+wrong focal length gives wrong metric results."""
+when_to_adjust = "Leave at 1000 unless the true focal length in pixels is known."
+
+[[parameters]]
+id = "fy"
+label = "Focal Length Y"
+summary = "The camera's vertical focal length in pixels."
+names = { comfyui = "fy" }
+type = "int"
+default = 1000
+range = [1, 16384]
+effect = "The vertical counterpart of Focal Length X."
+when_to_adjust = "Set it with Focal Length X."
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""

@@ -1,14 +1,24 @@
 id = "depth_anything_v2"
 label = "Depth Anything V2"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates relative depth with Depth Anything V2, which gives finer and more robust maps than V1."
+description = """\
+Depth Anything V2 draws a grayscale depth map, white near and black far. Its paper reports finer and more robust \
+depth than V1, and models more than 10 times faster than estimators built on Stable Diffusion. WebUI and Forge \
+run the large model; ComfyUI also offers small and base.\n\n\
+Check the license before commercial use. The small model is Apache-2.0, but the base and large models are \
+CC-BY-NC-4.0, which excludes commercial use. The WebUI download is a third-party safetensors copy of the large \
+model."""
+how_it_works = """\
+V2 changes how the training labels are made. The authors replace all labeled real photos with synthetic images, \
+whose depth labels are exact. A large teacher model is trained on those, and it then labels a big set of real \
+photos. The smaller student models, the ones people run, learn from those pseudo-labels. The paper credits these \
+three changes, synthetic labels, a larger teacher and pseudo-labeled real images, for the finer detail."""
 control_types = ["depth"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Replaces color and texture with a detailed grayscale map of relative distance."
+output = "Grayscale depth map, white near and black far, stretched to the full 0-255 range."
+best_input = "Images where fine detail matters; the paper reports finer depth than V1."
 weak_input = ""
-models = []
+models = ["depth_anything_controlnet_sd15"]
 
 sources = [
     "recorded_fixtures",
@@ -16,11 +26,85 @@ sources = [
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "paper_depth_anything_v2",
+    "gh_depth_anything_v2_readme",
+    "hf_depth_anything_v2_small",
+    "hf_depth_anything_v2_base",
+    "hf_depth_anything_v2_large",
+    "comfyui_controlnet_aux_readme",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
-open_questions = []
+research_status = "drafted"
+open_questions = [
+    "Confirm that brighter means nearer in the output, from a run or a source that says so.",
+    "The Giant checkpoint listed in ComfyUI is marked coming soon by the V2 README; check whether the file ever shipped.",
+]
 
 [names]
 webui = ["depth_anything_v2"]
 forge = ["depth_anything_v2"]
 comfyui = ["DepthAnythingV2Preprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "depth_anything_v2_vitl.pth"
+variant = "vitl (large), ComfyUI"
+size_bytes = 1341395338
+sha256 = "a7ea19fa0ed99244e67b624c72b8580b7e9553043245905be58796a608eb9345"
+source_url = "https://huggingface.co/depth-anything/Depth-Anything-V2-Large/resolve/cbbb86a30ce19b5684b7a05155dc7e6cbc7685b9/depth_anything_v2_vitl.pth"
+
+[[hardware.files]]
+filename = "depth_anything_v2_vitb.pth"
+variant = "vitb (base), ComfyUI"
+size_bytes = 389961218
+sha256 = "0d2b7002e62d39d655571c371333340bd88f67ab95050c03591555aa05645328"
+source_url = "https://huggingface.co/depth-anything/Depth-Anything-V2-Base/resolve/a4e71a6c2ce52fe50df0f212066b0d4a87be9b5e/depth_anything_v2_vitb.pth"
+
+[[hardware.files]]
+filename = "depth_anything_v2_vits.pth"
+variant = "vits (small), ComfyUI"
+size_bytes = 99218434
+sha256 = "715fade13be8f229f8a70cc02066f656f2423a59effd0579197bbf57860e1378"
+source_url = "https://huggingface.co/depth-anything/Depth-Anything-V2-Small/resolve/03876f8651c73a60fe4c2c48294e09fcb6838fcf/depth_anything_v2_vits.pth"
+
+[[hardware.files]]
+filename = "depth_anything_v2_vitl.safetensors"
+variant = "vitl (large) third-party safetensors copy, WebUI and Forge"
+size_bytes = 670674810
+sha256 = "f075a9099f94bae54a5bfe21a1423346429309bae40abb85b9935985b1f35a09"
+source_url = "https://huggingface.co/MackinationsAi/Depth-Anything-V2_Safetensors/resolve/cd163ab231131d3ce09d4aff284c94c004837ebc/depth_anything_v2_vitl.safetensors"
+
+[[parameters]]
+id = "checkpoint"
+label = "Checkpoint"
+summary = "Which model size to run."
+names = { comfyui = "ckpt_name" }
+type = "enum"
+default = "depth_anything_v2_vitl.pth"
+choices = [
+    "depth_anything_v2_vitg.pth",
+    "depth_anything_v2_vitl.pth",
+    "depth_anything_v2_vitb.pth",
+    "depth_anything_v2_vits.pth",
+]
+effect = """\
+Loads the named file. WebUI and Forge always load the large model. The vitg option has no released checkpoint."""
+when_to_adjust = "Pick small for speed. Pick small, the Apache-2.0 model, when a commercial license matters."
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384. WebUI and Forge show no \
+resolution slider for this preprocessor."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""

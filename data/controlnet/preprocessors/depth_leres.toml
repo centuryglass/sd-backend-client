@@ -1,14 +1,26 @@
 id = "depth_leres"
 label = "Depth LeReS"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates relative depth with LeReS and offers sliders that flatten the nearest and farthest parts."
+description = """\
+Depth LeReS draws a grayscale depth map, white near and black far, with the LeReS network, which was built to \
+recover correct 3D scene shape from one photo. Two sliders post-process the map. Remove Near sets the closest \
+part of the range to pure white, and Remove Background sets the farthest part to pure black. Both leave the \
+middle untouched.\n\n\
+The ControlNet 1.1 depth model lists LeReS among the estimators it was trained on. The preprocessor downloads \
+two files, 530 MB and 318 MB. The second serves only the boost option, which is the separate LeReS++ \
+preprocessor."""
+how_it_works = """\
+LeReS predicts depth with a neural network trained on a mix of datasets. Its paper adds two training losses for \
+mixed data: one normalizes errors within each image, and the other is a geometry loss on surface normals. The \
+paper's full pipeline also estimates the missing depth shift and focal length to rebuild true 3D shape, but the \
+preprocessor runs the depth network alone. Output is stretched to the full gray range and inverted so near is \
+white."""
 control_types = ["depth"]
-effect = ""
-output = ""
+effect = "Replaces color and texture with a grayscale map of relative distance, optionally flattened at both ends."
+output = "Grayscale depth map, white near and black far."
 best_input = ""
 weak_input = ""
-models = ["control_v11f1p_sd15_depth"]
+models = ["control_v11f1p_sd15_depth", "t2iadapter_depth_sd14v1", "t2iadapter_depth_sd15v2"]
 
 sources = [
     "recorded_fixtures",
@@ -16,11 +28,73 @@ sources = [
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "paper_leres",
+    "paper_boosting_depth",
+    "hf_lllyasviel_annotators",
+    "cn11_readme",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["depth_leres"]
 forge = ["depth_leres"]
 comfyui = ["LeReS-DepthMapPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "res101.pth"
+size_bytes = 530760553
+sha256 = "1d696b2ef3e8336b057d0c15bc82d2fecef821bfebe5ef9d7671a5ec5dde520b"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/res101.pth"
+
+[[hardware.files]]
+filename = "latest_net_G.pth"
+size_bytes = 318268048
+sha256 = "50ec735d74ed6499562d898f41b49343e521808b8dae589aa3c2f5c9ac9f7462"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/latest_net_G.pth"
+variant = "merging network, used by the boost option"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""
+
+[[parameters]]
+id = "remove_near"
+label = "Remove Near %"
+summary = "Flattens the nearest part of the depth range to pure white."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "rm_nearest" }
+type = "float"
+default = 0.0
+range = [0.0, 100.0]
+effect = """\
+Pixels in the nearest given percent of the map before inversion are all set to the same white. Zero leaves the \
+map unchanged."""
+when_to_adjust = "Raise it to stop a very close object from spreading into fine gradations of near depth."
+
+[[parameters]]
+id = "remove_background"
+label = "Remove Background %"
+summary = "Flattens the farthest part of the depth range to pure black."
+names = { webui = "threshold_b", forge = "threshold_b", comfyui = "rm_background" }
+type = "float"
+default = 0.0
+range = [0.0, 100.0]
+effect = """\
+Pixels in the farthest given percent of the map are all set to black, which removes background structure from \
+the control image. Zero leaves the map unchanged."""
+when_to_adjust = "Raise it to make the background free for the prompt to fill."

@@ -1,20 +1,80 @@
 id = "depth_zoe_anything"
 label = "Zoe Depth Anything"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates depth with ZoeDepth built on a Depth Anything encoder, with indoor and outdoor models."
+description = """\
+Zoe Depth Anything is the ZoeDepth design with its encoder replaced by Depth Anything's. It predicts metric \
+depth, and the preprocessor turns that into a grayscale map with white near and black far. Choose the indoor or \
+outdoor checkpoint to match the scene.\n\n\
+The ComfyUI node is the only place it appears. The comfyui_controlnet_aux table pairs it with the Depth Anything \
+ControlNet."""
+how_it_works = """\
+ZoeDepth predicts metric depth with a relative-depth encoder underneath, and here that encoder is Depth \
+Anything's. The Depth Anything authors report fine-tuning their model with measured depth from NYUv2 and KITTI, \
+and the metric checkpoints come in indoor and outdoor versions. The preprocessor discards the distances: like \
+Depth ZoeDepth, it stretches the 2nd to 85th percentiles to the full range and inverts the result so near is \
+white."""
 control_types = ["depth"]
-effect = ""
-output = ""
+effect = "Replaces color and texture with a grayscale map of distance."
+output = "Grayscale depth map, white near and black far, with the extremes clipped."
 best_input = ""
 weak_input = ""
-models = []
+models = ["depth_anything_controlnet_sd15"]
 
-sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "comfyui_controlnet_aux_nodes",
+    "paper_depth_anything",
+    "gh_depth_anything_readme",
+    "hf_liheyoung_depth_anything_space",
+    "comfyui_controlnet_aux_readme",
+    "comfyui_controlnet_aux_src",
+]
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = []
 forge = []
 comfyui = ["Zoe_DepthAnythingPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "depth_anything_metric_depth_indoor.pt"
+variant = "indoor"
+size_bytes = 1343378277
+sha256 = "e25a96605a2ea2dbbe57308d024e89a803fa87fe981bd51d4cee245f1de57977"
+source_url = "https://huggingface.co/spaces/LiheYoung/Depth-Anything/resolve/7f1457e21e74e7aa001c88fc15da5c74598aa3fa/checkpoints_metric_depth/depth_anything_metric_depth_indoor.pt"
+
+[[hardware.files]]
+filename = "depth_anything_metric_depth_outdoor.pt"
+variant = "outdoor"
+size_bytes = 1343378277
+sha256 = "50a33976a4c909bd2284395d686bd644ce06c5c1c70f870d032b0eee93bdc56e"
+source_url = "https://huggingface.co/spaces/LiheYoung/Depth-Anything/resolve/7f1457e21e74e7aa001c88fc15da5c74598aa3fa/checkpoints_metric_depth/depth_anything_metric_depth_outdoor.pt"
+
+[[parameters]]
+id = "environment"
+label = "Environment"
+summary = "Which checkpoint to run: indoor or outdoor."
+names = { comfyui = "environment" }
+type = "enum"
+default = "indoor"
+choices = ["indoor", "outdoor"]
+effect = "Loads depth_anything_metric_depth_<environment>.pt."
+when_to_adjust = "Match it to the scene in the image."
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""

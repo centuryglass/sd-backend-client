@@ -1,20 +1,57 @@
 id = "depth_marigold"
 label = "Depth Marigold"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates relative depth by running a Stable Diffusion-based model, Marigold, for 20 denoising steps."
+description = """\
+Depth Marigold draws a grayscale depth map with Marigold, a depth estimator made by retraining Stable Diffusion \
+2 instead of training a new network. Forge and reForge include it; the WebUI extension, Forge Neo and ComfyUI do \
+not.\n\n\
+Its card says it works best at about 768 pixels, which matches Forge's default for the resolution slider. Every \
+map takes 20 denoising steps, and the Depth Anything V2 paper reports models of its own more than 10 times \
+faster than estimators built on Stable Diffusion. The weights are Apache-2.0."""
+how_it_works = """\
+Marigold starts from Stable Diffusion 2, a model that already knows what scenes look like. Its authors fine-tune \
+it on small synthetic datasets so that, instead of painting a picture, it denoises its way to a depth map \
+conditioned on the input photo. Forge runs one prediction with 20 denoising steps on the DDIM scheduler. The \
+model card says Marigold works best near 768 pixels and returns depth known only up to scale and shift."""
 control_types = ["depth"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Replaces color and texture with a grayscale map of relative distance."
+output = "Grayscale depth map."
+best_input = "Images around 768 pixels on the long side, where the model works best."
 weak_input = ""
 models = []
 
-sources = ["recorded_fixtures", "forge_preprocessors"]
-research_status = "stub"
-open_questions = []
+sources = [
+    "recorded_fixtures",
+    "forge_preprocessors",
+    "paper_marigold",
+    "hf_bingxin_marigold",
+    "paper_depth_anything_v2",
+]
+research_status = "drafted"
+open_questions = [
+    "Confirm which end of the gray range is near in Forge's output; the code maps the pipeline's values with 0.5 - 0.5 * depth.",
+]
 
 [names]
 webui = []
 forge = ["depth_marigold"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+speed = "slow: a diffusion model run for 20 denoising steps"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { forge = "processor_res" }
+type = "int"
+default = 768
+range = [128, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384. Forge shows this slider in \
+steps of 8, and WebUI has no Marigold preprocessor."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""

@@ -1,11 +1,21 @@
 id = "normal_midas"
 label = "Normal MiDaS"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Builds a normal map from a MiDaS depth map, the method ControlNet 1.0 used, with a background threshold."
+description = """\
+Normal MiDaS first estimates depth with MiDaS, then works out which way each surface faces from how that depth \
+changes across the image, and draws the result as a color map. Areas below the background threshold are set to \
+face the viewer, so far background becomes a flat color. WebUI lists it as normal_map and normal_midas.\n\n\
+The ControlNet 1.1 README calls this method neither reasonable nor physically correct and replaced it with \
+Normal BAE. Use it with the 1.0 normal model, which was trained on maps made this way."""
+how_it_works = """\
+There is no normal-estimating network here. MiDaS predicts depth. The preprocessor measures how steeply depth \
+slopes left to right and top to bottom at each pixel, combines those slopes with a constant for the forward \
+direction, and scales each result to a unit-length direction. The constant, the Z scale, controls how pronounced \
+the tilt looks. Pixels in the farthest part of the depth range have their slope set to zero, which makes them \
+face straight at the camera."""
 control_types = ["normal_map"]
-effect = ""
-output = ""
+effect = "Replaces the image with a color map of surface direction derived from estimated depth."
+output = "RGB normal map with a flat color for the far background."
 best_input = ""
 weak_input = ""
 models = ["control_sd15_normal"]
@@ -17,11 +27,66 @@ sources = [
     "forge_preprocessors",
     "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "paper_midas",
+    "cn10_readme",
+    "cn11_readme",
+    "hf_lllyasviel_annotators",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["normal_map", "normal_midas"]
 forge = ["normal_midas", "normalmap_midas"]
 comfyui = ["MiDaS-NormalMapPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "dpt_hybrid-midas-501f0c75.pt"
+size_bytes = 492757791
+sha256 = "501f0c75b3bca7daec6b3682c5054c09b366765aef6fa3a09d03a5cb4b230853"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/dpt_hybrid-midas-501f0c75.pt"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""
+
+[[parameters]]
+id = "background_threshold"
+label = "Background Threshold"
+summary = "Depth below this fraction of the range is flattened to face the viewer."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "bg_threshold" }
+type = "float"
+default = 0.4
+range = [0.0, 1.0]
+effect = """\
+Raise it to turn more of the far scene into the flat background color. WebUI and Forge default to 0.4 and \
+ComfyUI to 0.1."""
+when_to_adjust = "Raise it to remove busy background shapes. Lower it when the background should keep its relief."
+
+[[parameters]]
+id = "a"
+label = "Z Scale"
+summary = "How strongly surfaces tilt away from the viewer."
+names = { comfyui = "a" }
+type = "float"
+default = 6.283185307179586
+range = [0.0, 15.707963267948966]
+effect = """\
+A larger value keeps normals closer to facing the camera and softens the relief. WebUI and Forge do not show it \
+and use the default."""
+when_to_adjust = "Lower it for more pronounced relief."

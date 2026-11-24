@@ -519,3 +519,195 @@ title = "xinsir/controlnet-union-sdxl-1.0 model card"
 url = "https://huggingface.co/xinsir/controlnet-union-sdxl-1.0"
 kind = "model_card"
 accessed = "2026-11-22"
+
+[paper_midas]
+title = "Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-shot Cross-dataset Transfer (MiDaS, 2019)"
+url = "https://arxiv.org/abs/1907.01341"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_dpt]
+title = "Vision Transformers for Dense Prediction (DPT, 2021)"
+url = "https://arxiv.org/abs/2103.13413"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_zoedepth]
+title = "ZoeDepth: Zero-shot Transfer by Combining Relative and Metric Depth (2023)"
+url = "https://arxiv.org/abs/2302.12288"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_leres]
+title = "Learning to Recover 3D Scene Shape from a Single Image (LeReS, 2020)"
+url = "https://arxiv.org/abs/2012.09365"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_boosting_depth]
+title = "Boosting Monocular Depth Estimation Models to High-Resolution via Content-Adaptive Multi-Resolution Merging (2021)"
+url = "https://arxiv.org/abs/2105.14021"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_depth_anything]
+title = "Depth Anything: Unleashing the Power of Large-Scale Unlabeled Data (2024)"
+url = "https://arxiv.org/abs/2401.10891"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_depth_anything_v2]
+title = "Depth Anything V2 (2024)"
+url = "https://arxiv.org/abs/2406.09414"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_marigold]
+title = "Repurposing Diffusion-Based Image Generators for Monocular Depth Estimation (Marigold, 2023)"
+url = "https://arxiv.org/abs/2312.02145"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_metric3d]
+title = "Metric3D: Towards Zero-shot Metric 3D Prediction from A Single Image (2023)"
+url = "https://arxiv.org/abs/2307.10984"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_metric3dv2]
+title = "Metric3Dv2: A Versatile Monocular Geometric Foundation Model for Zero-shot Metric Depth and Surface Normal Estimation (2024)"
+url = "https://arxiv.org/abs/2404.15506"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_dsine]
+title = "Rethinking Inductive Biases for Surface Normal Estimation (DSINE, 2024)"
+url = "https://arxiv.org/abs/2403.00712"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_bae]
+title = "Estimating and Exploiting the Aleatoric Uncertainty in Surface Normal Estimation (2021)"
+url = "https://arxiv.org/abs/2109.09881"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_handrefiner]
+title = "HandRefiner: Refining Malformed Hands in Generated Images by Diffusion-based Conditional Inpainting (2023)"
+url = "https://arxiv.org/abs/2311.17957"
+kind = "paper"
+accessed = "2026-11-23"
+
+[paper_mesh_graphormer]
+title = "Mesh Graphormer (2021)"
+url = "https://arxiv.org/abs/2104.00272"
+kind = "paper"
+accessed = "2026-11-23"
+
+[gh_depth_anything_readme]
+title = "Depth Anything README"
+url = "https://github.com/LiheYoung/Depth-Anything/blob/1d03336771fe09c5398ffdd211441e33941a97dc/README.md"
+kind = "official_docs"
+accessed = "2026-11-23"
+
+[gh_depth_anything_controlnet_readme]
+title = "Depth Anything depth-conditioned ControlNet README"
+url = "https://github.com/LiheYoung/Depth-Anything/blob/1d03336771fe09c5398ffdd211441e33941a97dc/controlnet/README.md"
+kind = "official_docs"
+accessed = "2026-11-23"
+
+[gh_depth_anything_v2_readme]
+title = "Depth Anything V2 README (model sizes and licenses)"
+url = "https://github.com/DepthAnything/Depth-Anything-V2/blob/a561b849ebae10a6f5ef49e26c83cbbcd36c71bf/README.md"
+kind = "official_docs"
+accessed = "2026-11-23"
+
+[gh_metric3d_readme]
+title = "Metric3D README"
+url = "https://github.com/YvanYin/Metric3D/blob/eb5b6fac0dc155e4e52f576e304fbf11655ff339/README.md"
+kind = "official_docs"
+accessed = "2026-11-23"
+
+[gh_dsine_readme]
+title = "DSINE README"
+url = "https://github.com/baegwangbin/DSINE/blob/ef0c2afa32b4dd19cb8ca4567c652802cd92591c/README.md"
+kind = "official_docs"
+accessed = "2026-11-23"
+
+[gh_handrefiner_readme]
+title = "HandRefiner README"
+url = "https://github.com/wenquanlu/HandRefiner/blob/f07e196298bafe871064b2952587548e28ccd467/README.md"
+kind = "official_docs"
+accessed = "2026-11-23"
+
+[hf_lllyasviel_annotators]
+title = "lllyasviel/Annotators (preprocessor weights)"
+url = "https://huggingface.co/lllyasviel/Annotators/tree/982e7edaec38759d914a963c48c4726685de7d96"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_liheyoung_depth_anything_space]
+title = "LiheYoung/Depth-Anything Space (checkpoints and ControlNet)"
+url = "https://huggingface.co/spaces/LiheYoung/Depth-Anything/tree/7f1457e21e74e7aa001c88fc15da5c74598aa3fa"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_depth_anything_v2_small]
+title = "depth-anything/Depth-Anything-V2-Small model card"
+url = "https://huggingface.co/depth-anything/Depth-Anything-V2-Small"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_depth_anything_v2_base]
+title = "depth-anything/Depth-Anything-V2-Base model card"
+url = "https://huggingface.co/depth-anything/Depth-Anything-V2-Base"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_depth_anything_v2_large]
+title = "depth-anything/Depth-Anything-V2-Large model card"
+url = "https://huggingface.co/depth-anything/Depth-Anything-V2-Large"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_jugghm_metric3d]
+title = "JUGGHM/Metric3D (Metric3D weights)"
+url = "https://huggingface.co/JUGGHM/Metric3D/tree/80d2d1410afb4b23cd9d18c6be9144483d4b70b6"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_bingxin_marigold]
+title = "Bingxin/Marigold (Marigold depth v1-0) model card"
+url = "https://huggingface.co/Bingxin/Marigold"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_hr16_handrefiner_pruned]
+title = "hr16/ControlNet-HandRefiner-pruned model card and weights"
+url = "https://huggingface.co/hr16/ControlNet-HandRefiner-pruned/tree/f0917f0595ecb7f6435f49e4b2b28f8dd68ab0cb"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_bdsqlsz_qinglong_lllite]
+title = "bdsqlsz/qinglong_controlnet-lllite (DSINE annotator weights)"
+url = "https://huggingface.co/bdsqlsz/qinglong_controlnet-lllite/tree/67006a35a5955437d118490bfec822402eff09f5"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_sargezt_controlnet_v1e_sdxl_depth]
+title = "SargeZT/controlnet-v1e-sdxl-depth model card"
+url = "https://huggingface.co/SargeZT/controlnet-v1e-sdxl-depth"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_sargezt_controlnet_sd_xl_1_0_depth_faid_vidit]
+title = "SargeZT/controlnet-sd-xl-1.0-depth-faid-vidit model card"
+url = "https://huggingface.co/SargeZT/controlnet-sd-xl-1.0-depth-faid-vidit"
+kind = "model_card"
+accessed = "2026-11-23"
+
+[hf_sargezt_controlnet_sd_xl_1_0_depth_zeed]
+title = "SargeZT/controlnet-sd-xl-1.0-depth-zeed model card"
+url = "https://huggingface.co/SargeZT/controlnet-sd-xl-1.0-depth-zeed"
+kind = "model_card"
+accessed = "2026-11-23"

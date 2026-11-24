@@ -1,8 +1,16 @@
 id = "diffusers_zoe_depth_sdxl"
 label = "Diffusers SDXL Zoe Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "A full-size SDXL ControlNet from Hugging Face trained on ZoeDepth maps."
+description = """\
+The diffusers team's SDXL depth ControlNet trained on ZoeDepth maps. Its card says Zoe produces high-quality \
+depth maps that are better suited for conditioning. It is the same size as the diffusers MiDaS-style depth \
+ControlNet, about 2.5 GB in fp16."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. It was trained \
+on 3 million image and caption pairs from LAION-Aesthetics V2, for 700 GPU hours on 80 GB A100s, at batch size \
+256 and a constant learning rate of 1e-5, in fp16."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["depth"]
@@ -12,11 +20,11 @@ license = "openrail++"
 homepage = "https://huggingface.co/diffusers/controlnet-zoe-depth-sdxl-1.0"
 
 strengths = []
-weaknesses = []
-good_for = []
+weaknesses = ["Large: about 2.5 GB in fp16"]
+good_for = ["restyling while keeping scene layout"]
 
-sources = ["hf_diffusers_controlnet_zoe_depth_sdxl_1_0"]
-research_status = "stub"
+sources = ["hf_diffusers_controlnet_zoe_depth_sdxl_1_0", "paper_controlnet", "paper_zoedepth"]
+research_status = "verified"
 open_questions = []
 
 [[files]]

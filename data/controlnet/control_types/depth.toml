@@ -1,19 +1,58 @@
 id = "depth"
 label = "Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Keeps the layout of a scene in depth, what is near and what is far, drawn as a grayscale map."
+description = """\
+Depth keeps the three-dimensional layout of a reference image. The control image is a grayscale map in which \
+brighter pixels are nearer the camera and darker pixels are farther away. The generated image follows that \
+spacing, with the same foreground, middle ground and background and the same rounded or flat forms, while color, \
+texture, lighting and style come from the prompt.\n\n\
+Depth ignores outlines and surface detail, so it leaves the model more freedom than an edge type. It suits \
+restyling a scene or changing its subject while keeping the composition. Models trained on one estimator name \
+it: the SDXL T2I-Adapters come in separate MiDaS and Zoe versions, while ControlNet 1.1 depth accepts several \
+estimators."""
+how_it_works = """\
+A depth estimator is a neural network that looks at one photo and guesses how far each pixel is from the camera. \
+Depth models are trained on pairs of images and these estimated depth maps, with a caption for each. During \
+generation the model reads the map alongside the noisy image at every step and nudges the result so its \
+distances match. Because training used maps from estimators, the better models also accept real depth: the \
+ControlNet 1.1 card says its depth model works on depth maps from rendering engines."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Grayscale depth map, white near and black far."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
+    "paper_midas",
+    "paper_depth_anything",
+    "hf_tencentarc_t2i_adapter_depth_midas_sdxl_1_0",
+    "hf_xinsir_controlnet_depth_sdxl_1_0",
+    "comfyui_controlnet_aux_readme",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Depth"]
 forge = ["Depth"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Restyle a scene and keep its composition"
+description = """\
+Estimate depth from a photo or render, then prompt for a new style, setting or subject. Near and far objects \
+keep their places while colors, materials and detail change."""
+
+[[uses]]
+kind = "creative"
+title = "Turn a 3D blockout into a finished image"
+description = """\
+Render a depth pass from a simple 3D scene and use it as the control image with no preprocessor. The ControlNet \
+1.1 card says its depth model works on real depth maps from rendering engines."""
 
 [choosing]
 guide = ""
@@ -51,4 +90,6 @@ models = [
     "sai_control_lora_depth_sdxl",
     "kohya_lllite_depth_sdxl",
     "kohya_lllite_depth_anime_sdxl",
+    "depth_anything_controlnet_sd15",
+    "handrefiner_inpaint_depth_hand_sd15",
 ]

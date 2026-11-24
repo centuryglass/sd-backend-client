@@ -1,28 +1,38 @@
 id = "t2iadapter_depth_sd14v1"
 label = "T2I-Adapter Depth v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The first TencentARC T2I-Adapter for depth maps on SD 1.x; its zoo entry says it is not final."
+description = """\
+The first T2I-Adapter for depth maps on SD1.x. It is a small add-on, about 309 MB at full precision, that steers \
+generation to follow a depth map. TencentARC's adapter zoo lists it as not the final model, still under \
+training, and an improved t2iadapter_depth_sd15v2 followed.\n\n\
+comfyui_controlnet_aux pairs T2I-Adapter depth with its MiDaS, LeReS and Zoe preprocessors."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. This adapter takes depth maps."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["depth"]
-preprocessors = ["depth_midas"]
+preprocessors = ["depth_midas", "depth_leres", "depth_zoe"]
 trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Small and fast compared with a ControlNet"]
+weaknesses = ["Marked not final in TencentARC's adapter zoo"]
+good_for = ["restyling while keeping scene layout"]
 
 sources = [
     "hf_tencentarc_t2i_adapter",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "t2i_adapter_zoo",
+    "paper_t2i_adapter",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "stub"
+research_status = "drafted"
 open_questions = [
-    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
+    "Find which depth estimator the SD1.x adapters were trained on. No model card says.",
 ]
 
 [[files]]

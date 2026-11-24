@@ -1,14 +1,24 @@
 id = "depth_anything"
 label = "Depth Anything"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates relative depth with Depth Anything V1, a model trained on about 62 million unlabeled images."
+description = """\
+Depth Anything V1 draws a grayscale depth map, white near and black far, with a model its authors trained for \
+robust results on any kind of image, from photos to artwork. It comes in three sizes. WebUI and Forge always use \
+the large one; ComfyUI lets you pick large, base or small, and the smaller ones are much lighter downloads.\n\n\
+The authors also trained a depth ControlNet on this estimator's maps, which they say gives more precise results \
+than the earlier MiDaS-based ControlNet. See the Depth Anything ControlNet model record."""
+how_it_works = """\
+Depth Anything trains one depth network on labeled images plus about 62 million unlabeled ones, using a data \
+engine that labels the unlabeled images automatically. Two choices make that extra data useful. The network \
+trains on strongly augmented versions of each image, which is a harder task, and an auxiliary objective makes it \
+inherit the scene knowledge of a pre-trained vision encoder. The output is relative depth, which the \
+preprocessor stretches to the full gray range."""
 control_types = ["depth"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Replaces color and texture with a grayscale map of relative distance."
+output = "Grayscale depth map, white near and black far, stretched to the full 0-255 range."
+best_input = "Photos and other images of any kind; the model was built for robust results on any image."
 weak_input = ""
-models = []
+models = ["depth_anything_controlnet_sd15"]
 
 sources = [
     "recorded_fixtures",
@@ -16,11 +26,70 @@ sources = [
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "paper_depth_anything",
+    "gh_depth_anything_readme",
+    "gh_depth_anything_controlnet_readme",
+    "hf_liheyoung_depth_anything_space",
+    "comfyui_controlnet_aux_readme",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
-open_questions = []
+research_status = "drafted"
+open_questions = [
+    "Confirm that brighter means nearer in the output, from a run or a source that says so.",
+]
 
 [names]
 webui = ["depth_anything"]
 forge = ["depth_anything"]
 comfyui = ["DepthAnythingPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "depth_anything_vitl14.pth"
+variant = "vitl14 (large)"
+size_bytes = 1341401882
+sha256 = "6c6a383e33e51c5fdfbf31e7ebcda943973a9e6a1cbef1564afe58d7f2e8fe63"
+source_url = "https://huggingface.co/spaces/LiheYoung/Depth-Anything/resolve/7f1457e21e74e7aa001c88fc15da5c74598aa3fa/checkpoints/depth_anything_vitl14.pth"
+
+[[hardware.files]]
+filename = "depth_anything_vitb14.pth"
+variant = "vitb14 (base)"
+size_bytes = 389962664
+sha256 = "64ae214ae4e27424b644c49464c0aa243016f6f753d95097c8eb9ad0b9cb2d9b"
+source_url = "https://huggingface.co/spaces/LiheYoung/Depth-Anything/resolve/7f1457e21e74e7aa001c88fc15da5c74598aa3fa/checkpoints/depth_anything_vitb14.pth"
+
+[[hardware.files]]
+filename = "depth_anything_vits14.pth"
+variant = "vits14 (small)"
+size_bytes = 99219880
+sha256 = "59afe57cfd9f4284deaf5b753d954723d7136ae842fba3e068ba03537ca1e60e"
+source_url = "https://huggingface.co/spaces/LiheYoung/Depth-Anything/resolve/7f1457e21e74e7aa001c88fc15da5c74598aa3fa/checkpoints/depth_anything_vits14.pth"
+
+[[parameters]]
+id = "checkpoint"
+label = "Checkpoint"
+summary = "Which model size to run: large, base or small."
+names = { comfyui = "ckpt_name" }
+type = "enum"
+default = "depth_anything_vitl14.pth"
+choices = ["depth_anything_vitl14.pth", "depth_anything_vitb14.pth", "depth_anything_vits14.pth"]
+effect = "Loads the named file. WebUI and Forge always load the large one."
+when_to_adjust = "Pick a smaller checkpoint to save time and memory."
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384. WebUI and Forge show no \
+resolution slider for this preprocessor."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""

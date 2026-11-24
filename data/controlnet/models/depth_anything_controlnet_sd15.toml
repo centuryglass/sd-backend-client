@@ -1,0 +1,45 @@
+id = "depth_anything_controlnet_sd15"
+label = "Depth Anything ControlNet"
+summary = "A depth ControlNet for SD 1.5 that the Depth Anything team trained on its own depth maps."
+description = """\
+A depth ControlNet that the Depth Anything authors retrained with diffusers on Depth Anything's maps. Their \
+README says it offers more precise synthesis than the earlier MiDaS-based ControlNet. Its config shows an SD 1.x \
+text encoder width, so it is an SD 1.5 model.\n\n\
+comfyui_controlnet_aux pairs it with its Depth Anything, Depth Anything V2 and Zoe Depth Anything preprocessors. \
+The weights sit in the authors' Hugging Face Space, which lists the license as Apache-2.0."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. The authors \
+retrained it with the diffusers ControlNet training script on depth maps from Depth Anything. The README gives \
+no further training details."""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["depth"]
+preprocessors = ["depth_anything", "depth_anything_v2", "depth_zoe_anything"]
+trainer = "Depth Anything team"
+license = "apache-2.0"
+homepage = "https://huggingface.co/spaces/LiheYoung/Depth-Anything"
+
+strengths = ["More precise synthesis than the earlier MiDaS-based ControlNet, per its README"]
+weaknesses = ["Training details are not published"]
+good_for = ["restyling while keeping scene layout"]
+
+sources = [
+    "gh_depth_anything_controlnet_readme",
+    "gh_depth_anything_readme",
+    "hf_liheyoung_depth_anything_space",
+    "comfyui_controlnet_aux_readme",
+    "paper_depth_anything",
+]
+research_status = "verified"
+open_questions = []
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+format = "safetensors"
+precision = "fp32"
+size_bytes = 1445157120
+sha256 = "da222ed7fd64c23269deb0872156b79673370a7ff8bae098e89b6798375cbc81"
+webui_hash = "48a4bc3a"
+source_url = "https://huggingface.co/spaces/LiheYoung/Depth-Anything/resolve/7f1457e21e74e7aa001c88fc15da5c74598aa3fa/checkpoints_controlnet/diffusion_pytorch_model.safetensors"
