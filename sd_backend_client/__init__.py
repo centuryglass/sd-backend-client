@@ -35,8 +35,10 @@ from sd_backend_client.api.webui.script_info_types import ScriptRequestData
 from sd_backend_client.discovery.backend_detector import SearchLocations, default_search_locations, detect
 from sd_backend_client.discovery.detected_backend import BackendKind, DetectedInstall, DetectedServer, \
     DetectionResult, Finding, FindingCode, FindingSeverity, InstallOwner
-from sd_backend_client.errors import AuthError, BackendConnectionError, BackendTimeoutError, GenerationError, \
-    SDBackendError, ServerError, UnexpectedResponseError, WorkflowValidationError
+from sd_backend_client.errors import AuthError, BackendConnectionError, BackendLaunchError, BackendTimeoutError, \
+    GenerationError, LaunchCancelledError, SDBackendError, ServerError, UnexpectedResponseError, \
+    WorkflowValidationError
+from sd_backend_client.launch.managed_comfyui import ManagedComfyUI, ManagedState
 
 __all__ = [
     # Clients
@@ -79,6 +81,9 @@ __all__ = [
     'FindingSeverity',
     'BackendKind',
     'InstallOwner',
+    # Running a local install
+    'ManagedComfyUI',
+    'ManagedState',
     # Generation handles
     'GenerationHandle',
     'GenerationStatus',
@@ -94,4 +99,6 @@ __all__ = [
     'UnexpectedResponseError',
     'WorkflowValidationError',
     'GenerationError',
+    'BackendLaunchError',
+    'LaunchCancelledError',
 ]

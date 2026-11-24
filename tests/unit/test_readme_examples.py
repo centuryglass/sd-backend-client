@@ -2,7 +2,8 @@
 
 Each example runs offline with `connect_to_backend` and the client constructors patched to return a real client whose
 `get` replays a recording (see `recorded_replay`), so discovery calls parse real responses. `detect` is patched to
-return a fixed result, so no example reads this machine's files or probes its ports. The `submit_*` methods are
+return a fixed result, so no example reads this machine's files or probes its ports. `ManagedComfyUI` runs a fake
+process whose server is ready at once, and its `connect` returns the offline client. The `submit_*` methods are
 replaced by autospecced stand-ins that check the call signature and return an already-finished handle. A renamed
 export, method or parameter fails here.
 """
@@ -21,8 +22,9 @@ from PIL import Image
 import sd_backend_client
 from sd_backend_client import A1111Webservice, Backend, BackendKind, ComfyUiWebservice, DetectedInstall, \
     DetectedServer, DetectionResult, Finding, FindingCode, GenerationHandle, GenerationProgress, GenerationResult, \
-    GenerationStatus, InstallOwner, PreprocessorParams
+    GenerationStatus, InstallOwner, ManagedComfyUI, ManagedState, PreprocessorParams
 
+from .fake_process import FakeProcessFactory
 from .recorded_replay import recordings, replay
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -79,6 +81,7 @@ def _detection_result() -> DetectionResult:
     """A result with a running ComfyUI install, a WebUI install with a finding, and an unlinked server."""
     comfyui = DetectedInstall(kind=BackendKind.COMFYUI, owner=InstallOwner.NONE, path=Path('/sd/ComfyUI'),
                               entry_point=Path('/sd/ComfyUI/main.py'),
+                              launch_command=['/sd/ComfyUI/venv/bin/python', '/sd/ComfyUI/main.py'],
                               server=DetectedServer(url='http://localhost:8188', kind=BackendKind.COMFYUI))
     webui = DetectedInstall(kind=BackendKind.WEBUI, owner=InstallOwner.STABILITY_MATRIX, path=Path('/sd/forge'),
                             entry_point=Path('/sd/forge/launch.py'), webui_variant='forge',
@@ -102,12 +105,31 @@ def _offline_backend(recording: dict[str, Any]) -> Backend:
     return service
 
 
+def _offline_managed_comfyui(backend: Backend) -> type[ManagedComfyUI]:
+    """A `ManagedComfyUI` that runs a fake process, is ready once started and connects to `backend`."""
+
+    class OfflineManagedComfyUI(ManagedComfyUI):
+        """Runs a fake process instead of the install, and connects to the recording's client."""
+
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, process_factory=FakeProcessFactory(),
+                             health_check=self._answer, **kwargs)
+
+        def _answer(self, _url: str) -> Optional[list[str]]:
+            return self.command[1:] if self.state == ManagedState.STARTING else None
+
+        def connect(self, **kwargs: Any) -> Any:
+            return backend
+
+    return OfflineManagedComfyUI
+
+
 @pytest.fixture(name='connect_offline')
 def fixture_connect_offline(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     """Run in an empty directory, and return a function that points the package's clients at a recording.
 
-    `connect_to_backend` and the constructor of the recording's client class return the offline client. `detect`
-    returns `_detection_result()` from the start.
+    `connect_to_backend`, `ManagedComfyUI.connect` and the constructor of the recording's client class return the
+    offline client. `detect` returns `_detection_result()` from the start.
     """
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sd_backend_client, 'detect',
@@ -120,6 +142,7 @@ def fixture_connect_offline(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         client_class = type(backend)
         monkeypatch.setattr(sd_backend_client, client_class.__name__,
                             create_autospec(client_class, return_value=backend))
+        monkeypatch.setattr(sd_backend_client, 'ManagedComfyUI', _offline_managed_comfyui(backend))
         return backend
 
     return connect

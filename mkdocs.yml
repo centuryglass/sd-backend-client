@@ -38,6 +38,7 @@ nav:
       - ControlNet: reference/controlnet.md
       - Discovery: reference/discovery.md
       - Local detection: reference/detection.md
+      - Running a local install: reference/launch.md
       - Generation handles: reference/generation.md
       - Errors: reference/errors.md
 

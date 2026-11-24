@@ -20,6 +20,13 @@ diffusion and need a checkpoint loaded. They are gated behind an opt-in flag::
     pytest tests/ --run-generation
     # or
     RUN_SD_GENERATION=1 pytest tests/
+
+The process tests start a stub ComfyUI as a real child process. They need no backend but wait on wall-clock time,
+so they are opt-in too::
+
+    pytest tests/ --run-process
+    # or
+    RUN_SD_PROCESS=1 pytest tests/
 """
 import os
 
@@ -46,12 +53,19 @@ def pytest_addoption(parser):
         default=False,
         help='Run the slow generation tests that actually invoke diffusion (needs a loaded checkpoint).',
     )
+    parser.addoption(
+        '--run-process',
+        action='store_true',
+        default=False,
+        help='Run the tests that start a stub ComfyUI as a real child process.',
+    )
 
 
 def pytest_configure(config):
     config.addinivalue_line('markers', 'integration: talks to a live WebUI instance.')
     config.addinivalue_line('markers', 'generation: invokes real diffusion; slow, needs a loaded checkpoint.')
     config.addinivalue_line('markers', 'controlnet: requires the ControlNet extension to be installed.')
+    config.addinivalue_line('markers', 'process: starts a real child process and waits on it.')
     config.pluginmanager.register(ResultsRecorder(_output_dir_path(), _generation_enabled(config)),
                                   'sd-review-results')
 
@@ -66,12 +80,14 @@ def _output_dir_path() -> str:
 
 
 def pytest_collection_modifyitems(config, items):
-    if _generation_enabled(config):
-        return
+    run_process = bool(config.getoption('--run-process') or os.environ.get('RUN_SD_PROCESS'))
     skip_gen = pytest.mark.skip(reason='generation tests are opt-in: use --run-generation or RUN_SD_GENERATION=1')
+    skip_process = pytest.mark.skip(reason='process tests are opt-in: use --run-process or RUN_SD_PROCESS=1')
     for item in items:
-        if 'generation' in item.keywords:
+        if 'generation' in item.keywords and not _generation_enabled(config):
             item.add_marker(skip_gen)
+        if 'process' in item.keywords and not run_process:
+            item.add_marker(skip_process)
 
 
 @pytest.fixture(scope='session')

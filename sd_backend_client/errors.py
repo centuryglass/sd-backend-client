@@ -110,3 +110,27 @@ class GenerationError(SDBackendError):
     def __init__(self, status: GenerationStatus, message: Optional[str] = None) -> None:
         self.status = status
         super().__init__(message or f'Generation ended with status {status.value}')
+
+
+class BackendLaunchError(SDBackendError):
+    """A backend process this package started exited, or failed to launch, before it served.
+
+    Also raised without launching when a server of that backend already answers on the port. Otherwise the last output
+    lines usually say why, such as a missing dependency or a port already in use.
+
+    Attributes
+    ----------
+    exit_code: int, optional
+        The process's exit code, or None if it failed to launch or never started.
+    output_tail: list[str]
+        The last lines of the process's output, oldest first.
+    """
+
+    def __init__(self, message: str, exit_code: Optional[int], output_tail: list[str]) -> None:
+        self.exit_code = exit_code
+        self.output_tail = output_tail
+        super().__init__(message)
+
+
+class LaunchCancelledError(SDBackendError):
+    """A wait for a backend process to start serving ended because it was cancelled or the process was stopped."""

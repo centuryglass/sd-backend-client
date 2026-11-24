@@ -17,3 +17,7 @@ A failure talking to a backend raises a subclass of `SDBackendError`. Invalid ca
 ::: sd_backend_client.WorkflowValidationError
 
 ::: sd_backend_client.GenerationError
+
+::: sd_backend_client.BackendLaunchError
+
+::: sd_backend_client.LaunchCancelledError
