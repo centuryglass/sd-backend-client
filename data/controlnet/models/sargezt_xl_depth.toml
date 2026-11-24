@@ -1,25 +1,31 @@
 id = "sargezt_xl_depth"
 label = "SargeZT SDXL Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SargeZT's early SDXL depth ControlNet, trained on depth maps perceptually mapped from ZoeDepth."
+description = """\
+An early community depth ControlNet for SDXL 1.0, from SargeZT. Its card says the input depth maps are \
+perceptually mapped from ZoeDepth and shows two sample images. lllyasviel's collection mirrors it under the name \
+sargezt_xl_depth.\n\n\
+The card's license field is creativeml-openrail-m, while its body points to the SDXL 1.0 license."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This one was \
+trained on depth maps mapped from ZoeDepth."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["depth"]
-preprocessors = []
+preprocessors = ["depth_zoe"]
 trainer = "SargeZT"
-license = ""
+license = "creativeml-openrail-m"
 homepage = "https://huggingface.co/lllyasviel/sd_control_collection"
 
 strengths = []
-weaknesses = []
+weaknesses = ["Little documentation: the card has two samples and no training details"]
 good_for = []
 
-sources = ["hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "Find the original SargeZT release this collection file was renamed from, and its model card.",
-]
+sources = ["hf_lllyasviel_sd_control_collection", "hf_sargezt_controlnet_v1e_sdxl_depth"]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "sargezt_xl_depth.safetensors"

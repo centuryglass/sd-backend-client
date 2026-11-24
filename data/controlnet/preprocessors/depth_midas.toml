@@ -1,22 +1,37 @@
 id = "depth_midas"
 label = "Depth MiDaS"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates relative depth with MiDaS, the estimator the original ControlNet depth models were trained on."
+description = """\
+Depth MiDaS guesses how far each part of an image is from the camera and draws it as a grayscale map, white for \
+near and black for far. It runs the DPT-Hybrid version of MiDaS, which was trained on a mix of datasets so it \
+copes with many kinds of scenes. The map is relative: it ranks things as nearer or farther and carries no \
+distances in meters.\n\n\
+WebUI lists it as depth and depth_midas. The ControlNet 1.0 depth model and the T2I-Adapter MiDaS depth adapter \
+for SDXL were trained on MiDaS maps, and the ControlNet 1.1 depth model accepts them."""
+how_it_works = """\
+MiDaS is a neural network trained on photos and film frames paired with depth data from several sources. Those \
+sources measure depth in different units, so the training objective ignores each dataset's scale and offset. \
+This is why the output ranks near and far but has no real units. The DPT-Hybrid version reads the whole image \
+with a vision transformer and rebuilds a full-size depth map with a convolutional decoder. The preprocessor then \
+stretches the result so its nearest point is white and its farthest is black."""
 control_types = ["depth"]
-effect = ""
-output = ""
+effect = "Replaces color and texture with a smooth grayscale map of relative distance."
+output = "Grayscale depth map, white near and black far, stretched to the full 0-255 range."
 best_input = ""
-weak_input = ""
+weak_input = "Fine detail: depth estimators of this kind return maps that lack fine-grained detail."
 models = [
     "control_sd15_depth",
     "control_v11f1p_sd15_depth",
-    "t2iadapter_depth_sd14v1",
-    "t2iadapter_depth_sd15v2",
-    "t2i_adapter_depth_midas_sdxl",
     "diffusers_depth_sdxl",
     "diffusers_depth_sdxl_mid",
     "diffusers_depth_sdxl_small",
+    "kohya_lllite_depth_anime_sdxl",
+    "kohya_lllite_depth_sdxl",
+    "sai_control_lora_depth_sdxl",
+    "t2i_adapter_depth_midas_sdxl",
+    "t2iadapter_depth_sd14v1",
+    "t2iadapter_depth_sd15v2",
+    "xinsir_depth_sdxl",
 ]
 
 sources = [
@@ -25,11 +40,69 @@ sources = [
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "paper_midas",
+    "paper_dpt",
+    "paper_boosting_depth",
+    "hf_lllyasviel_annotators",
+    "cn10_readme",
+    "cn11_readme",
+    "hf_tencentarc_t2i_adapter_depth_midas_sdxl_1_0",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["depth", "depth_midas"]
 forge = ["depth_midas"]
 comfyui = ["MiDaS-DepthMapPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "dpt_hybrid-midas-501f0c75.pt"
+size_bytes = 492757791
+sha256 = "501f0c75b3bca7daec6b3682c5054c09b366765aef6fa3a09d03a5cb4b230853"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/dpt_hybrid-midas-501f0c75.pt"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""
+
+[[parameters]]
+id = "a"
+label = "Normal Z Scale"
+summary = "Only shapes the normal map; the depth map ignores it."
+names = { comfyui = "a" }
+type = "float"
+default = 6.283185307179586
+range = [0.0, 15.707963267948966]
+effect = """\
+The ComfyUI node shares its inputs with MiDaS Normal Map. The depth map is computed before this value is used, \
+so it has no effect here."""
+when_to_adjust = "Leave it alone for depth."
+
+[[parameters]]
+id = "bg_threshold"
+label = "Background Threshold"
+summary = "Only shapes the normal map; the depth map ignores it."
+names = { comfyui = "bg_threshold" }
+type = "float"
+default = 0.1
+range = [0.0, 1.0]
+effect = """\
+The ComfyUI node shares its inputs with MiDaS Normal Map. The depth map is computed before this value is used, \
+so it has no effect here."""
+when_to_adjust = "Leave it alone for depth."

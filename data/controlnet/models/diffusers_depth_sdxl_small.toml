@@ -1,8 +1,14 @@
 id = "diffusers_depth_sdxl_small"
 label = "Diffusers SDXL Depth Small"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The smallest SDXL depth ControlNet from Hugging Face, seven times smaller than the full model."
+description = """\
+An experimental, smaller SDXL ControlNet for depth from the diffusers team, seven times smaller than the full \
+model at 320 MB in fp16. Its card says it works well on most depth maps, but for more complex ones the bigger \
+checkpoints may do better, and suggests adjusting the conditioning scale and guidance scale."""
+how_it_works = """\
+A smaller ControlNet, initialized from the SDXL U-Net without distillation and with no attention blocks. It was \
+trained on 3 million images from the LAION Aesthetics 6+ subset, batch size 256, for 50,000 steps at a learning \
+rate of 3e-5, in fp16."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["depth"]
@@ -11,12 +17,18 @@ trainer = "Hugging Face diffusers"
 license = "openrail++"
 homepage = "https://huggingface.co/diffusers/controlnet-depth-sdxl-1.0-small"
 
-strengths = []
-weaknesses = []
+strengths = ["Seven times smaller than the full SDXL depth ControlNet"]
+weaknesses = ["Experimental", "Complex depth maps may need a bigger checkpoint"]
 good_for = []
 
-sources = ["hf_diffusers_controlnet_depth_sdxl_1_0_small", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_diffusers_controlnet_depth_sdxl_1_0_small",
+    "hf_lllyasviel_sd_control_collection",
+    "paper_controlnet",
+    "paper_midas",
+    "paper_dpt",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

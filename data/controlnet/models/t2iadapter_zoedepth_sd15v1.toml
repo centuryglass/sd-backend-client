@@ -1,8 +1,14 @@
 id = "t2iadapter_zoedepth_sd15v1"
 label = "T2I-Adapter ZoeDepth v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC T2I-Adapter for ZoeDepth maps on SD1.x."
+description = """\
+A TencentARC T2I-Adapter for depth maps on SD1.x whose name says it takes ZoeDepth maps. It sits beside the \
+MiDaS-style depth adapters in the same repository. It steers generation to follow a depth map at a fraction of a \
+ControlNet's cost."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. This adapter takes depth maps from ZoeDepth."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["depth"]
@@ -11,13 +17,20 @@ trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
+strengths = ["Small and fast compared with a ControlNet"]
 weaknesses = []
-good_for = []
+good_for = ["restyling while keeping scene layout"]
 
-sources = ["hf_tencentarc_t2i_adapter"]
-research_status = "stub"
-open_questions = []
+sources = [
+    "hf_tencentarc_t2i_adapter",
+    "hf_tencentarc_t2i_adapter_v2_commit",
+    "paper_t2i_adapter",
+    "paper_zoedepth",
+]
+research_status = "drafted"
+open_questions = [
+    "Find the release date, training data and SD version of this adapter. No README or model card describes it, and the zoe pairing is read from the file name.",
+]
 
 [[files]]
 filename = "t2iadapter_zoedepth_sd15v1.pth"

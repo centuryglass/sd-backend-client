@@ -1,22 +1,36 @@
 id = "xinsir_depth_sdxl"
 label = "Xinsir SDXL Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "xinsir's SDXL depth ControlNet, shown with both Zoe and MiDaS depth maps."
+description = """\
+An SDXL depth ControlNet from xinsir. Its card says it supports Zoe and MiDaS, and its example code randomly \
+picks one of the two estimators to make each control image. It advises resizing the control image to 1024 by \
+1024 or another training bucket resolution for best results, and changing the VAE when testing with other base \
+checkpoints.\n\n\
+It is Apache-2.0 licensed."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. The card does \
+not describe its training data or schedule."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["depth"]
-preprocessors = []
+preprocessors = ["depth_zoe", "depth_midas"]
 trainer = "xinsir"
 license = "apache-2.0"
 homepage = "https://huggingface.co/xinsir/controlnet-depth-sdxl-1.0"
 
-strengths = []
+strengths = ["Handles both Zoe and MiDaS depth maps, per its card"]
 weaknesses = []
-good_for = []
+good_for = ["restyling while keeping scene layout"]
 
-sources = ["hf_xinsir_controlnet_depth_sdxl_1_0"]
-research_status = "stub"
+sources = [
+    "hf_xinsir_controlnet_depth_sdxl_1_0",
+    "paper_controlnet",
+    "paper_midas",
+    "paper_zoedepth",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

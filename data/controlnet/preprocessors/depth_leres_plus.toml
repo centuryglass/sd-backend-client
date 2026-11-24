@@ -1,14 +1,25 @@
 id = "depth_leres_plus"
 label = "Depth LeReS++"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "LeReS depth with the boost option, which merges estimates made at several scales for finer detail."
+description = """\
+Depth LeReS++ is LeReS with its boost option turned on. Instead of one pass, it estimates depth at different \
+scales and merges the results, so the map keeps both the overall scene layout and small details that a single \
+pass blurs. It takes the same Remove Near and Remove Background sliders as LeReS and draws white for near, black \
+for far.\n\n\
+Boost uses the second downloaded file, a 318 MB merging network. ComfyUI exposes it as the boost switch on the \
+LeReS node."""
+how_it_works = """\
+Depth networks trade off scene consistency against detail: a low-resolution pass gets the layout right, and a \
+high-resolution pass adds fine detail but can distort the layout. The boosting method behind LeReS++ estimates \
+depth at several resolutions and in image patches that depend on the content, then combines them with a small \
+merging network. The result is a depth map with more detail than a single pass gives, at the cost of several \
+runs of the depth network."""
 control_types = ["depth"]
-effect = ""
-output = ""
+effect = "Like LeReS, with finer detail in the depth map."
+output = "Grayscale depth map, white near and black far."
 best_input = ""
 weak_input = ""
-models = []
+models = ["control_v11f1p_sd15_depth"]
 
 sources = [
     "recorded_fixtures",
@@ -16,8 +27,14 @@ sources = [
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "paper_leres",
+    "paper_boosting_depth",
+    "hf_lllyasviel_annotators",
+    "cn11_readme",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -27,3 +44,60 @@ comfyui = ["LeReS-DepthMapPreprocessor"]
 
 [name_parameters]
 comfyui = { boost = "enable" }
+
+[hardware]
+device = "gpu_preferred"
+speed = "slower than LeReS: it runs the depth network several times"
+
+[[hardware.files]]
+filename = "res101.pth"
+size_bytes = 530760553
+sha256 = "1d696b2ef3e8336b057d0c15bc82d2fecef821bfebe5ef9d7671a5ec5dde520b"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/res101.pth"
+
+[[hardware.files]]
+filename = "latest_net_G.pth"
+size_bytes = 318268048
+sha256 = "50ec735d74ed6499562d898f41b49343e521808b8dae589aa3c2f5c9ac9f7462"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/latest_net_G.pth"
+variant = "merging network, used by the boost option"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""
+
+[[parameters]]
+id = "remove_near"
+label = "Remove Near %"
+summary = "Flattens the nearest part of the depth range to pure white."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "rm_nearest" }
+type = "float"
+default = 0.0
+range = [0.0, 100.0]
+effect = """\
+Pixels in the nearest given percent of the map before inversion are all set to the same white. Zero leaves the \
+map unchanged."""
+when_to_adjust = "Raise it to stop a very close object from spreading into fine gradations of near depth."
+
+[[parameters]]
+id = "remove_background"
+label = "Remove Background %"
+summary = "Flattens the farthest part of the depth range to pure black."
+names = { webui = "threshold_b", forge = "threshold_b", comfyui = "rm_background" }
+type = "float"
+default = 0.0
+range = [0.0, 100.0]
+effect = """\
+Pixels in the farthest given percent of the map are all set to black, which removes background structure from \
+the control image. Zero leaves the map unchanged."""
+when_to_adjust = "Raise it to make the background free for the prompt to fill."

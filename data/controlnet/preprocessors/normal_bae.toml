@@ -1,11 +1,22 @@
 id = "normal_bae"
 label = "Normal BAE"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Estimates a surface normal map with Bae's network, the preprocessor the ControlNet 1.1 normal model uses."
+description = """\
+Normal BAE draws each surface's facing direction as a color map. In the convention of the ControlNet 1.1 normal \
+model, blue faces the camera, red faces left and green faces up. It carries surface angle, including small bumps \
+that a depth map flattens.\n\n\
+The ControlNet 1.1 README says the network was trained on the NYU-V2 visualization protocol and that the normal \
+model can read real normal maps from 3D engines if their colors follow ScanNet's convention. WebUI lists it as \
+normal_bae. Forge and reForge also list it as normalbae."""
+how_it_works = """\
+The network predicts a probability distribution over surface directions at each pixel, not a single direction. \
+The spread of that distribution tells how uncertain the estimate is. The paper uses that uncertainty to choose \
+which pixels to train on, so large flat surfaces do not dominate. Small multilayer perceptrons then refine the \
+prediction at the chosen pixels, which improves detail. The preprocessor shows the expected direction as a \
+color."""
 control_types = ["normal_map"]
-effect = ""
-output = ""
+effect = "Replaces the image with a color map of the direction each surface faces."
+output = "RGB normal map: blue faces the camera, red faces left, green faces up."
 best_input = ""
 weak_input = ""
 models = ["control_v11p_sd15_normalbae"]
@@ -17,11 +28,40 @@ sources = [
     "forge_preprocessors",
     "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "paper_bae",
+    "cn11_readme",
+    "hf_lllyasviel_annotators",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["normal_bae"]
 forge = ["normalbae", "normal_bae_variant"]
 comfyui = ["BAE-NormalMapPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "scannet.pt"
+size_bytes = 290767728
+sha256 = "03dbf1600c51ee3d45c29f77b77bf1a3b7a24c3452dba62a4ae658f37330c209"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/scannet.pt"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [128, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. Larger values keep finer detail and take longer. ComfyUI accepts up to 16384. Forge shows this slider from \
+128 in steps of 8, and WebUI has no resolution slider for this preprocessor."""
+when_to_adjust = """\
+Raise it toward the generation's short side for finer depth detail. Lower it for a smoother, simpler map."""

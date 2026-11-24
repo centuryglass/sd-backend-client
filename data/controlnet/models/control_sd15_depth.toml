@@ -1,8 +1,20 @@
 id = "control_sd15_depth"
 label = "ControlNet 1.0 Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The original ControlNet 1.0 depth model for SD 1.5, trained on MiDaS depth maps."
+description = """\
+The first depth ControlNet for Stable Diffusion 1.5, from lllyasviel's ControlNet 1.0 release. It reads a MiDaS \
+depth map, white near and black far, and steers generation to keep the same layout in depth. Unlike Stability's \
+SD2 depth model, which works from a 64 by 64 map, it receives the full 512 by 512 depth map and so preserves \
+more detail.\n\n\
+ControlNet 1.1 replaced it with control_v11f1p_sd15_depth. The 1.1 README says the 1.0 training data contained \
+duplicated grayscale people, blurry images and wrongly paired captions, and that 1.1 should be a bit better with \
+other preprocessors or resolutions."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on pairs of images and MiDaS depth maps, with a caption for each. The ControlNet paper tests depth among \
+other controls."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["depth"]
@@ -11,16 +23,23 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Receives the full 512 by 512 depth map rather than a 64 by 64 one"]
+weaknesses = [
+    "The 1.0 training data had duplicated grayscale human images, so grayscale people were likelier",
+    "Trained on one estimator, MiDaS; 1.1 handles other estimators better",
+]
+good_for = ["restyling while keeping scene layout"]
 
 sources = [
     "hf_lllyasviel_controlnet",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
+    "paper_midas",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

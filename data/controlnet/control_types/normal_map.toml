@@ -1,19 +1,55 @@
 id = "normal_map"
 label = "Normal Map"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Keeps the direction each surface faces, drawn as a color map, so shapes keep their 3D form."
+description = """\
+A normal map colors every pixel by the direction its surface faces. The ControlNet 1.1 model expects blue for \
+surfaces facing the camera, red for left and green for up. The control image therefore carries the shape of \
+objects and the angle of their surfaces, including small bumps that a depth map hides. The ControlNet 1.0 README \
+found its normal model better than its depth model at keeping geometry such as a hairstyle.\n\n\
+The two SD1.5 models read different maps. The 1.0 model was trained on normals computed from MiDaS depth, and \
+the 1.1 model on maps from Bae's normal estimator, so use the preprocessor that matches. On SDXL the xinsir \
+union models cover normal maps."""
+how_it_works = """\
+A normal estimator is a neural network that looks at one photo and guesses, for every pixel, the direction of \
+the surface it shows. Normal models are trained on pairs of images and these estimated normal maps, with a \
+caption for each. During generation the model reads the map alongside the noisy image at every step and nudges \
+the result so its surfaces face the same way. The ControlNet 1.1 card says its normal model also works on normal \
+maps from rendering engines when their colors follow the ScanNet protocol."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Color normal map: blue faces the camera, red faces left and green faces up."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
+    "paper_bae",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "comfyui_controlnet_aux_readme",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["NormalMap"]
 forge = ["NormalMap"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Restyle an object and keep its shape"
+description = """\
+Estimate normals from a photo, then prompt for a new material or style. The surface angles stay, including small \
+bumps and creases that a depth map flattens."""
+
+[[uses]]
+kind = "creative"
+title = "Render an image from a 3D normal pass"
+description = """\
+Export a camera-space normal pass from a 3D program and use it as the control image. The ControlNet 1.1 card \
+says its normal model reads real normal maps when their colors follow the ScanNet protocol."""
 
 [choosing]
 guide = ""

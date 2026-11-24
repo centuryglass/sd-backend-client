@@ -1,24 +1,32 @@
 id = "sargezt_xl_depth_faid_vidit"
 label = "SargeZT SDXL Depth Faid Vidit"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SargeZT's SDXL depth ControlNet trained with a conditioning its card calls a new type."
+description = """\
+A depth ControlNet for SDXL 1.0 from SargeZT. Its card says only that it was trained with a new type of \
+conditioning and shows one sample. Nothing else documents the conditioning."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["depth"]
 preprocessors = []
 trainer = "SargeZT"
-license = ""
+license = "creativeml-openrail-m"
 homepage = "https://huggingface.co/lllyasviel/sd_control_collection"
 
 strengths = []
-weaknesses = []
+weaknesses = ["Its conditioning is undocumented"]
 good_for = []
 
-sources = ["hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_lllyasviel_sd_control_collection",
+    "hf_sargezt_controlnet_sd_xl_1_0_depth_faid_vidit",
+]
+research_status = "drafted"
 open_questions = [
-    "Find the original SargeZT release this collection file was renamed from, and its model card.",
+    "Find what conditioning image this model expects. The card says only a new type of conditioning, and no preprocessor is known to match it.",
 ]
 
 [[files]]

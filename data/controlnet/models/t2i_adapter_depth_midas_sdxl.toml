@@ -1,8 +1,15 @@
 id = "t2i_adapter_depth_midas_sdxl"
 label = "T2I-Adapter SDXL Depth MiDaS"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC and Hugging Face SDXL T2I-Adapter for MiDaS depth maps; small at about 158 MB in fp16."
+description = """\
+An SDXL adapter for MiDaS depth maps, trained by TencentARC and Hugging Face. Its input is a grayscale image \
+with black for deep areas and white for shallow ones. At about 79 million parameters it is a small fraction of \
+the diffusers SDXL depth ControlNet. A twin adapter, t2i_adapter_depth_zoe_sdxl, takes Zoe maps instead."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. The SDXL adapters were trained on 3 million high-resolution image and caption pairs \
+from LAION-Aesthetics V2 for 35,000 steps at batch size 256. This adapter takes MiDaS depth maps."""
 base_models = ["sdxl"]
 adapter = "t2i_adapter"
 control_types = ["depth"]
@@ -11,12 +18,18 @@ trainer = "TencentARC"
 license = "apache-2.0"
 homepage = "https://huggingface.co/TencentARC/t2i-adapter-depth-midas-sdxl-1.0"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Far smaller than an SDXL ControlNet", "Fast"]
+weaknesses = ["Expects MiDaS maps; the Zoe adapter covers Zoe maps"]
+good_for = ["restyling while keeping scene layout"]
 
-sources = ["hf_tencentarc_t2i_adapter_depth_midas_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_tencentarc_t2i_adapter_depth_midas_sdxl_1_0",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_blog_t2i_sdxl_adapters",
+    "paper_t2i_adapter",
+    "paper_midas",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

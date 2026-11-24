@@ -1,8 +1,20 @@
 id = "control_sd15_normal"
 label = "ControlNet 1.0 Normal"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The original ControlNet 1.0 normal model for SD 1.5, trained on normal maps computed from MiDaS depth."
+description = """\
+The ControlNet 1.0 normal model for Stable Diffusion 1.5. It reads a normal map, a color image in which each \
+color gives the direction a surface faces. The 1.0 card says it works best with maps made by its own Gradio app, \
+which derived normals from MiDaS depth, and that other maps can work if directions match: left looks red, right \
+looks blue, up looks green and down looks purple.\n\n\
+The 1.0 README found it a bit better than the depth model at keeping geometry, such as a man's hairstyle. The \
+1.1 README says it cannot interpret real normal maps from rendering engines, and replaced it with \
+control_v11p_sd15_normalbae."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on normal maps computed from MiDaS depth, which the 1.1 README calls neither reasonable nor physically \
+correct."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["normal_map"]
@@ -11,16 +23,24 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Preserves geometry such as hairstyles better than the 1.0 depth model, per its README",
+]
+weaknesses = [
+    "Cannot interpret real normal maps from rendering engines, per the 1.1 README",
+    "Trained on normals derived from depth, not measured ones",
+]
+good_for = ["restyling while keeping surface shape"]
 
 sources = [
     "hf_lllyasviel_controlnet",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

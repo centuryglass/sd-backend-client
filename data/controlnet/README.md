@@ -121,8 +121,9 @@ Each model forbids unknown keys, so a misspelled field fails to load.
   T2I-Adapters (SD1.x and SDXL), diffusers SDXL ControlNets, every file in `lllyasviel/sd_control_collection`
   (SargeZT, kohya LLLite, Stability control-LoRAs, thibaud), xinsir (including union and ProMax), TTPlanet tile,
   monster-labs, DionTimmer, Nacholmo and latentcat/ioclab QR and brightness models, h94 IP-Adapter and FaceID,
-  PuLID, InstantID, PhotoMaker, MistoLine, SparseCtrl, MediaPipe Face, and the SDXL inpainting ControlNets in the
-  recorded fixtures.
+  PuLID, InstantID, PhotoMaker, MistoLine, SparseCtrl, MediaPipe Face, the SDXL inpainting ControlNets in the
+  recorded fixtures, and the two SD1.5 ControlNets that comfyui_controlnet_aux's table pairs with preprocessors
+  (the Depth Anything ControlNet and HandRefiner's inpaint depth hand model).
 
 ### Left out
 
@@ -138,8 +139,8 @@ Each model forbids unknown keys, so a misspelled field fails to load.
 
 | Kind | Records | Stub | Drafted | Verified |
 |---|---|---|---|---|
-| Control types | 23 | 18 | 5 | 0 |
-| Preprocessors | 81 | 59 | 8 | 14 |
-| Models | 125 | 93 | 2 | 30 |
+| Control types | 23 | 16 | 7 | 0 |
+| Preprocessors | 81 | 45 | 14 | 22 |
+| Models | 127 | 73 | 7 | 47 |
 
 `python scripts/controlnet_data.py` prints the current counts. Update this table when a session changes them.

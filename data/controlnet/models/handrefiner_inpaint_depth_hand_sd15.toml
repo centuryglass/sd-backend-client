@@ -1,0 +1,47 @@
+id = "handrefiner_inpaint_depth_hand_sd15"
+label = "HandRefiner Inpaint Depth Hand"
+summary = "An SD 1.5 depth-inpainting ControlNet fine-tuned on hand meshes to redraw malformed hands."
+description = """\
+The ControlNet from the HandRefiner project. It reads the hand depth map from the Depth Hand Refiner \
+preprocessor and guides an inpainting pass over a mask around the hands, so a malformed hand is redrawn with the \
+right shape while the rest of the picture stays. The hr16 repository hosts a pruned fp16 copy.\n\n\
+The README recommends a control strength of 0.4 to 0.8, since 1 can lose texture, and hands at least about 60 \
+pixels wide. It is built on SD 1.5."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This one was \
+fine-tuned for inpainting with a depth map of hand meshes. The paper reports a phase transition as the control \
+strength varies, which lets it use synthetic hand data without the domain gap."""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["depth", "inpaint"]
+preprocessors = ["depth_hand_refiner"]
+trainer = "HandRefiner authors"
+license = "apache-2.0"
+homepage = "https://huggingface.co/hr16/ControlNet-HandRefiner-pruned"
+
+strengths = ["Fixes malformed hands without touching the rest of the image"]
+weaknesses = [
+    "Hands must be recognizable and at least about 60 pixels wide",
+    "Strength 1 can lose texture; the authors suggest 0.4 to 0.8",
+]
+good_for = ["fixing malformed hands"]
+
+sources = [
+    "paper_handrefiner",
+    "gh_handrefiner_readme",
+    "hf_hr16_handrefiner_pruned",
+    "comfyui_controlnet_aux_readme",
+]
+research_status = "verified"
+open_questions = []
+
+[[files]]
+filename = "control_sd15_inpaint_depth_hand_fp16.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722601104
+sha256 = "944b74b8ed3701117ffe5550026bbff2c8616f1c92b1bb2fee00e5349ff46256"
+webui_hash = "09456e54"
+source_url = "https://huggingface.co/hr16/ControlNet-HandRefiner-pruned/resolve/f0917f0595ecb7f6435f49e4b2b28f8dd68ab0cb/control_sd15_inpaint_depth_hand_fp16.safetensors"

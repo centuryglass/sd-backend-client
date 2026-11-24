@@ -1,22 +1,41 @@
 id = "control_v11p_sd15_normalbae"
 label = "ControlNet 1.1 Normal BAE"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ControlNet 1.1 normal map model for SD 1.5, trained on maps from Bae's normal estimator."
+description = """\
+The ControlNet 1.1 normal model. It was trained on maps from Bae's normal estimator, and its README says it can \
+accept normal maps from rendering engines if their colors follow the ScanNet protocol: blue faces the camera, \
+red faces left and green faces up. The README calls it much more reasonable than the 1.0 normal-from-MiDaS \
+method, and says its tests found it as robust as the depth model.\n\n\
+comfyui_controlnet_aux also pairs it with its DSINE and Metric3D normal preprocessors."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. It was trained \
+on pairs of images and normal maps estimated by Bae's network, with a caption for each image."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["normal_map"]
-preprocessors = ["normal_bae"]
+preprocessors = ["normal_bae", "normal_dsine", "normal_metric3d"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "Reads real normal maps from rendering engines that follow ScanNet's color convention",
+    "Robust, with performance similar to the depth model's in the README's tests",
+]
 weaknesses = []
-good_for = []
+good_for = ["restyling while keeping surface shape", "building images from rendered normal passes"]
 
-sources = ["hf_lllyasviel_controlnet_v1_1", "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors"]
-research_status = "stub"
+sources = [
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "cn11_readme",
+    "comfyui_controlnet_aux_readme",
+    "paper_controlnet",
+    "paper_bae",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

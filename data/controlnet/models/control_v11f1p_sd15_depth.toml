@@ -1,26 +1,43 @@
 id = "control_v11f1p_sd15_depth"
 label = "ControlNet 1.1 Depth"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ControlNet 1.1 depth for SD 1.5, trained on MiDaS, LeReS and Zoe maps so it works with many estimators."
+description = """\
+The ControlNet 1.1 depth model, resumed from the 1.0 depth model. Its training used MiDaS, LeReS and ZoeDepth \
+depth maps at 256, 384 and 512 pixels, so it is not tied to one estimator or one preprocessor resolution. Its \
+README calls it highly robust and says it works on real depth maps from rendering engines.\n\n\
+The f1 in the name marks a bug fix. A wrong, unconverged checkpoint named control_v11p_sd15_depth was uploaded \
+by mistake and removed. The 1.1 data also fixes duplicated grayscale images, low-quality images and wrong \
+captions in the 1.0 set."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. It was trained \
+on pairs of images and depth maps from three estimators at several resolutions, with random left-right flips, \
+with a caption for each image."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["depth"]
-preprocessors = ["depth_midas", "depth_leres", "depth_zoe"]
+preprocessors = ["depth_midas", "depth_leres", "depth_leres_plus", "depth_zoe", "depth_metric3d"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "Works with MiDaS, LeReS and Zoe maps, per its README",
+    "Accepts real depth from 3D renderers, per its README",
+]
 weaknesses = []
-good_for = []
+good_for = ["restyling while keeping scene layout", "building images from rendered depth passes"]
 
 sources = [
     "hf_lllyasviel_controlnet_v1_1",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "cn11_readme",
+    "comfyui_controlnet_aux_readme",
+    "paper_controlnet",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]
