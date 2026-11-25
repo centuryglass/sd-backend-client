@@ -1,19 +1,47 @@
 id = "shuffle"
 label = "Shuffle"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Carries a reference image's colors, textures and style into a new picture, by recomposing a scrambled copy of it."
+description = """\
+Shuffle transfers the look of a reference image, its palette, textures and style, without its layout. Content \
+Shuffle scrambles the reference with a random warp, and the Shuffle model recomposes the scramble into a new \
+image of whatever the prompt describes.\n\n\
+The ControlNet 1.1 README combines it with other ControlNets: a canny map supplies the structure and a shuffled \
+image the style. It notes that the original, unshuffled image sometimes works as input too, and that the model \
+uses no CLIP vision encoder. It exists for SD 1.5 only."""
+how_it_works = """\
+The Shuffle model was trained to rebuild images from randomly warped copies, so it learns to read colors and \
+textures from a jumble with no reliable positions. Its output is averaged over the whole image before it reaches \
+Stable Diffusion, so it conveys overall style rather than where things go, and it is applied only on the \
+prompt's side of guidance."""
 base_models = ["sd15"]
-control_image = ""
+control_image = "A randomly warped copy of the reference image, or the reference itself."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "cn11_readme",
+    "cn11_annotator_docs",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Shuffle"]
 forge = ["Shuffle"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Borrow a painting's palette and style"
+description = "Shuffle a painting and prompt for a new subject. The result takes the painting's colors and brushwork."
+
+[[uses]]
+kind = "creative"
+title = "Combine structure from one image with style from another"
+description = """\
+Run two units: Canny or another structure control on one image, Shuffle on another. The ControlNet 1.1 README \
+shows this pairing."""
 
 [choosing]
 guide = ""

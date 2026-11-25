@@ -1,22 +1,42 @@
 id = "inpaint_noobai"
 label = "Inpaint NoobAI"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Blacks out the masked area of the image for the NoobAI XL inpainting ControlNet."
+description = """\
+Inpaint NoobAI prepares a control image for the NoobAI inpainting ControlNet, which expects the masked area as \
+plain black. It doesn't hold the unmasked area in place during sampling. Forge Neo prints a reminder that a high \
+denoising strength is recommended when it runs at under 0.9.\n\n\
+reForge calls it inpaint_noobai_xl and Forge Neo calls it inpaint_noobai; both make the same image. ComfyUI's \
+Inpaint Preprocessor makes it too when black_pixel_for_xinsir_cn is on. sd-webui-controlnet doesn't have it."""
+how_it_works = """\
+No network is involved. Every pixel inside the mask is set to black, 0, and the rest of the image is left as it \
+is. The NoobAI inpainting ControlNet's card says it takes the masked image as its control image, and it fills \
+the masked area to match its surroundings."""
 control_types = ["inpaint"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Paints the masked area solid black; the visible area is context for the model."
+output = "The source image with masked pixels set to black."
+best_input = "Images generated with NoobAI, Illustrious or other SDXL models, with a mask over the area to repaint."
 weak_input = ""
 models = ["noobai_inpaint_sdxl"]
 
-sources = ["recorded_fixtures", "reforge_preprocessors", "forge_neo_controlnet"]
-research_status = "stub"
-open_questions = [
-    "reForge calls this inpaint_noobai_xl and Forge Neo calls it inpaint_noobai. Confirm they are the same preprocessor.",
+sources = [
+    "recorded_fixtures",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "hf_wenaka_noobai_inpainting_sfw",
+    "hf_acly_noobai_inpainting",
 ]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = []
 forge = ["inpaint_noobai", "inpaint_noobai_xl"]
-comfyui = []
+comfyui = ["InpaintPreprocessor"]
+
+[name_parameters]
+comfyui = { black_pixel_for_xinsir_cn = true }
+
+[hardware]
+device = "none"
+speed = "fast: no network"

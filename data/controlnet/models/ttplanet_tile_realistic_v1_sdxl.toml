@@ -1,22 +1,38 @@
 id = "ttplanet_tile_realistic_v1_sdxl"
 label = "TTPlanet SDXL Tile Realistic V1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TTPlanet's first SDXL Tile ControlNet, trained on realistic images for detail-boosting upscales."
+description = """\
+TTPlanet's first SDXL Tile ControlNet, released because no open SDXL Tile model existed. Its author trained it \
+for a personal realistic-model project, to add detail in Ultimate SD Upscale. The card stresses that it isn't an \
+upscale model: it enhances or changes the detail of an image at its own size.\n\n\
+It was trained on realistic images, and the card promises nothing for comics or animation. V2 followed with a \
+larger training set and less color shift; the card's usage advice is written for both."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads the \
+image itself, softened, and was trained with the Hugging Face diffusers scripts for SDXL."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["tile"]
-preprocessors = ["ttplanet_tile_gf", "ttplanet_tile_simple"]
+preprocessors = ["ttplanet_tile_gf", "ttplanet_tile_simple", "tile_resample"]
 trainer = "TTPlanet"
 license = "openrail"
 homepage = "https://huggingface.co/TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Adds detail to realistic images during tiled upscaling, per its card"]
+weaknesses = [
+    "Trained on realistic images only; no promise for comics or animation, per its card",
+    "Superseded by V2, which reduced color shift",
+]
+good_for = ["tiled upscaling of photos and realistic images"]
 
-sources = ["hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic"]
-research_status = "stub"
+sources = [
+    "hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic",
+    "hf_ttplanet_tile_preprocessor_v5",
+    "paper_controlnet",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

@@ -1,26 +1,52 @@
 id = "inpaint_only_lama"
 label = "Inpaint Only + LaMa"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Inpaint Only, with the hole first filled by the LaMa inpainting network for cleaner results with fewer stray objects."
+description = """\
+Inpaint Only + LaMa first fills the masked area with LaMa, a dedicated inpainting network, then lets Stable \
+Diffusion refine that fill while keeping the unmasked area unchanged, as Inpaint Only does. Its announcement \
+describes results that look like Inpaint Only's but cleaner: less complicated, more consistent, with fewer random \
+objects. That suits outpainting, where Resize and Fill extends the canvas, and object removal.\n\n\
+It needs a mask. sd-webui-controlnet, Forge, reForge and Forge Neo all have it."""
+how_it_works = """\
+LaMa is an inpainting network built on fast Fourier convolutions, which let every layer see the whole image. It \
+was trained with large masks and handles wide holes and repeating patterns. Here it runs at 256 pixels, and its \
+fill is scaled back up and blended into the masked area. That filled image is encoded into latent space and \
+mixed into Stable Diffusion's starting noise, so generation begins from LaMa's layout. From there it works as \
+Inpaint Only: the ControlNet sees the blanked-out image, and the unmasked area is held to the source."""
 control_types = ["inpaint"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Fills the masked area with a plain LaMa inpainting, which seeds the generation; the unmasked area stays unchanged."
+output = "The source with the masked area filled by LaMa, plus the mask."
+best_input = "Object removal and outpainting, where the hole should become background rather than something new."
+weak_input = "Masks meant to receive a new object: LaMa's fill favors plain continuation of the surroundings."
 models = ["control_v11p_sd15_inpaint"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
     "forge_preprocessors",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "hf_lllyasviel_annotators",
+    "sdwebui_cn_inpaint_lama_discussion",
+    "paper_lama",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["inpaint_only+lama"]
 forge = ["inpaint_only+lama", "inpaint_only+lama_variant"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "LaMa weights file is about 205 MB."
+speed = "moderate: LaMa runs once, at 256 pixels"
+
+[[hardware.files]]
+filename = "ControlNetLama.pth"
+size_bytes = 204597536
+sha256 = "3b54044a23222eb835b549d61b480c444c06cf36df0ca86ea97aa9b14b001150"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/ControlNetLama.pth"

@@ -1,21 +1,70 @@
 id = "tile"
 label = "Tile"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Keeps an image's layout and colors and redraws its detail: for upscaling, fixing blur and making variations."
+description = """\
+Tile reads the image itself, often softened or shrunk, and generates a new version with the same composition and \
+colors but freshly drawn detail. Tile models ignore the existing detail and invent their own, and where a region's \
+content disagrees with the prompt they follow the region.\n\n\
+That makes Tile the usual partner for tiled upscaling, such as Ultimate SD Upscale, where each tile would \
+otherwise be pulled toward the whole prompt. It also repairs blur or bad detail from other upscalers, and \
+restyles an image while keeping its structure, even at full denoising strength. Forge and its forks also list \
+a Blur type that offers the same models."""
+how_it_works = """\
+A Tile model is trained to rebuild images from degraded copies of themselves: downscaled, blurred or filtered. It \
+learns to recognize what each region shows from its rough colors and shapes, and to steer the generation toward \
+that content while adding sharp detail. Preprocessors control how degraded the copy is. The more detail is \
+removed, the more the model invents. Some Tile preprocessors also act during sampling: the color fix variants \
+hold the result's broad colors to the source at every step."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "The source image itself, unchanged or softened by downscaling or blur."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
-open_questions = [
-    "Forge lists \"Blur\" as its own type, holding blur_gaussian and the tile models; sd-webui-controlnet files blur under Tile. Should Blur get its own record?",
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "cn11_readme",
+    "sdwebui_cn_tile_discussion",
+    "sdwebui_cn_tile_colorfix_discussion",
+    "hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic",
+    "hf_xinsir_controlnet_tile_sdxl_1_0",
+    "hf_kohya_ss_controlnet_lllite",
 ]
+research_status = "drafted"
+open_questions = []
 
 [names]
 webui = ["Tile"]
 forge = ["Tile", "Blur"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Upscale with new detail"
+description = """\
+Enlarge an image, then run img2img in tiles with Ultimate SD Upscale and a Tile model. Each tile follows its own \
+content, not the whole prompt, so faces don't appear in leaves. TTPlanet's card suggests denoising around 0.3 to \
+0.4 and a control weight of 0.9 for this."""
+
+[[uses]]
+kind = "standard"
+title = "Repair a blurry or damaged image"
+description = """\
+Feed a blurred, low-resolution or badly upscaled image as the control image. The ControlNet 1.1 README shows a \
+64-pixel dog and a dog damaged by Real-ESRGAN both regenerated with clean detail."""
+
+[[uses]]
+kind = "creative"
+title = "Finish a color-block draft"
+description = """\
+lllyasviel's release notes say Tile 1.1 can finish unfinished artwork drafted in blocks of color. Paint the \
+composition in flat colors and let the model add the rendering."""
+
+[[uses]]
+kind = "creative"
+title = "Restyle while keeping the structure"
+description = """\
+With no preprocessor and "My prompt is more important", TTPlanet's Tile V2 changes clothes or background to match \
+the prompt while keeping the pose and layout."""
 
 [choosing]
 guide = ""
@@ -38,4 +87,6 @@ models = [
     "kohya_lllite_blur_sdxl",
     "kohya_lllite_blur_anime_sdxl",
     "kohya_lllite_blur_anime_beta_sdxl",
+    "kohya_lllite_replicate_anime_sdxl",
+    "kohya_lllite_replicate_anime_v2_sdxl",
 ]

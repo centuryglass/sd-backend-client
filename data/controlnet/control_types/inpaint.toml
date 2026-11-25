@@ -1,19 +1,70 @@
 id = "inpaint"
 label = "Inpaint"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Fills a masked area of an image so it matches the rest: removing objects, adding new ones, or extending the canvas."
+description = """\
+Inpaint control repaints the part of an image under a mask, using the rest as context. Because it is a \
+ControlNet, any base model can inpaint with it, without a separately merged inpainting checkpoint. Outpainting \
+works the same way: extend the canvas and mask the new area.\n\n\
+The preprocessor decides how strictly the unmasked area is kept. Inpaint Only holds it unchanged, even in \
+txt2img. Inpaint Global Harmonious lets the whole image adjust. Inpaint Only + LaMa starts from a plain LaMa fill, \
+for cleaner object removal. SDXL inpainting ControlNets each expect their own marking for the masked area: -1, \
+black or white."""
+how_it_works = """\
+The control image is the source with the masked pixels marked as missing, by a value the model was trained to \
+recognize. The model learns to guide generation so the hole is filled consistently with the visible parts. Some \
+backends also work on the latent image during sampling: they replace the unmasked area with the source after \
+every step, so only the masked area changes, and can paste the original pixels back at the end."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "The source image with the masked area marked as missing: -1 for ControlNet 1.1 and EcomXL, black for NoobAI, white for Inpaint Dreamer."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "cn11_readme",
+    "sdwebui_cn_inpaint_discussion",
+    "sdwebui_cn_inpaint_only_discussion",
+    "sdwebui_cn_inpaint_lama_discussion",
+    "sdwebui_cn_hook",
+    "hf_alimama_creative_ecomxl_controlnet_inpaint",
+    "hf_destitech_controlnet_inpaint_dreamer_sdxl",
+    "hf_wenaka_noobai_inpainting_sfw",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Inpaint"]
 forge = ["Inpaint"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Remove an object"
+description = """\
+Mask the object and describe the background, or leave the prompt empty. Inpaint Only + LaMa suits this: its \
+announcement shows fewer random objects appearing in the filled area."""
+
+[[uses]]
+kind = "standard"
+title = "Extend the canvas"
+description = """\
+Outpaint by choosing Resize and Fill in sd-webui-controlnet, so the new border becomes the masked area, with \
+Inpaint Only + LaMa as the preprocessor."""
+
+[[uses]]
+kind = "standard"
+title = "Inpaint without a prompt"
+description = """\
+sd-webui-controlnet's 1.1.202 notes describe prompt-free inpainting: Inpaint Only in txt2img, "ControlNet is \
+more important" mode, a base size near 512 with hires fix at 2x, and a CFG scale below 5."""
+
+[[uses]]
+kind = "creative"
+title = "Replace a product photo's background"
+description = """\
+EcomXL Inpaint was trained to fill around a masked product without growing the product itself. Mask everything \
+but the product and prompt for a new setting."""
 
 [choosing]
 guide = ""

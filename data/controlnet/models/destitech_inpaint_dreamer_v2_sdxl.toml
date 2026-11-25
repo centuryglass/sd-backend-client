@@ -1,8 +1,19 @@
 id = "destitech_inpaint_dreamer_v2_sdxl"
 label = "Inpaint Dreamer V2"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Second release of destitech's SDXL inpainting and outpainting ControlNet; areas to fill are painted solid white."
+description = """\
+The second release of destitech's Inpaint Dreamer, an SDXL ControlNet for inpainting and outpainting, published \
+in the same repo's v2 folder. Its card, written for the first release, describes the use: the image goes in as \
+the control image in a txt2img pipeline at denoising 1.0, with the areas to fill painted solid white.\n\n\
+None of the backends' inpaint preprocessors paints the mask white, so the control image is prepared by hand. \
+Civitai's ControlNetXL collection carries it as destitech-inpaintv2. The \
+full-precision file's path in the repo ends in a newline character; Civitai serves the same file under a plain \
+name."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads an \
+image with its missing areas in solid white and guides generation to fill them."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["inpaint"]
@@ -11,22 +22,34 @@ trainer = "destitech"
 license = "openrail"
 homepage = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Outpainting as well as inpainting, per its card"]
+weaknesses = ["Needs a hand-made control image with white fill areas", "No release notes for what changed from V1"]
+good_for = ["outpainting", "inpainting"]
 
-sources = ["hf_destitech_controlnet_inpaint_dreamer_sdxl"]
-research_status = "stub"
-open_questions = [
-    "controlnetxlCNXL_destitechInpaint-inpainting.safetensors (a Civitai download) appears in the recorded ComfyUI fixture. Hash a copy to find which destitech release it is.",
-    "The repo's full-precision v2 file has a newline at the end of its path, so it is left out of files. Check whether upstream has fixed the name.",
+sources = [
+    "hf_destitech_controlnet_inpaint_dreamer_sdxl",
+    "civitai_controlnetxl_cnxl",
+    "paper_controlnet",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model.fp16.safetensors"
+also_seen_as = ["destitech-inpaintv2-fp16.safetensors"]
 format = "safetensors"
 precision = "fp16"
 size_bytes = 2502139104
 sha256 = "e829938de2b6cd700e57dece4ad0e3e33018c1b5a95fdab780c3c99b12e0867d"
 webui_hash = "e799aa20"
 source_url = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl/resolve/e37388101f7f551a0ed5a621c0d7da434f0e0124/v2/diffusion_pytorch_model.fp16.safetensors"
+
+[[files]]
+filename = "diffusion_pytorch_model.safetensors"
+also_seen_as = ["destitech-inpaintv2-fp32.safetensors"]
+format = "safetensors"
+precision = "fp32"
+size_bytes = 5004167864
+sha256 = "0a69d73c00dba1f8a3822495b7743f55a88668bb31b2274aded56dd83c417dfb"
+webui_hash = "5b9dde76"
+source_url = "https://huggingface.co/destitech/controlnet-inpaint-dreamer-sdxl/resolve/e37388101f7f551a0ed5a621c0d7da434f0e0124/v2/diffusion_pytorch_model.safetensors%0A"

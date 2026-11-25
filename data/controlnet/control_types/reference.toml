@@ -1,19 +1,49 @@
 id = "reference"
 label = "Reference"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Makes the result resemble a reference image's subject or style by linking it into the generation; no model file needed."
+description = """\
+Reference makes a new image resemble a reference image, its subject, character or style, with no control model \
+to download. The reference is fed through the same base model during generation, and the generation borrows from \
+it. sd-webui-controlnet offers it for SD 1.5 and SDXL.\n\n\
+There are three variants. Reference Only shares attention features, carrying subject and detail. Reference AdaIN \
+matches feature statistics, carrying overall style and color. Reference AdaIN + Attention does both. Style \
+Fidelity sets how strongly the reference outweighs the prompt."""
+how_it_works = """\
+At every step the reference image is noised to the current noise level and run through the base model's U-Net, \
+which records its internal features. When the actual image is denoised, its self-attention layers also attend \
+to the reference's features, or its feature statistics are matched to the reference's, or both. No trained \
+control network is involved: the base model compares the image with itself."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "The reference image itself, unprocessed."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "sdwebui_cn_hook",
+    "sdwebui_cn_reference_discussion",
+    "sdwebui_cn_reference_adain_discussion",
+    "sdwebui_cn_1_1_400_discussion",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Reference"]
 forge = ["Reference"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Generate more images of the same subject"
+description = """\
+Use a picture of a character or object as the reference with Reference Only, and prompt for a new scene. The \
+announcement shows a reference dog reappearing in a new picture."""
+
+[[uses]]
+kind = "creative"
+title = "Borrow a style without its subject"
+description = "Reference AdaIN carries palette, lighting and texture more than content. Use a painting as the reference and prompt for a new subject."
 
 [choosing]
 guide = ""

@@ -1,27 +1,79 @@
 id = "tile_resample"
 label = "Tile Resample"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Passes the image to a Tile model as it is, or shrunk to soften its detail so the model invents more."
+description = """\
+Tile Resample hands the source image to a Tile model with its detail optionally reduced. The Tile model then \
+redraws the detail itself, so the less detail survives, the more the result varies from the source. The \
+sd-webui-controlnet announcement of the Tile 1.1 model calls it just a resizing to make the image smaller for \
+more variation, and says None works as well.\n\n\
+Backends differ. sd-webui-controlnet shrinks the image by Down Sampling Rate, and at the default of 1 passes it \
+unchanged. Forge, reForge and Forge Neo always pass it unchanged; reForge's tile_resample_variant keeps the \
+rate slider. ComfyUI's Tile node shrinks the image and scales it back up, which blurs it."""
+how_it_works = """\
+No network is involved. In sd-webui-controlnet the image is resized down by the rate with area averaging, and \
+the smaller image is scaled up to the generation size later, as every control image is. ComfyUI's \
+TilePreprocessor rounds the image to a multiple of 64 pixels, shrinks it by a factor of two once per pyramid \
+step, then enlarges it back step by step with an image pyramid, which leaves a smooth, blurred copy at the \
+original size."""
 control_types = ["tile"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Leaves the image as it is, or lowers its resolution so fine detail and texture are lost while colors and layout stay."
+output = "The source image at full or reduced detail."
+best_input = "Any image whose layout and colors should stay: photos, renders, paintings, low-resolution images to upscale."
 weak_input = ""
-models = ["control_v11f1e_sd15_tile", "control_v11u_sd15_tile"]
+models = [
+    "control_v11f1e_sd15_tile",
+    "control_v11u_sd15_tile",
+    "ttplanet_tile_realistic_v1_sdxl",
+    "ttplanet_tile_realistic_v2_sdxl",
+]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_script",
     "forge_preprocessors",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_tile_discussion",
+    "hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["tile_resample"]
 forge = ["tile_resample", "tile_resample_variant"]
 comfyui = ["TilePreprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: a resize with no network"
+
+[[parameters]]
+id = "down_sampling_rate"
+label = "Down Sampling Rate"
+summary = "How many times smaller the image is made before it goes to the model."
+names = { webui = "threshold_a", forge = "threshold_a" }
+type = "float"
+default = 1.0
+range = [1.0, 8.0]
+effect = """\
+The image's width and height are divided by this value. Values below 1.1 leave the image unchanged. In the Forge \
+family only reForge's tile_resample_variant has this slider."""
+when_to_adjust = "Raise it when results stay too close to the source and more new detail is wanted."
+
+[[parameters]]
+id = "pyrup_iters"
+label = "Pyramid Steps"
+summary = "How many halvings ComfyUI's Tile node applies before scaling the image back up."
+names = { comfyui = "pyrUp_iters" }
+type = "int"
+default = 3
+range = [1, 10]
+effect = """\
+Each step halves the image's width and height before it is enlarged back, so the default of 3 keeps one eighth of \
+the resolution. The node's resolution input is accepted but not used."""
+when_to_adjust = "Lower it to keep more of the source's detail. Raise it to give the model more freedom."

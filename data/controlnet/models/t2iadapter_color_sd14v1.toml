@@ -1,8 +1,17 @@
 id = "t2iadapter_color_sd14v1"
 label = "T2I-Adapter Color v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC T2I-Adapter for SD1.x that follows a spatial color palette: a coarse grid of where each color goes."
+description = """\
+The T2I-Adapter color model paints an image whose colors follow a spatial palette, a coarse mosaic saying which \
+color goes where, while the prompt decides what is drawn. TencentARC added it in March 2023. It is tiny: 18 \
+million parameters, 75 MB at full precision.\n\n\
+The palette can be painted by hand or made from any image with Color Grid, which follows TencentARC's own \
+recipe. TencentARC trained it on SD 1.4 and says it works with any model fine-tuned from the same base."""
+how_it_works = """\
+A T2I-Adapter is a small network that reads the control map and feeds features into a frozen Stable Diffusion \
+model. It runs once per image rather than at every denoising step, so it costs far less than a ControlNet. This \
+one uses TencentARC's light adapter design, smaller than its structure adapters, since a palette carries little \
+detail. It was trained on images paired with their color grids."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["t2i_adapter"]
@@ -11,19 +20,22 @@ trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
+strengths = ["Very small and fast", "Accepts hand-painted palettes, per TencentARC's examples"]
 weaknesses = []
-good_for = []
+good_for = ["setting a color scheme", "colorizing a composition from a rough color sketch"]
 
 sources = [
+    "t2i_adapter_zoo",
+    "t2i_adapter_readme_sd",
+    "t2i_adapter_adapter_code",
+    "t2i_adapter_condition_code",
+    "paper_t2i_adapter",
     "hf_tencentarc_t2i_adapter",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
 ]
-research_status = "stub"
-open_questions = [
-    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
-]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "t2iadapter_color_sd14v1.pth"

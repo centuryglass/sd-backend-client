@@ -1,8 +1,17 @@
 id = "sai_control_lora_recolor_sdxl"
 label = "Stability Control-LoRA Recolor"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Stability AI's SDXL Control-LoRA that colorizes black-and-white photos from their grayscale lightness."
+description = """\
+Stability AI's Recolor Control-LoRA colorizes images. Its card says it is designed for black-and-white \
+photographs: given a grayscale image, it paints in color guided by the prompt. Its sibling, Sketch, colorizes \
+drawings instead.\n\n\
+sd-webui-controlnet's SDXL recolor example pairs it with Recolor Luminance. The rank 256 and rank 128 files are \
+reductions of the same original ControlNet; sd_control_collection mirrors both under its own names."""
+how_it_works = """\
+A Control-LoRA is a ControlNet trained with low-rank adaptation: in place of full weight matrices it stores \
+small low-rank updates, which shrinks a 4.7 GB SDXL ControlNet to about 738 MB at rank 256 or 377 MB at rank \
+128. It is loaded and used like a ControlNet. This one reads a grayscale image and steers generation to keep its \
+lightness while choosing colors."""
 base_models = ["sdxl"]
 adapter = "control_lora"
 control_types = ["recolor"]
@@ -11,15 +20,18 @@ trainer = "Stability AI"
 license = "other"
 homepage = "https://huggingface.co/stabilityai/control-lora"
 
-strengths = []
+strengths = ["Small next to a full SDXL ControlNet"]
 weaknesses = []
-good_for = []
+good_for = ["colorizing black-and-white photos", "recoloring images"]
 
-sources = ["hf_stabilityai_control_lora", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "Confirm from the model card whether the rank 128 and rank 256 files are one training at two ranks (files of one record) or separate trainings.",
+sources = [
+    "hf_stabilityai_control_lora",
+    "hf_lllyasviel_sd_control_collection",
+    "sdwebui_cn_1_1_400_discussion",
+    "comfyui_controlnet_aux_readme",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "control-lora-recolor-rank128.safetensors"

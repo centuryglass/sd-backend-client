@@ -1,26 +1,68 @@
 id = "tile_colorfix_sharp"
 label = "Tile Color Fix and Sharpen"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Tile Color Fix plus a sharpening push that keeps Tile from softening upscaled images."
+description = """\
+Tile Color Fix and Sharpen does everything Tile Color Fix does, locking the result's broad colors to the source, \
+and adds a Sharpness setting. Its announcement says it controls the latent sharpness of Tile's output and stops \
+the model's tendency to create a somewhat blurred "harmonious atmosphere" in upscaled images. Its comparisons \
+show the difference is clearer on anime images than on realistic ones.\n\n\
+Like Tile Color Fix, it can't change colors through the prompt. sd-webui-controlnet, Forge, reForge and Forge \
+Neo all have it."""
+how_it_works = """\
+Color fixing works as in Tile Color Fix: at each step the low-frequency part of the predicted image is replaced \
+with the source's. For sharpening, the prediction used on the negative side of classifier-free guidance is \
+blended toward a blurred copy of itself. Guidance pushes the result away from the negative side, so it is \
+pushed away from blur, toward crisper detail. The Sharpness value, times 0.01, is the blend weight."""
 control_types = ["tile"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Passes the image unchanged; during sampling, locks broad colors to the source and steers detail toward sharpness."
+output = "The source image, unchanged."
+best_input = "Images upscaled with Tile that come out soft, especially anime and illustration."
+weak_input = "Any image where the prompt should change colors: the lock overrides it."
 models = ["control_v11f1e_sd15_tile"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_hook",
     "forge_preprocessors",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "sdwebui_cn_tile_colorfix_sharp_discussion",
+    "sdwebui_cn_tile_colorfix_discussion",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["tile_colorfix+sharp"]
 forge = ["tile_colorfix+sharp", "tile_colorfix+sharp_variant"]
 comfyui = []
+
+[hardware]
+device = "none"
+speed = "fast to prepare; adds one VAE encode and a few blurs per step during sampling"
+
+[[parameters]]
+id = "variation"
+label = "Variation"
+summary = "Blur radius, in latent pixels, that separates the locked broad colors from the regenerated detail."
+names = { webui = "threshold_a", forge = "threshold_a" }
+type = "int"
+default = 8
+range = [3, 32]
+effect = """\
+The color lock applies to everything coarser than this radius, and sharpening uses the same blur. The radius \
+doubles in a hires-fix pass."""
+when_to_adjust = "Lower it when local colors still drift. Raise it when the result looks too close to a blurred copy of the source."
+
+[[parameters]]
+id = "sharpness"
+label = "Sharpness"
+summary = "How hard guidance pushes the result away from blur."
+names = { webui = "threshold_b", forge = "threshold_b" }
+type = "float"
+default = 1.0
+range = [0.0, 2.0]
+effect = "0 adds no sharpening, which matches Tile Color Fix. Higher values give crisper detail; the announcement compares 0.5 and 1."
+when_to_adjust = "Raise it when upscaled results look soft or hazy. Lower it if edges turn harsh."

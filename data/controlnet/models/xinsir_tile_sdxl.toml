@@ -1,22 +1,32 @@
 id = "xinsir_tile_sdxl"
 label = "Xinsir SDXL Tile"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "xinsir's SDXL Tile ControlNet: repaints blurred detail, makes variations, and upscales tile by tile."
+description = """\
+xinsir's SDXL Tile ControlNet. Its card shows three uses, each with example code: deblurring, which repaints \
+detail into a blurred image; variation, which regenerates an image Midjourney-style; and super-resolution, which \
+upscales any aspect ratio by any factor, three by three tiles in its example.\n\n\
+The card's blur example softens the control image with TTPlanet's preprocessing: a Gaussian blur, a guided \
+filter and a resize, each applied at random strengths. It recommends detailed, long prompts and generating near \
+1024 by 1024 pixels or another SDXL resolution. It calls the super-resolution path unstable so far."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads the \
+image itself, optionally blurred, filtered and resized, and redraws its detail."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["tile"]
-preprocessors = []
+preprocessors = ["ttplanet_tile_gf"]
 trainer = "xinsir"
 license = "apache-2.0"
 homepage = "https://huggingface.co/xinsir/controlnet-tile-sdxl-1.0"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Covers deblurring, variation and super-resolution, per its card"]
+weaknesses = ["Super-resolution results may be unstable, per its card"]
+good_for = ["repainting blurred images", "image variations", "tiled upscaling"]
 
-sources = ["hf_xinsir_controlnet_tile_sdxl_1_0"]
-research_status = "stub"
+sources = ["hf_xinsir_controlnet_tile_sdxl_1_0", "hf_ttplanet_tile_preprocessor_v5", "paper_controlnet"]
+research_status = "verified"
 open_questions = []
 
 [[files]]

@@ -137,14 +137,16 @@ Each model forbids unknown keys, so a misspelled field fails to load.
 - **TencentARC CoAdapters** (`coadapter-*-sd15v1`): no backend ships a control type or preprocessor for them.
 - **bdsqlsz qinglong ControlNet-LLLite** (19 SDXL models): a large third-party family. Add it if users turn out
   to have it.
+- **The SFW NoobAI inpainting ControlNet** (`Wenaka/NoobAI_XL_Inpainting_ControlNet_SFW`): an earlier, separate
+  training. The full release is `noobai_inpaint_sdxl`.
 - **Other Civitai fine-tunes,** and SD2.1 releases of the same families.
 
 ## Status
 
 | Kind | Records | Stub | Drafted | Verified |
 |---|---|---|---|---|
-| Control types | 23 | 14 | 9 | 0 |
-| Preprocessors | 81 | 30 | 17 | 34 |
-| Models | 127 | 58 | 11 | 58 |
+| Control types | 23 | 6 | 17 | 0 |
+| Preprocessors | 81 | 12 | 17 | 52 |
+| Models | 126 | 34 | 15 | 77 |
 
 `python scripts/controlnet_data.py` prints the current counts. Update this table when a session changes them.

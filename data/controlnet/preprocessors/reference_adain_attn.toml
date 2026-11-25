@@ -1,12 +1,22 @@
 id = "reference_adain_attn"
 label = "Reference AdaIN + Attention"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Combines Reference Only's attention sharing with Reference AdaIN's style matching; no control model needed."
+description = """\
+Reference AdaIN + Attention applies both reference methods at once: the generation's attention layers look at \
+the reference, as in Reference Only, and its feature statistics are matched to the reference's, as in Reference \
+AdaIN. Subject and style both carry over.\n\n\
+sd-webui-controlnet's 1.1.400 notes use it for the SDXL reference example. Style Fidelity works as in the other \
+two: it applies in Balanced mode, and on SDXL its value is cubed."""
+how_it_works = """\
+At every step the reference is noised to the current noise level and run through the U-Net once, recording both \
+the inputs to its self-attention layers and the mean and variance of features at several blocks. While the \
+actual image is denoised, its self-attention layers also attend to the recorded reference features, and the \
+chosen blocks rescale their outputs to the reference's statistics. Weight chooses how many layers and blocks \
+take part."""
 control_types = ["reference"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Passes the image unchanged; during sampling, shares the reference's attention features and feature statistics."
+output = "The reference image, unchanged."
+best_input = "An image whose subject and style should both carry over."
 weak_input = ""
 models = []
 
@@ -14,13 +24,35 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_hook",
     "forge_preprocessors",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "sdwebui_cn_reference_adain_discussion",
+    "sdwebui_cn_1_1_400_discussion",
+    "paper_adain",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["reference_adain+attn"]
 forge = ["reference_adain+attn", "reference_adain+attn_variant"]
 comfyui = []
+
+[hardware]
+device = "none"
+speed = "fast to prepare; each sampling step runs an extra U-Net pass on the reference"
+
+[[parameters]]
+id = "style_fidelity"
+label = "Style Fidelity"
+summary = "How strongly the reference outweighs the prompt, through guidance."
+names = { webui = "threshold_a", forge = "threshold_a" }
+type = "float"
+default = 0.5
+range = [0.0, 1.0]
+effect = """\
+At 0 both the prompt and negative passes use the reference. At 1 only the prompt pass does, and classifier-free \
+guidance amplifies the difference. sd-webui-controlnet uses it only in Balanced mode, and cubes it on SDXL."""
+when_to_adjust = "Raise it when the result strays from the reference. Lower it when the prompt should have more say."

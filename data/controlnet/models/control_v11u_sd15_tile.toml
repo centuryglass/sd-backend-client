@@ -1,8 +1,18 @@
 id = "control_v11u_sd15_tile"
 label = "ControlNet 1.1 Tile (unfinished)"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The unfinished first release of ControlNet 1.1 Tile, replaced by control_v11f1e_sd15_tile."
+description = """\
+The first, unfinished release of ControlNet 1.1 Tile. On 25 April 2023 lllyasviel released the finished model, \
+control_v11f1e_sd15_tile, removed this one from the ControlNet 1.1 downloads, and asked users with v11u to \
+update. Only comfyanonymous's fp16 conversion is still hosted.\n\n\
+It is the same kind of model as the finished Tile: it reads the image itself and regenerates its detail. Use \
+control_v11f1e_sd15_tile instead."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one was \
+trained to read the image itself, at reduced detail. The "u" in its name marks it unfinished under ControlNet \
+1.1's naming rules."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["tile"]
@@ -12,14 +22,17 @@ license = ""
 homepage = "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors"
 
 strengths = []
-weaknesses = []
+weaknesses = ["Unfinished; replaced by control_v11f1e_sd15_tile"]
 good_for = []
 
-sources = ["hf_comfyanonymous_controlnet_v1_1_fp16_safetensors"]
-research_status = "stub"
-open_questions = [
-    "lllyasviel/ControlNet-v1-1 no longer hosts the v11u tile model this fp16 file was converted from. Find its original model card or release note.",
+sources = [
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "cn11_readme",
+    "sdwebui_cn_tile_discussion",
+    "paper_controlnet",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "control_v11u_sd15_tile_fp16.safetensors"

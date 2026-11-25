@@ -1,8 +1,19 @@
 id = "control_v11e_sd15_shuffle"
 label = "ControlNet 1.1 Shuffle"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ControlNet 1.1 for SD 1.5 that recomposes a shuffled image, carrying its colors and style into a new picture."
+description = """\
+ControlNet 1.1 Shuffle transfers the look of a reference image: its colors, textures and style. It was trained to \
+reorganize images scrambled by Content Shuffle, so the scrambled reference supplies the palette and the prompt, \
+or another ControlNet, supplies the content. Its README shows a canny map and a shuffled image combined.\n\n\
+The README notes it can sometimes take the unshuffled original directly, and that it is a pure ControlNet with \
+no CLIP vision model involved. Implementations must average its output over the whole image and apply it only \
+on the prompt's side of guidance; sd-webui-controlnet does this for it."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one was \
+trained to rebuild images from randomly warped copies. Its output is averaged over the whole image before it is \
+added, so it conveys overall style rather than where things are."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["shuffle"]
@@ -11,16 +22,20 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Combines with other ControlNets for content plus style, per its README"]
+weaknesses = ["Experimental quality flag"]
+good_for = ["transferring a reference image's colors and style"]
 
 sources = [
     "hf_lllyasviel_controlnet_v1_1",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "cn11_readme",
+    "cn11_annotator_docs",
+    "paper_controlnet",
+    "sdwebui_cn_hook",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

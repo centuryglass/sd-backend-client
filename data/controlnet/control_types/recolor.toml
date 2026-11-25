@@ -1,19 +1,49 @@
 id = "recolor"
 label = "Recolor"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Keeps an image's brightness and paints new colors: colorizing black-and-white photos or recoloring images."
+description = """\
+Recolor reduces an image to grayscale and has a model paint colors back in, guided by the prompt. Lights and \
+shadows stay where they were, and the colors are new. Stability AI's Recolor Control-LoRA is designed for \
+black-and-white photographs; ioclab's Brightness model names colorizing grayscale images and recoloring \
+generated ones.\n\n\
+Recolor Luminance, the default, keeps perceived lightness; Recolor Intensity keeps each pixel's brightest \
+channel. Gamma Correction lightens or darkens the map. Forge and reForge also match each result's brightness to \
+the map after generation. Forge Neo has no Recolor type."""
+how_it_works = """\
+The preprocessor converts the image to a grayscale brightness map with a fixed color-space formula; no network \
+is involved. A recolor model is trained on images paired with their grayscale versions, so it learns to keep the \
+given brightness pattern while choosing colors. The prompt then decides which colors those are."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Grayscale image of the source's lightness or brightness."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "sdwebui_cn_legacy_preprocessors",
+    "forge_preprocessors",
+    "hf_stabilityai_control_lora",
+    "hf_latentcat_control_v1p_sd15_brightness",
+    "sdwebui_cn_1_1_400_discussion",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Recolor"]
 forge = ["Recolor"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Colorize a black-and-white photo"
+description = "Use the photo as the control image with Recolor Luminance, and describe its colors in the prompt."
+
+[[uses]]
+kind = "creative"
+title = "Recolor a generated image"
+description = """\
+Keep an image's lighting and composition and give it a new palette by prompting for different colors, such as \
+a red car instead of a blue one."""
 
 [choosing]
 guide = ""
@@ -23,5 +53,4 @@ models = [
     "sai_control_lora_recolor_sdxl",
     "latentcat_brightness_sd15",
     "latentcat_illumination_sd15",
-    "ioclab_recolor_sd15",
 ]

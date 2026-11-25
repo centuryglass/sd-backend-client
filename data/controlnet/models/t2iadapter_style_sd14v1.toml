@@ -1,8 +1,17 @@
 id = "t2iadapter_style_sd14v1"
 label = "T2I-Adapter Style v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC T2I-Adapter for SD1.x that carries a reference image's style into the generation as extra prompt tokens."
+description = """\
+The T2I-Adapter style model transfers the look of a reference image, its style, palette and mood, into a new \
+image of whatever the prompt describes. TencentARC calls it a preliminary model and promised style adapters with \
+finer control later. It takes CLIP image features from T2I Style CLIP Vision, not a picture.\n\n\
+TencentARC trained it on SD 1.4 and says it works with any model fine-tuned from the same base. \
+sd-webui-controlnet offers no control mode setting for it."""
+how_it_works = """\
+Unlike TencentARC's other adapters, this one doesn't add features to the U-Net. It is a small transformer that \
+reads the CLIP ViT-L/14 features of the reference image and condenses them into eight tokens shaped like text \
+tokens. Those are appended to the prompt's tokens, so the U-Net's cross-attention reads them alongside the \
+words, the way it would read a description of the style."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["t2i_adapter"]
@@ -11,19 +20,22 @@ trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Small: about 154 MB at full precision"]
+weaknesses = ["Preliminary model, per TencentARC's Adapter Zoo"]
+good_for = ["transferring a reference image's style"]
 
 sources = [
+    "t2i_adapter_zoo",
+    "t2i_adapter_adapter_code",
+    "t2i_adapter_condition_code",
+    "paper_t2i_adapter",
     "hf_tencentarc_t2i_adapter",
     "hf_webui_controlnet_modules_safetensors",
+    "sdwebui_cn_legacy_preprocessors",
     "recorded_fixtures",
 ]
-research_status = "stub"
-open_questions = [
-    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
-]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "t2iadapter_style_sd14v1.pth"

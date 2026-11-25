@@ -1,26 +1,48 @@
 id = "control_v11p_sd15_inpaint"
 label = "ControlNet 1.1 Inpaint"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ControlNet 1.1 inpainting model for SD 1.5; fills masked areas to match their surroundings, with any SD 1.5 base model."
+description = """\
+ControlNet 1.1 Inpaint fills a masked area of an image so it matches the rest. Because it is a ControlNet, any SD \
+1.5 base model can inpaint with it, without a merged inpainting checkpoint, and sd-webui-controlnet's guide says \
+it works with LoRAs and other add-ons.\n\n\
+Its preprocessor decides how strictly the unmasked area is kept. Inpaint Only holds it unchanged even in \
+txt2img; Inpaint Global Harmonious lets the whole image adjust; Inpaint Only + LaMa starts from a LaMa fill for \
+cleaner object removal and outpainting. Its README notes it was trained with half random masks and half optical \
+flow occlusion masks, so it could also serve video warping."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads the \
+image with masked pixels set to -1, below black, and learns to guide generation so the hole is filled \
+consistently with what is visible."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["inpaint"]
-preprocessors = ["inpaint_global_harmonious", "inpaint_only", "inpaint_only_lama"]
+preprocessors = ["inpaint_only", "inpaint_global_harmonious", "inpaint_only_lama"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "Works with any SD 1.5 base model, without an inpainting merge, per sd-webui-controlnet's guide",
+    "Can inpaint without a prompt, guided by the image, per sd-webui-controlnet's 1.1.202 notes",
+]
 weaknesses = []
-good_for = []
+good_for = ["inpainting", "outpainting", "object removal"]
 
 sources = [
     "hf_lllyasviel_controlnet_v1_1",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "cn11_readme",
+    "paper_controlnet",
+    "sdwebui_cn_inpaint_discussion",
+    "sdwebui_cn_inpaint_only_discussion",
+    "sdwebui_cn_inpaint_firefly_discussion",
+    "sdwebui_cn_inpaint_lama_discussion",
+    "sdwebui_cn_hook",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

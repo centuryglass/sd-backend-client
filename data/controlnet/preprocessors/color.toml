@@ -1,26 +1,59 @@
 id = "color"
 label = "Color Grid"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Reduces the image to a coarse grid of color blocks, a spatial palette for the T2I color adapter."
+description = """\
+Color Grid turns an image into a mosaic of large flat color squares, keeping which colors sit where and nothing \
+else. TencentARC calls this a spatial palette: the T2I-Adapter color model paints a new image whose colors follow \
+the grid while the prompt decides what is drawn.\n\n\
+A hand-painted palette works too. TencentARC's examples feed the adapter a color image directly, and convert \
+other images the same way this preprocessor does. sd-webui-controlnet labels it t2ia_color_grid, and ComfyUI's \
+node is Color Pallete."""
+how_it_works = """\
+No network is involved. The image is resized so its short side matches the resolution, shrunk to one pixel per \
+64 by 64 block with cubic interpolation, then enlarged back with nearest-neighbor scaling. Each block becomes one \
+flat color, the blend of the pixels it covered. This is TencentARC's own recipe from the T2I-Adapter code."""
 control_types = ["t2i_adapter"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Replaces the image with a grid of flat color squares, 64 pixels across at the working resolution."
+output = "A blocky mosaic of the source's colors."
+best_input = "Any image whose color layout should carry over, or a rough color sketch."
 weak_input = ""
 models = ["t2iadapter_color_sd14v1"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
     "forge_preprocessors",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "t2i_adapter_readme_sd",
+    "t2i_adapter_zoo",
+    "t2i_adapter_condition_code",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["color", "t2ia_color_grid"]
 forge = ["t2ia_color_grid"]
 comfyui = ["ColorPreprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: two resizes with no network"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side before it is cut into 64-pixel blocks."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+Blocks are always 64 pixels at this size, so a higher resolution gives more, smaller blocks relative to the \
+image. ComfyUI accepts up to 16384."""
+when_to_adjust = "Lower it for a coarser palette with fewer blocks. Raise it to keep smaller color areas."

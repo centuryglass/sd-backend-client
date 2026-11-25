@@ -1,19 +1,45 @@
 id = "ip2p"
 label = "Instruct Pix2Pix"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Edits an image by following the prompt as an instruction, such as \"make it winter\", while keeping it recognizable."
+description = """\
+Instruct Pix2Pix control edits the control image according to the prompt, read as an instruction: "make it \
+winter", "make it into a painting". The picture stays recognizable while the requested change is applied. The \
+ControlNet 1.1 model also accepts plain description prompts.\n\n\
+It takes the source image directly, with no preprocessor. Its README notes that instructions phrased "make it \
+into X" work better than "make Y into X". sd-webui-controlnet presents this type as InstructP2P, with only one \
+model, for SD 1.5."""
+how_it_works = """\
+InstructPix2Pix trained an image-editing model on a large set of generated examples: GPT-3 wrote edit \
+instructions and edited captions, and Stable Diffusion rendered before-and-after image pairs. The ControlNet 1.1 \
+version learns the same edits as a ControlNet. It reads the source image and steers a normal Stable Diffusion \
+model to produce the edited version, so it works with any SD 1.5 base model."""
 base_models = ["sd15"]
-control_image = ""
+control_image = "The source image itself, unprocessed."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "sdwebui_cn_preprocessors",
+    "cn11_readme",
+    "paper_instruct_pix2pix",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["InstructP2P"]
 forge = []
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Change the season, weather or time of day"
+description = "Give a photo and an instruction such as \"make it winter\". The scene stays, its conditions change."
+
+[[uses]]
+kind = "creative"
+title = "Turn a photo into another medium"
+description = "Instructions such as \"make it into a watercolor painting\" restyle the image while keeping its content."
 
 [choosing]
 guide = ""

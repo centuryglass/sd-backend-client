@@ -1,19 +1,45 @@
 id = "sparsectrl"
 label = "SparseCtrl"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Guides an AnimateDiff animation from one or a few images or sketches placed on chosen frames."
+description = """\
+SparseCtrl controls AnimateDiff animations with a few condition images instead of one per frame. The RGB encoder \
+takes ordinary images, so a single picture can be animated or several keyframes interpolated. The scribble \
+encoder takes sketches, for storyboard-style control.\n\n\
+In sd-webui-controlnet the condition images go on frames chosen in the AnimateDiff batch settings, the first \
+frame by default. It needs AnimateDiff and an SD 1.5 model. Of the WebUI backends, only sd-webui-controlnet has \
+this type."""
+how_it_works = """\
+SparseCtrl adds a condition encoder to a text-to-video model without changing the model. The encoder sees only \
+the condition images, each paired with a mask saying which frames have one. Motion modules inside the encoder \
+carry the guidance from those frames across the rest of the animation."""
 base_models = ["sd15"]
-control_image = ""
+control_image = "An RGB image or a white-on-black scribble, for one or a few frames of the animation."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "sdwebui_cn_sparsectrl",
+    "sdwebui_cn_script",
+    "gh_animatediff_readme",
+    "paper_sparsectrl",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["SparseCtrl"]
 forge = []
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Animate a still image"
+description = "Put an image on the first frame with the RGB encoder, and prompt for the motion. AnimateDiff's demos do this."
+
+[[uses]]
+kind = "creative"
+title = "Storyboard an animation"
+description = "Sketch a few key moments and place them on frames with the scribble encoder. SparseCtrl's paper names storyboarding as an application."
 
 [choosing]
 guide = ""

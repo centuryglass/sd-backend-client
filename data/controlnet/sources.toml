@@ -942,3 +942,204 @@ accessed = "2026-11-25"
 project = "sd-webui-controlnet"
 commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
 path = "scripts/controlnet.py"
+
+[sdwebui_cn_hook]
+title = "sd-webui-controlnet U-Net hook (inpaint, tile color fix and reference attention code)"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/hook.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/hook.py"
+
+[sdwebui_cn_sparsectrl]
+title = "sd-webui-controlnet SparseCtrl model"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/controlnet_sparsectrl.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/controlnet_sparsectrl.py"
+
+[forge_neo_preprocessors]
+title = "Forge Neo built-in preprocessor extensions"
+url = "https://github.com/Haoming02/sd-webui-forge-classic/tree/46af880c003d31846bbea984ce00fc7be247ce5b/extensions-builtin"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-forge-classic (Forge Neo)"
+commit = "46af880c003d31846bbea984ce00fc7be247ce5b"
+path = "extensions-builtin/"
+
+[sdwebui_cn_tile_discussion]
+title = "sd-webui-controlnet discussion #1142: the finished tile model is released"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1142"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_tile_color_offset_discussion]
+title = "sd-webui-controlnet discussion #1163: ControlNet 1.1 Tile color offset problems with anime images"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1163"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_tile_colorfix_discussion]
+title = "sd-webui-controlnet discussion #1431: tile_colorfix is added"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1431"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_tile_colorfix_sharp_discussion]
+title = "sd-webui-controlnet discussion #1435: tile_colorfix+sharp is added"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1435"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_inpaint_discussion]
+title = "sd-webui-controlnet discussion #1143: guidelines for using inpaint in A1111"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1143"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_inpaint_only_discussion]
+title = "sd-webui-controlnet discussion #1442: inpaint_only is added"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1442"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_inpaint_firefly_discussion]
+title = "sd-webui-controlnet discussion #1464: inpaint improvements in 1.1.202 (prompt-free inpainting)"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1464"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_inpaint_lama_discussion]
+title = "sd-webui-controlnet discussion #1597: inpaint_only+lama"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1597"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_reference_discussion]
+title = "sd-webui-controlnet discussion #1236: reference-only control"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1236"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_reference_adain_discussion]
+title = "sd-webui-controlnet discussion #1280: reference_adain and reference_adain+attn are added"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1280"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_1_1_400_discussion]
+title = "sd-webui-controlnet discussion #2039: 1.1.400 update (SDXL models, Recolor, Reference and LLLite)"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2039"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[cn11_annotator_docs]
+title = "ControlNet 1.1 annotator notes (content reshuffle)"
+url = "https://github.com/lllyasviel/ControlNet-v1-1-nightly/blob/e2b44154b72965c5e11b1ccee941d550682e4701/github_docs/annotator.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[t2i_adapter_adapter_code]
+title = "T2I-Adapter adapter networks (StyleAdapter, Adapter_light)"
+url = "https://github.com/TencentARC/T2I-Adapter/blob/16bba674b472121d5a86e3ed6b935f91d516bc74/ldm/modules/encoders/adapter.py"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[t2i_adapter_condition_code]
+title = "T2I-Adapter condition preparation (color and style inputs)"
+url = "https://github.com/TencentARC/T2I-Adapter/blob/16bba674b472121d5a86e3ed6b935f91d516bc74/ldm/modules/extra_condition/api.py"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[gh_animatediff_readme]
+title = "AnimateDiff README (v3 model zoo and SparseCtrl)"
+url = "https://github.com/guoyww/AnimateDiff/blob/e92bd5671ba62c0d774a32951453e328018b7c5b/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[paper_sparsectrl]
+title = "SparseCtrl: Adding Sparse Controls to Text-to-Video Diffusion Models"
+url = "https://arxiv.org/abs/2311.16933"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_instruct_pix2pix]
+title = "InstructPix2Pix: Learning to Follow Image Editing Instructions"
+url = "https://arxiv.org/abs/2211.09800"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_lama]
+title = "Resolution-robust Large Mask Inpainting with Fourier Convolutions (LaMa)"
+url = "https://arxiv.org/abs/2109.07161"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_adain]
+title = "Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization"
+url = "https://arxiv.org/abs/1703.06868"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_fast_guided_filter]
+title = "Fast Guided Filter"
+url = "https://arxiv.org/abs/1505.00996"
+kind = "paper"
+accessed = "2026-11-25"
+
+[hf_ttplanet_tile_preprocessor_v5]
+title = "TTPlanet tile preprocessor script for ComfyUI (TTP_tile_preprocessor_v5.py)"
+url = "https://huggingface.co/TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic/blob/37f1c4575b543fb2036e39f5763d082fdd135318/TTP_tile_preprocessor_v5.py"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[hf_openai_clip_vit_large_patch14]
+title = "openai/clip-vit-large-patch14 on Hugging Face"
+url = "https://huggingface.co/openai/clip-vit-large-patch14/tree/32bd64288804d66eefd0ccbe215aa642df71cc41"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[hf_wenaka_noobai_inpainting_full]
+title = "Wenaka/NoobAI_XL_Inpainting_ControlNet_Full model card"
+url = "https://huggingface.co/Wenaka/NoobAI_XL_Inpainting_ControlNet_Full/tree/bb7e0e4e41bfdfac7b3ce935028e14bdcb594005"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[hf_wenaka_noobai_inpainting_sfw]
+title = "Wenaka/NoobAI_XL_Inpainting_ControlNet_SFW model card"
+url = "https://huggingface.co/Wenaka/NoobAI_XL_Inpainting_ControlNet_SFW/tree/d80fe3b566f117294d194a6e2df732ef95fd3fbc"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[hf_acly_noobai_inpainting]
+title = "Acly/NoobAI-Inpainting (fp16 copy)"
+url = "https://huggingface.co/Acly/NoobAI-Inpainting/tree/7341925b3346eb48dcac4dd4049cdb5bf2afd472"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[civitai_noobai_inpainting]
+title = "NoobAI Inpainting ControlNet on Civitai (model 1376234)"
+url = "https://civitai.com/models/1376234"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[civitai_controlnetxl_cnxl]
+title = "ControlNetXL (CNXL) collection on Civitai (model 136070)"
+url = "https://civitai.com/models/136070"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[paper_clip]
+title = "Learning Transferable Visual Models From Natural Language Supervision (CLIP)"
+url = "https://arxiv.org/abs/2103.00020"
+kind = "paper"
+accessed = "2026-11-25"
+
+[gh_animatediff_sparsectrl_configs]
+title = "AnimateDiff SparseCtrl inference configs (image and latent condition) and demo prompts"
+url = "https://github.com/guoyww/AnimateDiff/tree/e92bd5671ba62c0d774a32951453e328018b7c5b/configs"
+kind = "repo_code"
+accessed = "2026-11-25"

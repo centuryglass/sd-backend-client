@@ -1,8 +1,18 @@
 id = "sparsectrl_scribble_sd15"
 label = "SparseCtrl Scribble"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "AnimateDiff v3 SparseCtrl encoder that guides an animation from a few scribbles and sketches placed on chosen frames."
+description = """\
+SparseCtrl controls AnimateDiff animations from a few condition images instead of one per frame. This encoder \
+takes scribbles and sketches. It was released with AnimateDiff v3 for SD 1.5, and its paper names storyboarding among its \
+applications. AnimateDiff's demos turn a single sketch into a video.\n\n\
+In sd-webui-controlnet it takes a scribble preprocessor's output. The extension applies the control images to frames chosen in the AnimateDiff batch settings, \
+the first frame by default, and leaves the others free. It is useful only with AnimateDiff. Of the WebUI \
+backends, only sd-webui-controlnet has a SparseCtrl type."""
+how_it_works = """\
+A SparseCtrl encoder is shaped like a ControlNet but sees only the condition, not the noisy frames: its paper \
+adds a condition encoder to a text-to-video model and leaves that model untouched. Each frame's condition is \
+paired with a mask marking whether it has one, and motion modules inside the encoder spread the guidance from \
+conditioned frames to the rest. This one reads white-on-black scribble maps of its keyframes."""
 base_models = ["sd15"]
 adapter = "other"
 control_types = ["sparsectrl"]
@@ -11,12 +21,20 @@ trainer = "guoyww"
 license = "apache-2.0"
 homepage = "https://huggingface.co/guoyww/animatediff"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Needs only one or a few condition images for a whole animation, per its paper"]
+weaknesses = ["Useful only with AnimateDiff"]
+good_for = ["sketch-to-video", "storyboarding"]
 
-sources = ["hf_guoyww_animatediff"]
-research_status = "stub"
+sources = [
+    "hf_guoyww_animatediff",
+    "gh_animatediff_readme",
+    "gh_animatediff_sparsectrl_configs",
+    "paper_sparsectrl",
+    "sdwebui_cn_sparsectrl",
+    "sdwebui_cn_script",
+    "recorded_fixtures",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

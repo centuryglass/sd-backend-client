@@ -1,23 +1,31 @@
 id = "kohya_lllite_replicate_anime_v2_sdxl"
 label = "LLLite SDXL Replicate Anime V2"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "kohya-ss ControlNet-LLLite for SDXL that reproduces the control image as closely as it can, blended with the prompt."
+description = """\
+A ControlNet-LLLite model from kohya-ss that replicates the control image, mixed with the prompt, as closely as \
+the model can. It needs no preprocessor and also works in img2img. Its card names no control type; this \
+reference files it under Tile, whose models also redraw the image they are given.\n\n\
+It was trained on kohya-ss's custom anime SDXL model with 896 generated image pairs at 1024 and 2048 pixels, the \
+larger made with hires fix, for timesteps 0 to 1000, the whole schedule."""
+how_it_works = """\
+ControlNet-LLLite is kohya-ss's lightweight alternative to ControlNet: small conditioning modules attached to \
+the SDXL U-Net. Its model card calls the structure highly experimental and subject to change. This model was \
+trained on pairs of the same image at two resolutions, so it learns to reproduce its control image."""
 base_models = ["sdxl"]
 adapter = "controlnet_lllite"
-control_types = []
+control_types = ["tile"]
 preprocessors = []
 trainer = "kohya-ss"
 license = "apache-2.0"
 homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Very small", "Needs no preprocessor, per its card"]
+weaknesses = ["Experimental architecture", "Small training set of 896 image pairs"]
+good_for = ["reproducing an image with prompt changes", "img2img refinement"]
 
 sources = ["hf_kohya_ss_controlnet_lllite"]
-research_status = "stub"
-open_questions = ["Find what control image the \"replicate\" models take, and which control type they fit."]
+research_status = "drafted"
+open_questions = []
 
 [[files]]
 filename = "controllllite_v01032064e_sdxl_replicate_anime_v2.safetensors"
