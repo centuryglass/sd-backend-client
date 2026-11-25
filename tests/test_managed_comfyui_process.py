@@ -72,15 +72,16 @@ def test_another_server_on_the_port_is_not_ready():
     """A second instance on a port the first holds fails to bind and crashes, and never counts as ready."""
     logs: list[str] = []
     first = _managed(logs=logs)
+    second = ManagedComfyUI([sys.executable, str(STUB_DIR / 'main.py'), '--lowvram-stub'], STUB_DIR,
+                            int(first.command[-1]), on_log=logs.append)
     first.start()
     try:
         first.wait_until_ready(timeout=READY_TIMEOUT, poll_interval=0.1)
-        second = ManagedComfyUI([sys.executable, str(STUB_DIR / 'main.py'), '--lowvram-stub'], STUB_DIR,
-                                int(first.command[-1]), on_log=logs.append)
         second.start()
         cancel = threading.Event()
         with pytest.raises(BackendLaunchError):
             second.wait_until_ready(timeout=READY_TIMEOUT, cancel=cancel, poll_interval=0.1)
         assert second.state == ManagedState.CRASHED
     finally:
+        second.stop()
         first.stop()

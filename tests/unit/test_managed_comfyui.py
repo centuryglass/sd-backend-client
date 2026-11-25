@@ -100,7 +100,7 @@ def test_server_arguments_replace_listen_and_port(arguments: list[str], expected
 def test_paths_and_ipv6_host():
     """Path arguments become strings, and an IPv6 host is bracketed in the URL."""
     managed = ManagedComfyUI([Path('/py'), Path('/sd/main.py')], Path('/sd'), 9000, host='::1')
-    assert managed.command == ['/py', '/sd/main.py', '--listen', '::1', '--port', '9000']
+    assert managed.command == [str(Path('/py')), str(Path('/sd/main.py')), '--listen', '::1', '--port', '9000']
     assert managed.url == 'http://[::1]:9000'
 
 

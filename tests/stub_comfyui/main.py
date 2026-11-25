@@ -50,6 +50,8 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
+# On Windows, `SO_REUSEADDR` lets a second socket bind a port in use. ComfyUI's asyncio server doesn't set it there.
+HTTPServer.allow_reuse_address = sys.platform != 'win32'
 server = HTTPServer((args.listen, args.port), Handler)
 print(f'To see the GUI go to: http://{args.listen}:{args.port}', flush=True)
 server.serve_forever()
