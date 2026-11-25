@@ -1,11 +1,24 @@
 id = "seg_ofcoco"
 label = "OneFormer COCO"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Labels every pixel with one of COCO's 133 panoptic classes using OneFormer, and paints each class its COCO color."
+description = """\
+OneFormer COCO divides an image into regions of COCO's 133 panoptic classes, 80 kinds of object such as \
+person, car and dog, and 53 kinds of background such as sky, grass and wall, and fills each region with that \
+class's COCO color. The result is a flat color map, like the ADE20K preprocessors but in a different \
+palette.\n\n\
+Only ControlNet 1.1 Segmentation was trained on COCO maps, so use it with that model. ControlNet 1.0 \
+Segmentation reads only ADE20K colors. The two class lists differ: ADE20K's 150 classes split into 100 \
+objects and 50 backgrounds, against COCO's 80 and 53. COCO has giraffe, zebra and pizza, which ADE20K \
+lacks, and ADE20K has fireplace, which COCO lacks."""
+how_it_works = """\
+OneFormer is one transformer network trained for three segmentation tasks at once. A task token tells it \
+which output to produce: semantic, instance or panoptic. The preprocessor asks for semantic segmentation, \
+which gives every pixel a class. This checkpoint uses a Swin-L backbone trained on COCO for 100 epochs. Inside \
+the network the image is rescaled so its short side is 800 pixels, and the predicted class of each pixel is \
+then painted in the COCO panoptic palette."""
 control_types = ["segmentation"]
-effect = ""
-output = ""
+effect = "Replaces the image with flat regions in COCO panoptic class colors, one region per detected class."
+output = "Flat color map in the 133-class COCO panoptic palette."
 best_input = ""
 weak_input = ""
 models = ["control_v11p_sd15_seg"]
@@ -14,13 +27,54 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_supported_preprocessor",
+    "sdwebui_cn_script",
     "forge_preprocessors",
+    "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "hf_lllyasviel_annotators",
+    "paper_oneformer",
+    "gh_oneformer_readme",
+    "paper_coco_stuff",
+    "cn11_readme",
+    "cn10_readme",
 ]
-research_status = "stub"
-open_questions = []
+research_status = "drafted"
+open_questions = [
+    "The ControlNet 1.1 README says Segmentation 1.1 adds 182 COCO colors, the COCO-Stuff class count, while this preprocessor draws the 133-class COCO panoptic palette. Find which palette the 1.1 training maps used, and whether the 133 panoptic colors are among the colors the model learned.",
+]
 
 [names]
 webui = ["oneformer_coco", "seg_ofcoco"]
 forge = ["seg_ofcoco"]
 comfyui = ["OneFormer-COCO-SemSegPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+vram = "Swin-L OneFormer, 219M parameters per OneFormer's README; the weights file is about 950 MB."
+
+[[hardware.files]]
+filename = "150_16_swin_l_oneformer_coco_100ep.pth"
+size_bytes = 949602739
+sha256 = "0684dfc39720c772b81d43639c3ae1896b5c15aa9ee9a76f4c593b19dfa33855"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/150_16_swin_l_oneformer_coco_100ep.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side before it goes to the segmenter, and of the map it returns."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value and padded to a multiple of 64. OneFormer then \
+rescales it to an 800-pixel short side internally, so this value mostly sets the size of the returned map and \
+how much detail survives the first scaling. sd-webui-controlnet and reForge hide the slider for this \
+preprocessor. In sd-webui-controlnet the API value and Pixel Perfect still apply. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Leave it at the default in the WebUI, which has no slider for it. In ComfyUI, match it to the generation's \
+short side to avoid rescaling the map later."""

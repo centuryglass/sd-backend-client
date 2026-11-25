@@ -1,8 +1,18 @@
 id = "control_v11p_sd15_seg"
 label = "ControlNet 1.1 Segmentation"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ControlNet 1.1 segmentation model for SD 1.5; reads both ADE20K and COCO class-color maps."
+description = """\
+The ControlNet 1.1 segmentation model. It was trained on both COCO and ADE20K, so it reads either palette: \
+about 150 ADE20K colors, as 1.0 did, plus another 182 colors from COCO. It was resumed from Segmentation 1.0, \
+and its README says all previous inputs should still work.\n\n\
+The README lists OneFormer ADE20K, OneFormer COCO and UniFormer ADE20K as acceptable preprocessors, along with \
+manually created masks. Its tests show a house generated from an ADE20K map and from a COCO map."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was \
+trained on images paired with ADE20K and COCO segmentation maps. Its README notes that recognizing which \
+palette a map uses is trivial for the ControlNet encoder, and that training on both improved results."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["segmentation"]
@@ -11,16 +21,22 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "Reads both ADE20K and COCO maps, per its README",
+    "Accepts every input that worked with Segmentation 1.0, per its README",
+]
 weaknesses = []
-good_for = []
+good_for = ["restyling a scene while keeping its layout", "generating from a hand-painted class map"]
 
 sources = [
     "hf_lllyasviel_controlnet_v1_1",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "cn11_readme",
+    "paper_controlnet",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

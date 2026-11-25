@@ -689,7 +689,7 @@ kind = "model_card"
 accessed = "2026-11-23"
 
 [hf_bdsqlsz_qinglong_lllite]
-title = "bdsqlsz/qinglong_controlnet-lllite (DSINE annotator weights)"
+title = "bdsqlsz/qinglong_controlnet-lllite model card and annotator weights"
 url = "https://huggingface.co/bdsqlsz/qinglong_controlnet-lllite/tree/67006a35a5955437d118490bfec822402eff09f5"
 kind = "model_card"
 accessed = "2026-11-23"
@@ -819,3 +819,126 @@ title = "xinsir/controlnet-openpose-sdxl-1.0 discussion #3, \"what is this model
 url = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0/discussions/3"
 kind = "official_docs"
 accessed = "2026-11-25"
+
+[paper_controlnet_v1]
+title = "Zhang and Agrawala, Adding Conditional Control to Text-to-Image Diffusion Models, arXiv v1 (2023), with per-model training data"
+url = "https://arxiv.org/abs/2302.05543v1"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_oneformer]
+title = "Jain et al., OneFormer: One Transformer to Rule Universal Image Segmentation (2022)"
+url = "https://arxiv.org/abs/2211.06220"
+kind = "paper"
+accessed = "2026-11-25"
+
+[gh_oneformer_readme]
+title = "SHI-Labs/OneFormer README (model zoo)"
+url = "https://github.com/SHI-Labs/OneFormer/blob/4962ef6a96ffb76a76771bfa3e8b3587f209752b/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[paper_uniformer]
+title = "Li et al., UniFormer: Unifying Convolution and Self-attention for Visual Recognition (2022)"
+url = "https://arxiv.org/abs/2201.09450"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_upernet]
+title = "Xiao et al., Unified Perceptual Parsing for Scene Understanding (2018)"
+url = "https://arxiv.org/abs/1807.10221"
+kind = "paper"
+accessed = "2026-11-25"
+
+[gh_uniformer_seg_readme]
+title = "Sense-X/UniFormer semantic segmentation README (ADE20K models)"
+url = "https://github.com/Sense-X/UniFormer/blob/52a0415e4e0dda880fab8ffbc710e4d8e171149d/semantic_segmentation/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[paper_ade20k]
+title = "Zhou et al., Semantic Understanding of Scenes through the ADE20K Dataset (2016)"
+url = "https://arxiv.org/abs/1608.05442"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_coco_stuff]
+title = "Caesar, Uijlings and Ferrari, COCO-Stuff: Thing and Stuff Classes in Context (2016)"
+url = "https://arxiv.org/abs/1612.03716"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_sam]
+title = "Kirillov et al., Segment Anything (2023)"
+url = "https://arxiv.org/abs/2304.02643"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_mobile_sam]
+title = "Zhang et al., Faster Segment Anything: Towards Lightweight SAM for Mobile Applications (2023)"
+url = "https://arxiv.org/abs/2306.14289"
+kind = "paper"
+accessed = "2026-11-25"
+
+[gh_mobile_sam_readme]
+title = "ChaoningZhang/MobileSAM README"
+url = "https://github.com/ChaoningZhang/MobileSAM/blob/f706ad9c4eb7f219c00d9050e46328518ffb65d2/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[hf_dhkim2810_mobilesam]
+title = "dhkim2810/MobileSAM (MobileSAM weights)"
+url = "https://huggingface.co/dhkim2810/MobileSAM/tree/4e2e5245fe9dc63096d575d36e70eb39b03b3aba"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[gh_controlnet_aux_sam]
+title = "huggingface/controlnet_aux SamDetector, which sd-webui-controlnet's mobile_sam subclasses"
+url = "https://github.com/huggingface/controlnet_aux/blob/b1aac318b15c4e65a21bc516dc236ad4bf593d46/src/controlnet_aux/segment_anything/__init__.py"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[gh_anime_face_segmentation_readme]
+title = "siyeong0/Anime-Face-Segmentation README"
+url = "https://github.com/siyeong0/Anime-Face-Segmentation/blob/7107bfc64610cec5b9e64a2c16a4f011b5f513e5/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[gh_anime_segmentation_readme]
+title = "SkyTNT/anime-segmentation README (anime character background removal)"
+url = "https://github.com/SkyTNT/anime-segmentation/blob/55d874013a2811cdf59c365059174c7823acf5b4/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[hf_skytnt_anime_seg]
+title = "skytnt/anime-seg (ISNet anime segmentation weights)"
+url = "https://huggingface.co/skytnt/anime-seg/tree/493cb60893f47441b26ec4fb9a306bce9e342982"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[paper_dis]
+title = "Qin et al., Highly Accurate Dichotomous Image Segmentation (2022), the IS-Net paper"
+url = "https://arxiv.org/abs/2203.03041"
+kind = "paper"
+accessed = "2026-11-25"
+
+[t2i_adapter_seg_training]
+title = "T2I-Adapter segmentation training script and COCO-Stuff color-mask loader (SD1.x branch)"
+url = "https://github.com/TencentARC/T2I-Adapter/blob/16bba674b472121d5a86e3ed6b935f91d516bc74/train_seg.py"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[hf_tencentarc_t2i_seg_examples]
+title = "TencentARC/T2I-Adapter example segmentation maps (examples/seg)"
+url = "https://huggingface.co/TencentARC/T2I-Adapter/tree/003997adaae088a8311e25f6d395e821b5398a11/examples/seg"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[sdwebui_cn_script]
+title = "sd-webui-controlnet main script (preprocessor resolution, Pixel Perfect and numpy seeding)"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/controlnet.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/controlnet.py"

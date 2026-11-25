@@ -1,26 +1,42 @@
 id = "control_sd15_seg"
 label = "ControlNet 1.0 Segmentation"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The original ControlNet segmentation model for SD 1.5; reads ADE20K class-color maps."
+description = """\
+The ControlNet 1.0 segmentation model. It reads maps in ADE20K's segmentation protocol: flat regions in the \
+palette of ADE20K's 150 scene classes. Its README's demo detects the map from an input image with UniFormer, \
+and notes that the model deserves a UI for drawing segmentations directly.\n\n\
+ControlNet 1.1 Segmentation was resumed from this model and also accepts COCO colors. The 1.1 README says all \
+inputs to 1.0 should still work with it. comfyui_controlnet_aux pairs this model with its UniFormer \
+preprocessor."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model \
+was trained on ADE20K images and their segmentation maps, captioned by BLIP, on SD 1.5."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["segmentation"]
-preprocessors = ["seg_ufade20k"]
+preprocessors = ["seg_ufade20k", "seg_ofade20k"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet"
 
 strengths = []
-weaknesses = []
-good_for = []
+weaknesses = ["Reads only the ADE20K palette; COCO maps need ControlNet 1.1"]
+good_for = ["restyling a scene while keeping its layout"]
 
 sources = [
     "hf_lllyasviel_controlnet",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
+    "paper_controlnet_v1",
+    "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

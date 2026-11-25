@@ -1,11 +1,22 @@
 id = "seg_ufade20k"
 label = "UniFormer ADE20K"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Labels every pixel with one of ADE20K's 150 scene classes using UniFormer, the segmenter ControlNet 1.0 was shown with."
+description = """\
+UniFormer ADE20K divides an image into regions of ADE20K's 150 scene classes and fills each region with that \
+class's color, the same palette OneFormer ADE20K draws. The result is a flat color map with no edges or \
+shading inside regions.\n\n\
+This is the segmenter of ControlNet 1.0's segmentation demo, and sd-webui-controlnet's module named \
+"segmentation". Both SD 1.5 segmentation ControlNets read its maps. Its network is smaller than OneFormer's: 52 \
+million parameters against 219 million, and a 206 MB weights file against about 950 MB."""
+how_it_works = """\
+UniFormer is a vision network that mixes convolution, which looks at small neighborhoods, in its early layers \
+with self-attention, which relates distant parts of the image, in its later ones. Here it feeds UperNet, a \
+segmentation head from scene-parsing research, which turns those features into a class for each pixel. This \
+checkpoint is UniFormer-S with UperNet, trained on ADE20K. Each pixel's predicted class is painted in \
+ADE20K's palette color."""
 control_types = ["segmentation"]
-effect = ""
-output = ""
+effect = "Replaces the image with flat regions in ADE20K class colors, one region per detected class."
+output = "Flat color map in the 150-class ADE20K palette."
 best_input = ""
 weak_input = ""
 models = ["control_sd15_seg", "control_v11p_sd15_seg"]
@@ -15,12 +26,59 @@ sources = [
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
+    "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "hf_lllyasviel_annotators",
+    "hf_lllyasviel_controlnet",
+    "paper_uniformer",
+    "paper_upernet",
+    "gh_uniformer_seg_readme",
+    "gh_oneformer_readme",
+    "paper_ade20k",
+    "cn10_readme",
+    "cn11_readme",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["segmentation", "seg_ufade20k"]
 forge = ["seg_ufade20k"]
 comfyui = ["UniFormer-SemSegPreprocessor", "SemSegPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+vram = "UniFormer-S with UperNet, 52M parameters per UniFormer's README; the weights file is about 206 MB."
+
+[[hardware.files]]
+filename = "upernet_global_small.pth"
+size_bytes = 206313115
+sha256 = "bebfa1264c10381e389d8065056baaadbdadee8ddc6e36770d1ec339dc84d970"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/upernet_global_small.pth"
+variant = "comfyui_controlnet_aux download"
+
+[[hardware.files]]
+filename = "upernet_global_small.pth"
+size_bytes = 206313115
+sha256 = "bebfa1264c10381e389d8065056baaadbdadee8ddc6e36770d1ec339dc84d970"
+source_url = "https://huggingface.co/lllyasviel/ControlNet/resolve/e78a8c4a5052a238198043ee5c0cb44e22abb9f7/annotator/ckpts/upernet_global_small.pth"
+variant = "sd-webui-controlnet and reForge download, the same file"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value and padded to a multiple of 64. UniFormer then \
+rescales it to a 512-pixel short side internally, or less for very wide images, so this value mostly sets \
+the size of the returned map and how much detail survives the first scaling. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Match it to the generation's short side to avoid rescaling the map later. Values far below 512 discard \
+detail before the segmenter sees the image."""

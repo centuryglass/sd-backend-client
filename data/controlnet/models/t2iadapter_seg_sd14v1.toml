@@ -1,8 +1,19 @@
 id = "t2iadapter_seg_sd14v1"
 label = "T2I-Adapter Segmentation v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC's T2I-Adapter for COCO-Stuff segmentation maps on SD 1.x, a small add-on trained on SD 1.4."
+description = """\
+A T2I-Adapter that steers SD 1.x generation to follow a segmentation map. It is a small add-on, about 309 MB \
+at full precision, from the first T2I-Adapter release with the sketch and keypose adapters. It was trained on \
+COCO-Stuff, whose maps cover 80 thing classes, 91 stuff classes and an unlabeled class.\n\n\
+Its README's example takes a ready-made segmentation map, not a photo, and the example maps don't use the \
+ADE20K or COCO panoptic colors that the OneFormer and UniFormer preprocessors draw. It was trained on SD 1.4. \
+TencentARC's README recommends SD 1.5 as the base and says the adapters should work on other models \
+fine-tuned from SD 1.4 or 1.5. The README also shows it combined with the sketch adapter."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. This adapter was trained on COCO images paired with color-coded COCO-Stuff \
+segmentation masks and their captions."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["segmentation"]
@@ -11,18 +22,26 @@ trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Small and fast compared with a ControlNet", "Combines with the sketch adapter, per its README"]
+weaknesses = ["No backend preprocessor draws the palette of its example maps"]
+good_for = ["generating from a prepared segmentation map"]
 
 sources = [
     "hf_tencentarc_t2i_adapter",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "t2i_adapter_readme_sd",
+    "t2i_adapter_zoo",
+    "t2i_adapter_seg_training",
+    "hf_tencentarc_t2i_seg_examples",
+    "paper_t2i_adapter",
+    "paper_coco_stuff",
+    "sdwebui_cn_annotators",
 ]
-research_status = "stub"
+research_status = "drafted"
 open_questions = [
-    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
+    "The example maps (motor.png, dinner.png) match the PASCAL VOC bit-shift colormap indexed by COCO-Stuff class id (motorcycle, grass, bush, house and tree in motor.png). Confirm the palette from the code that made the training masks, which is not in the T2I-Adapter repo.",
+    "Find whether any backend or extension ships a preprocessor that draws this palette, or whether users must convert maps themselves.",
 ]
 
 [[files]]

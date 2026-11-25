@@ -1,12 +1,22 @@
 id = "seg_anime_face"
 label = "Anime Face Segmentation"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Splits an anime character into seven flat color regions: background, hair, eyes, mouth, face, skin and clothes."
+description = """\
+Anime Face Segmentation paints an anime-style image as seven flat colors: yellow background, blue hair, red \
+eyes, white mouth, green face, cyan skin and magenta clothes. It is built for anime characters, not photos or \
+scenes, and its palette is its own, unrelated to ADE20K's or COCO's.\n\n\
+Its weights come from bdsqlsz's qinglong ControlNet-LLLite release, whose README recommends this segmenter for \
+its SDXL anime face segmentation models. Those models sit outside this reference. In ComfyUI the node first \
+removes the background with a second network and also returns a character mask."""
+how_it_works = """\
+The segmenter is a small U-Net, a network that shrinks the image to find what is where and then grows it back \
+to full size, with a pretrained MobileNetV2 encoder. It was trained to label each pixel of a 512 by 512 anime \
+image with one of seven classes, and each class is painted in a fixed color. ComfyUI's version can run IS-Net, \
+a background removal network trained on anime characters, beforehand and fill the background with white."""
 control_types = ["segmentation"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Replaces the image with seven flat color regions for background, hair, eyes, mouth, face, skin and clothes."
+output = "Seven-color map: yellow background, blue hair, red eyes, white mouth, green face, cyan skin, magenta clothes."
+best_input = "Anime-style character images."
 weak_input = ""
 models = []
 
@@ -15,12 +25,64 @@ sources = [
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
+    "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "hf_bdsqlsz_qinglong_lllite",
+    "gh_anime_face_segmentation_readme",
+    "gh_anime_segmentation_readme",
+    "hf_skytnt_anime_seg",
+    "paper_dis",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["anime_face_segment", "seg_anime_face"]
 forge = ["seg_anime_face"]
 comfyui = ["AnimeFace_SemSegPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "UNet.pth"
+size_bytes = 6428741
+sha256 = "96c2a509b3eb1b2083b5384bbc30808dc205f370c513ee930e644edc0ea4688d"
+source_url = "https://huggingface.co/bdsqlsz/qinglong_controlnet-lllite/resolve/67006a35a5955437d118490bfec822402eff09f5/Annotators/UNet.pth"
+variant = "face segmenter"
+
+[[hardware.files]]
+filename = "isnetis.ckpt"
+size_bytes = 204275908
+sha256 = "2c8f6b9a77386c54dcdbf55b6c917108c4bdf4328abca9152c7bce5727b74d18"
+source_url = "https://huggingface.co/skytnt/anime-seg/resolve/493cb60893f47441b26ec4fb9a306bce9e342982/isnetis.ckpt"
+variant = "background remover, ComfyUI only"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+In the WebUI the image is scaled so its short side matches this value, then rescaled to a 512-pixel short \
+side for the segmenter. ComfyUI fixes it at 512, the size the segmenter was trained on."""
+when_to_adjust = "Leave it at 512."
+
+[[parameters]]
+id = "remove_background_using_abg"
+label = "Remove Background"
+summary = "Removes the background with an anime segmentation network before segmenting, and returns a character mask."
+names = { comfyui = "remove_background_using_abg" }
+type = "bool"
+default = true
+effect = """\
+When on, IS-Net finds the character, the background is filled with white before segmentation, and the \
+node's second output is the character mask. When off, the whole image is segmented and the mask is all ones."""
+when_to_adjust = """\
+Turn it off to segment the whole image, background included."""

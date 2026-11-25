@@ -143,8 +143,8 @@ Each model forbids unknown keys, so a misspelled field fails to load.
 
 | Kind | Records | Stub | Drafted | Verified |
 |---|---|---|---|---|
-| Control types | 23 | 15 | 8 | 0 |
-| Preprocessors | 81 | 35 | 16 | 30 |
-| Models | 127 | 61 | 10 | 56 |
+| Control types | 23 | 14 | 9 | 0 |
+| Preprocessors | 81 | 30 | 17 | 34 |
+| Models | 127 | 58 | 11 | 58 |
 
 `python scripts/controlnet_data.py` prints the current counts. Update this table when a session changes them.

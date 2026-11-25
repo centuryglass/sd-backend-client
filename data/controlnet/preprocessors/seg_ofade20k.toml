@@ -1,26 +1,78 @@
 id = "seg_ofade20k"
 label = "OneFormer ADE20K"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Labels every pixel with one of ADE20K's 150 scene classes using OneFormer, and paints each class its palette color."
+description = """\
+OneFormer ADE20K divides an image into regions of 150 everyday scene classes, such as wall, sky, floor, tree, \
+person and car, and fills each region with that class's ADE20K color. The result is a flat color map with no \
+edges or shading inside regions.\n\n\
+The ControlNet 1.1 README lists it first among the acceptable preprocessors for Segmentation 1.1, and \
+sd-webui-controlnet sorts it to the top of the Segmentation list. It draws the same 150-color palette as \
+UniFormer, so ControlNet 1.0 Segmentation reads its maps too. Its network is larger than UniFormer's: 219 \
+million parameters against 52 million."""
+how_it_works = """\
+OneFormer is one transformer network trained for three segmentation tasks at once. A task token tells it \
+which output to produce: semantic, instance or panoptic. The preprocessor asks for semantic segmentation, \
+which gives every pixel a class. This checkpoint uses a Swin-L backbone trained on ADE20K at 640 by 640 \
+pixels. Inside the network the image is rescaled so its short side is 640 pixels, and the predicted class of \
+each pixel is then painted in ADE20K's palette color."""
 control_types = ["segmentation"]
-effect = ""
-output = ""
+effect = "Replaces the image with flat regions in ADE20K class colors, one region per detected class."
+output = "Flat color map in the 150-class ADE20K palette."
 best_input = ""
 weak_input = ""
-models = ["control_v11p_sd15_seg"]
+models = ["control_v11p_sd15_seg", "control_sd15_seg"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_supported_preprocessor",
+    "sdwebui_cn_script",
     "forge_preprocessors",
+    "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "hf_lllyasviel_annotators",
+    "paper_oneformer",
+    "gh_oneformer_readme",
+    "paper_ade20k",
+    "gh_uniformer_seg_readme",
+    "cn11_readme",
+    "cn10_readme",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["oneformer_ade20k", "seg_ofade20k"]
 forge = ["seg_ofade20k"]
 comfyui = ["OneFormer-ADE20K-SemSegPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+vram = "Swin-L OneFormer, 219M parameters per OneFormer's README; the weights file is about 950 MB."
+
+[[hardware.files]]
+filename = "250_16_swin_l_oneformer_ade20k_160k.pth"
+size_bytes = 949729587
+sha256 = "f7ac095c28ddea4715e854a587eaee24327c624cbbdb17095bc9903c51930b16"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/250_16_swin_l_oneformer_ade20k_160k.pth"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side before it goes to the segmenter, and of the map it returns."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value and padded to a multiple of 64. OneFormer then \
+rescales it to a 640-pixel short side internally, so this value mostly sets the size of the returned map and \
+how much detail survives the first scaling. sd-webui-controlnet and reForge hide the slider for this \
+preprocessor. In sd-webui-controlnet the API value and Pixel Perfect still apply. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Leave it at the default in the WebUI, which has no slider for it. In ComfyUI, match it to the generation's \
+short side to avoid rescaling the map later."""
