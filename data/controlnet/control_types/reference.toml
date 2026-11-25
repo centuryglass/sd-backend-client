@@ -24,8 +24,13 @@ sources = [
     "sdwebui_cn_reference_discussion",
     "sdwebui_cn_reference_adain_discussion",
     "sdwebui_cn_1_1_400_discussion",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "paper_adain",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -46,7 +51,10 @@ title = "Borrow a style without its subject"
 description = "Reference AdaIN carries palette, lighting and texture more than content. Use a painting as the reference and prompt for a new subject."
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = ["reference_only", "reference_adain", "reference_adain_attn"]
+guide = """\
+Reference needs no model file. Reference Only shares the reference's features through attention and carries its \
+subject or character. Reference AdaIN matches feature statistics and carries palette, lighting and style without \
+the subject. Reference AdaIN + Attention does both. Each adds a U-Net pass on the reference at every step, so \
+generation slows."""
+preprocessors = ["reference_only", "reference_adain_attn", "reference_adain"]
 models = []

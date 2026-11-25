@@ -24,8 +24,27 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_supported_preprocessor",
     "forge_preprocessors",
+    "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_core_nodes",
+    "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "cn10_readme",
+    "hf_webui_controlnet_modules_safetensors",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -41,12 +60,11 @@ Extract the straight lines of a room photo and prompt for a new interior style. 
 outlines keep their positions."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = ["invert", "mlsd"]
-models = [
-    "control_sd15_mlsd",
-    "control_v11p_sd15_mlsd",
-    "xinsir_union_sdxl",
-    "xinsir_union_promax_sdxl",
-]
+guide = """\
+Use the M-LSD preprocessor on architecture, interiors and other scenes built from straight edges. On people, \
+animals and landscapes it finds few straight lines and gives a nearly empty map, so another type suits those. \
+Invert turns hand-drawn black-on-white straight lines into the white-on-black lines the models read. On SD 1.5, \
+ControlNet 1.1 MLSD was trained on extra images rich in straight lines and fixes 1.0's training-set flaws. On \
+SDXL, the xinsir union models cover MLSD; no dedicated SDXL MLSD model is in this reference."""
+preprocessors = ["mlsd", "invert"]
+models = ["control_v11p_sd15_mlsd", "control_sd15_mlsd", "xinsir_union_promax_sdxl", "xinsir_union_sdxl"]

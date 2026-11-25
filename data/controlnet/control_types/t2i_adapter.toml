@@ -22,8 +22,25 @@ sources = [
     "t2i_adapter_zoo",
     "t2i_adapter_adapter_code",
     "paper_t2i_adapter",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_annotators",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "t2i_adapter_readme_sd",
+    "t2i_adapter_condition_code",
+    "hf_openai_clip_vit_large_patch14",
+    "paper_clip",
+    "sdwebui_cn_preprocessors",
+    "hf_tencentarc_t2i_adapter_sketch_sdxl_1_0",
+    "hf_tencentarc_t2i_adapter",
+    "hf_webui_controlnet_modules_safetensors",
+    "hf_tencentarc_t2i_adapter_v2_commit",
+    "hf_blog_t2i_sdxl_adapters",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -42,12 +59,15 @@ title = "Carry a reference's style"
 description = "Use the style adapter with T2I Style CLIP Vision and a style image, and prompt for the subject."
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = ["t2ia_sketch_pidi", "color", "t2ia_style_clipvision"]
+guide = """\
+Each adapter here has one preprocessor. Color Grid reduces an image to a coarse grid of colors for the Color \
+adapter, which also accepts hand-painted palettes. T2I Style CLIP Vision encodes an image for the Style adapter, a \
+preliminary model that carries overall style and mood but not layout. T2I Sketch PiDiNet makes hard white edges \
+for the Sketch adapters. All are SD 1.x models; the SDXL T2I-Adapters sit under their own control types."""
+preprocessors = ["color", "t2ia_style_clipvision", "t2ia_sketch_pidi"]
 models = [
     "t2iadapter_color_sd14v1",
-    "t2iadapter_sketch_sd14v1",
     "t2iadapter_style_sd14v1",
     "t2iadapter_sketch_sd15v2",
+    "t2iadapter_sketch_sd14v1",
 ]

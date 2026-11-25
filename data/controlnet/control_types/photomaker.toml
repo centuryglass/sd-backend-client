@@ -28,8 +28,9 @@ sources = [
     "hf_tencentarc_photomaker",
     "gh_photomaker",
     "forge_neo_preprocessors",
+    "hf_tencentarc_photomaker_v2",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -52,7 +53,10 @@ TencentARC shows PhotoMaker turning characters from paintings and old photos int
 changing a person's apparent age or gender through the prompt."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+PhotoMaker V1 is the version reForge and ComfyUI's core nodes load, with PhotoMaker CLIP Vision passing the photo \
+through unchanged. Keep the face clear and near the center, since the model's encoder crops the center. PhotoMaker \
+V2 gives better likeness, especially from one photo, per TencentARC, but neither reForge nor ComfyUI's core nodes \
+load it. Both are SDXL only."""
 preprocessors = ["photomaker_clipvision"]
 models = ["photomaker_v1_sdxl", "photomaker_v2_sdxl"]

@@ -5,7 +5,8 @@ description = """\
 Metric3D Normal draws each surface's facing direction as a color map, from the same Metric3D v2 networks that \
 produce its depth map. Its README says the normal output exists for the ViT models, which are the three ComfyUI \
 offers. The node inverts the normal map's values before returning it, with a code comment saying ControlNet uses \
-inverse normals.\n\n\
+inverse normals; the result follows the ControlNet 1.1 normal model's colors, blue front, red left and green \
+top.\n\n\
 The comfyui_controlnet_aux table pairs it with the ControlNet 1.1 normal model. It is not available in WebUI or \
 Forge."""
 how_it_works = """\
@@ -15,7 +16,7 @@ images into a canonical camera space so cameras with different focal lengths can
 node takes the normal output, inverts its values, and returns it as an image."""
 control_types = ["normal_map"]
 effect = "Replaces color and texture with a color map of the direction each surface faces."
-output = "RGB normal map."
+output = "RGB normal map: red left, green top, blue front."
 best_input = ""
 weak_input = ""
 models = ["control_v11p_sd15_normalbae"]
@@ -23,6 +24,7 @@ models = ["control_v11p_sd15_normalbae"]
 sources = [
     "recorded_fixtures",
     "comfyui_controlnet_aux_nodes",
+    "cn11_readme",
     "paper_metric3d",
     "paper_metric3dv2",
     "gh_metric3d_readme",
@@ -30,10 +32,8 @@ sources = [
     "comfyui_controlnet_aux_src",
     "comfyui_controlnet_aux_readme",
 ]
-research_status = "drafted"
-open_questions = [
-    "Confirm that the node's color convention matches the ControlNet 1.1 normal model's: blue front, red left, green top.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = []

@@ -24,8 +24,33 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_supported_preprocessor",
     "forge_preprocessors",
+    "paper_pidinet",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_readme",
+    "paper_teed",
+    "anyline_readme",
+    "hf_themistoai_mistoline",
+    "paper_diffusion_edge",
+    "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "hf_lllyasviel_controlnet",
+    "hf_webui_controlnet_modules_safetensors",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "hf_sargezt_controlnet_sd_xl_1_0_softedge_dexined",
+    "hf_lllyasviel_sd_control_collection",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -41,14 +66,20 @@ Soft edges hold the layout of the source image but leave room for new colors, ma
 1.0 described its HED model as suited to recoloring and stylizing."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = ["anyline", "hed", "hed_safe", "pidinet", "pidinet_safe", "teed", "diffusion_edge"]
+guide = """\
+ControlNet 1.1 names PiDiNet Safe the most robust soft edge preprocessor. The Safe variants quantize edges to a \
+few levels, removing the hidden image detail a model can over-fit to; plain HED and PiDiNet keep more detail. TEED \
+is a tiny network with crisp maps, and SargeZT's SDXL soft edge model pairs with it. AnyLine was made for \
+MistoLine. DiffusionEdge is slow and pairs with no model here.\n\n\
+On SD 1.5, ControlNet 1.1 Soft Edge is much more robust than ControlNet 1.0 HED, which over-fits the hidden \
+grayscale image in HED maps. On SDXL, the xinsir union models read HED, PiDiNet and TEED maps, and MistoLine takes \
+many line styles."""
+preprocessors = ["pidinet_safe", "hed_safe", "pidinet", "hed", "teed", "anyline", "diffusion_edge"]
 models = [
-    "control_sd15_hed",
     "control_v11p_sd15_softedge",
-    "sargezt_xl_softedge",
-    "xinsir_union_sdxl",
+    "control_sd15_hed",
     "xinsir_union_promax_sdxl",
+    "xinsir_union_sdxl",
     "mistoline_sdxl",
+    "sargezt_xl_softedge",
 ]

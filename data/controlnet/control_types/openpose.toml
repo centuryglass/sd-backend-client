@@ -31,8 +31,52 @@ sources = [
     "sdwebui_cn_annotators",
     "comfyui_controlnet_aux_readme",
     "comfyui_controlnet_aux_src",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "reforge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "paper_dwpose",
+    "gh_dwpose_readme",
+    "sdwebui_cn_dwpose_discussion",
+    "hf_yzd_v_dwpose",
+    "hf_hr16_dwpose_torchscript_bs5",
+    "hf_hr16_yolox_onnx",
+    "hf_hr16_unjit_dwpose",
+    "hf_lllyasviel_annotators",
+    "hf_xinsir_controlnet_openpose_sdxl_1_0",
+    "hf_thibaud_controlnet_openpose_sdxl_1_0",
+    "hf_tencentarc_t2i_adapter_openpose_sdxl_1_0",
+    "sdwebui_cn_animal_openpose_discussion",
+    "gh_controlnet_animalpose_readme",
+    "paper_ap10k",
+    "hf_bdsqlsz_qinglong_lllite",
+    "mediapipe_face_landmarker",
+    "hf_crucibleai_controlnetmediapipeface",
+    "sdwebui_cn_densepose_pr",
+    "paper_densepose",
+    "hf_layernorm_densepose_torchscript",
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "hf_tencentarc_t2i_adapter",
+    "hf_webui_controlnet_modules_safetensors",
+    "t2i_adapter_readme_sd",
+    "paper_t2i_adapter",
+    "hf_lllyasviel_controlnet",
+    "hf_huchenlei_animal_openpose",
+    "hf_xinsir_openpose_discussion_3",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_kohya_ss_controlnet_lllite",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -63,33 +107,42 @@ this: drag the joints of a stick figure, or edit one a preprocessor made, and us
 image with no preprocessor."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+DWPose draws the same stick figure as OpenPose and is more accurate, especially on hands. Choose how much of the \
+figure to keep: the body alone leaves hands and face free, Full adds both, and the Hand, Face and Face Only \
+variants pick parts. ControlNet 1.1 OpenPose reads any combination; ControlNet 1.0 reads bodies only. Animal Pose \
+is for four-legged animals and pairs only with the Animal Pose ControlNet. MediaPipe Face carries expression and \
+gaze to its own model. The DensePose maps serve MagicAnimate and a CivitAI DensePose ControlNet, neither in this \
+reference.\n\n\
+On SDXL, xinsir's OpenPose reports the highest pose accuracy in its card's test and expects thick skeleton lines; \
+the default lines may give unstable results. Its Twins variant follows the pose more closely with lower aesthetic \
+scores. The T2I-Adapter Keypose model reads MMPose skeletons, which no backend preprocessor makes. The LLLite pose \
+models are small, experimental and trained on an anime checkpoint."""
 preprocessors = [
+    "dw_openpose_full",
+    "openpose_full",
     "openpose",
+    "openpose_hand",
     "openpose_face",
     "openpose_faceonly",
-    "openpose_full",
-    "openpose_hand",
-    "dw_openpose_full",
     "animal_openpose",
+    "mediapipe_face",
     "densepose",
     "densepose_parula",
-    "mediapipe_face",
 ]
 models = [
-    "control_sd15_openpose",
     "control_v11p_sd15_openpose",
-    "t2iadapter_keypose_sd14v1",
     "t2iadapter_openpose_sd14v1",
-    "t2i_adapter_openpose_sdxl",
-    "xinsir_openpose_sdxl",
-    "xinsir_openpose_twins_sdxl",
-    "xinsir_union_sdxl",
-    "xinsir_union_promax_sdxl",
-    "thibaud_openpose_xl2",
-    "kohya_lllite_pose_anime_sdxl",
-    "kohya_lllite_pose_anime_v2_sdxl",
+    "control_sd15_openpose",
     "animal_openpose_sd15",
     "crucibleai_mediapipe_face_sd15",
+    "t2iadapter_keypose_sd14v1",
+    "xinsir_openpose_sdxl",
+    "xinsir_openpose_twins_sdxl",
+    "xinsir_union_promax_sdxl",
+    "xinsir_union_sdxl",
+    "thibaud_openpose_xl2",
+    "t2i_adapter_openpose_sdxl",
+    "kohya_lllite_pose_anime_v2_sdxl",
+    "kohya_lllite_pose_anime_sdxl",
 ]

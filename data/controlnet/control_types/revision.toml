@@ -34,8 +34,12 @@ sources = [
     "paper_openclip_scaling",
     "paper_clip",
     "paper_sdxl",
+    "sdwebui_cn_legacy_processor",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
+    "hf_lllyasviel_annotators",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -58,7 +62,9 @@ Add a Revision unit for each image. Their embeddings add together, weighted by e
 mixes both concepts. Stability describes this blending for positive and negative prompts."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+Revision is SDXL only and needs no model file. Use Revision to add the image's subject and mood beside the text \
+prompt, and Revision Ignore Prompt to generate from the image alone. Both reduce the image to one embedding, so \
+neither keeps layout or fine detail; add a structural unit, such as Depth or Canny, for those."""
 preprocessors = ["revision_clipvision", "revision_ignore_prompt"]
 models = []

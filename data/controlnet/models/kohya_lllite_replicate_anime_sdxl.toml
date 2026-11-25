@@ -24,7 +24,7 @@ weaknesses = ["Experimental architecture", "Small training set of 896 image pair
 good_for = ["reproducing an image with prompt changes", "img2img refinement"]
 
 sources = ["hf_kohya_ss_controlnet_lllite"]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [[files]]

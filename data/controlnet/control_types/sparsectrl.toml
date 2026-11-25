@@ -22,8 +22,19 @@ sources = [
     "sdwebui_cn_script",
     "gh_animatediff_readme",
     "paper_sparsectrl",
+    "cn11_readme",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_legacy_preprocessors",
+    "forge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "cn10_readme",
+    "sdwebui_cn_annotators",
+    "hf_guoyww_animatediff",
+    "gh_animatediff_sparsectrl_configs",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -42,7 +53,9 @@ title = "Storyboard an animation"
 description = "Sketch a few key moments and place them on frames with the scribble encoder. SparseCtrl's paper names storyboarding as an application."
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = ["scribble_hed", "scribble_pidinet", "scribble_xdog"]
+guide = """\
+SparseCtrl works only with AnimateDiff on SD 1.5. Use SparseCtrl RGB with plain images as conditions and no \
+preprocessor, and SparseCtrl Scribble with sketches or with scribbles made by one of the scribble preprocessors. \
+One or a few condition images can guide a whole animation, per its paper."""
+preprocessors = ["scribble_pidinet", "scribble_xdog", "scribble_hed"]
 models = ["sparsectrl_rgb_sd15", "sparsectrl_scribble_sd15"]

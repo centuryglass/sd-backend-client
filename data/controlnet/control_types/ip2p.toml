@@ -22,8 +22,11 @@ sources = [
     "sdwebui_cn_preprocessors",
     "cn11_readme",
     "paper_instruct_pix2pix",
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "paper_controlnet",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -42,7 +45,9 @@ title = "Turn a photo into another medium"
 description = "Instructions such as \"make it into a watercolor painting\" restyle the image while keeping its content."
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+There is one model, ControlNet 1.1 Instruct Pix2Pix for SD 1.5, and no preprocessor: the control image is the \
+picture to edit. Write the prompt as an instruction, such as "make it winter", or as a description of the result; \
+its README says both work. It carries the experimental quality flag. No SDXL model here covers this type."""
 preprocessors = []
 models = ["control_v11e_sd15_ip2p"]

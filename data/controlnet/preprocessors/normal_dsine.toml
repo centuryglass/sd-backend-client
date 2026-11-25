@@ -5,8 +5,10 @@ description = """\
 Normal DSINE draws each surface's facing direction as a color map. Unlike most normal estimators it takes the \
 camera's field of view, because the direction a surface faces depends on where it sits in the camera's view. A \
 rough value is enough; the default is 60 degrees. A second setting controls how many refinement passes run.\n\n\
-The comfyui_controlnet_aux table pairs it with the ControlNet 1.1 normal model. The weights file the backends \
-fetch comes from a third-party repository whose card is licensed CC-BY-NC-SA 4.0."""
+The comfyui_controlnet_aux table pairs it with the ControlNet 1.1 normal model, but the colors differ. DSINE's \
+axes are right, down and front, so red marks right-facing and green down-facing surfaces, the reverse of the 1.1 \
+model's red left and green top. Neither sd-webui-controlnet nor comfyui_controlnet_aux converts them. The \
+weights file the backends fetch comes from a third-party repository whose card is licensed CC-BY-NC-SA 4.0."""
 how_it_works = """\
 DSINE argues that normal estimation needs different assumptions from other image tasks. It feeds the direction \
 of the camera ray through each pixel to the network, because a surface seen head-on looks different from the \
@@ -15,7 +17,7 @@ which keeps results crisp but smooth within a flat area. The network refines its
 the iterations setting chooses how many."""
 control_types = ["normal_map"]
 effect = "Replaces the image with a sharp color map of the direction each surface faces."
-output = "RGB normal map."
+output = "RGB normal map: red right, green down, blue front."
 best_input = ""
 weak_input = ""
 models = ["control_v11p_sd15_normalbae"]
@@ -26,16 +28,15 @@ sources = [
     "sdwebui_cn_preprocessors",
     "comfyui_controlnet_aux_nodes",
     "paper_dsine",
+    "cn11_readme",
     "gh_dsine_readme",
     "hf_bdsqlsz_qinglong_lllite",
     "comfyui_controlnet_aux_readme",
     "comfyui_controlnet_aux_src",
     "sdwebui_cn_annotators",
 ]
-research_status = "drafted"
-open_questions = [
-    "Confirm that DSINE's color convention matches the ControlNet 1.1 normal model's: blue front, red left, green top.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["normal_dsine"]

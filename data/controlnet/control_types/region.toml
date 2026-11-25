@@ -1,16 +1,30 @@
 id = "region"
 label = "Region"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Forge Neo only: draws colored region masks for a regional ControlNet made for Anima, a base model outside SD 1.5 and SDXL."
+description = """\
+Region is a mode of Forge Neo's ControlNet unit, not a preprocessor. Choosing it swaps the image upload for a \
+canvas. Generate Canvas fills it with white, or with up to seven rectangles or ovals in different solid colors, one \
+per subject, and the canvas can be painted over. The canvas becomes the unit's control image.\n\n\
+Forge Neo's README lists Region as support for a regional ControlNet-LLLite trained on Anima, a base model outside \
+this reference's SD 1.5 and SDXL scope. That model's card says each solid color marks a region on a white \
+background, and that prompts still need spatial words, since the model doesn't match prompt text to colors."""
+how_it_works = """\
+The canvas only makes the control image; no network runs on it before generation. The regional model, a \
+ControlNet-LLLite adapter, was trained on 580 images with hand-masked color regions, so it learns to keep separate \
+subjects inside separate colored areas. It sees the mask but not which prompt words belong to which color, and its \
+card suggests attention-masking tools such as Forge Couple for that."""
 base_models = []
-control_image = ""
+control_image = "Solid-color regions on a white background, one color per subject."
 
-sources = ["recorded_fixtures", "forge_preprocessors"]
-research_status = "stub"
-open_questions = [
-    "Forge Neo adds \"Region\" to its type list as a canvas-editor mode with no preprocessors or models. What does it do, and does it belong in this reference at all?",
+sources = [
+    "recorded_fixtures",
+    "forge_preprocessors",
+    "forge_neo_controlnet",
+    "forge_neo_readme",
+    "hf_sen_sou_anima_lllite_regional_controlnet",
 ]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = []
@@ -18,7 +32,6 @@ forge = ["Region"]
 comfyui = []
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = "No preprocessor or model in this reference's SD 1.5 and SDXL scope uses Region."
 preprocessors = []
 models = []

@@ -14,7 +14,7 @@ LoRA and no ControlNet."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
-preprocessors = ["ip_adapter_face_id"]
+preprocessors = ["ip_adapter_face_id", "ip_adapter_face_id_plus"]
 trainer = "h94 (Tencent AI Lab)"
 license = ""
 homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"

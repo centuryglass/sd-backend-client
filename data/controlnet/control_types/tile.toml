@@ -28,8 +28,33 @@ sources = [
     "hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic",
     "hf_xinsir_controlnet_tile_sdxl_1_0",
     "hf_kohya_ss_controlnet_lllite",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_script",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_hook",
+    "sdwebui_cn_tile_color_offset_discussion",
+    "sdwebui_cn_tile_colorfix_sharp_discussion",
+    "hf_ttplanet_tile_preprocessor_v5",
+    "paper_fast_guided_filter",
+    "comfyui_core_nodes",
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "paper_controlnet",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "hf_lllyasviel_sd_control_collection",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -67,8 +92,16 @@ With no preprocessor and "My prompt is more important", TTPlanet's Tile V2 chang
 the prompt while keeping the pose and layout."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+On SD 1.5, use ControlNet 1.1 Tile with Tile Resample. Shrinking the image in Tile Resample softens its detail, so \
+the model invents more. If Tile shifts colors, most often with anime images and models, Tile Color Fix locks \
+colors to the source, and Tile Color Fix and Sharpen also counters softness; both override color changes the \
+prompt asks for.\n\n\
+On SDXL, TTPlanet Tile Realistic V2 has less color shift than V1 and was trained on realistic images. Its card \
+warns that too sharp a control image gives halos, so feed it through TTPlanet Tile Guided Filter or Simple. \
+xinsir's Tile covers deblurring, variations and super-resolution, and Union ProMax adds tile to its other types. \
+The LLLite blur models are small and take a Gaussian Blur image. The LLLite Replicate models take the image with \
+no preprocessor and reproduce it as closely as they can."""
 preprocessors = [
     "tile_resample",
     "tile_colorfix",
@@ -80,13 +113,13 @@ preprocessors = [
 models = [
     "control_v11f1e_sd15_tile",
     "control_v11u_sd15_tile",
+    "ttplanet_tile_realistic_v2_sdxl",
     "xinsir_tile_sdxl",
     "xinsir_union_promax_sdxl",
     "ttplanet_tile_realistic_v1_sdxl",
-    "ttplanet_tile_realistic_v2_sdxl",
     "kohya_lllite_blur_sdxl",
     "kohya_lllite_blur_anime_sdxl",
     "kohya_lllite_blur_anime_beta_sdxl",
-    "kohya_lllite_replicate_anime_sdxl",
     "kohya_lllite_replicate_anime_v2_sdxl",
+    "kohya_lllite_replicate_anime_sdxl",
 ]

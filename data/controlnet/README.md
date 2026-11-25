@@ -44,6 +44,12 @@ Each model forbids unknown keys, so a misspelled field fails to load.
   alongside the model, such as each FaceID model's, is a `files` entry of that model too.
 - **A union model is one record across every type it covers.** Its own prose holds how it groups types and how each
   backend chooses one. Each control type it covers lists it in `choosing.models`, with no per-type fields.
+- **`choosing` lists run in recommended order.** Preprocessors start with those the type's main models were trained
+  on and end with utilities and special-purpose ones. Models list SD 1.5 before SDXL. Within each, current
+  general-purpose models come first and superseded or experimental ones last. `choosing.guide` says why.
+- **Links are recorded on both sides.** A control type's `choosing` lists and each listed record's `control_types`
+  name each other, as do a preprocessor's `models` and a model's `preprocessors`. A model may list a preprocessor
+  from another control type.
 - **`name_parameters` tells apart preprocessors that share a backend name.** ComfyUI folds several WebUI
   preprocessors into one node with a switch. For example, `LineArtPreprocessor` with `coarse = "enable"` is
   `lineart_coarse`. Every record sharing a name sets it, except the one matching the node's defaults.
@@ -119,7 +125,10 @@ Each model forbids unknown keys, so a misspelled field fails to load.
 
 - **Base models: SD1.5 and SDXL.** `base_models` takes more values later.
 - **Control types: every type a backend presents,** plus `qr_code`, a grouping for QR and illusion models, which
-  every backend files under "All".
+  every backend files under "All". Forge Neo's `region` serves only a model for Anima, outside the base-model scope,
+  so its record lists no preprocessors or models.
+- **Records no backend files under a type go under the nearest one.** MediaPipe Face is under `openpose`, and the
+  LLLite Replicate models are under `tile`.
 - **Preprocessors: everything in sd-webui-controlnet, Forge, reForge, Forge Neo and comfyui_controlnet_aux,** plus
   the ComfyUI core nodes a guide would send an artist to (`Canny`, `ImageInvert`, `ImageBlur`). reForge's `*_variant`
   preprocessors are its copies of the A1111 legacy implementations. They are aliases in the base record's
@@ -151,8 +160,8 @@ Each model forbids unknown keys, so a misspelled field fails to load.
 
 | Kind | Records | Stub | Drafted | Verified |
 |---|---|---|---|---|
-| Control types | 23 | 1 | 22 | 0 |
-| Preprocessors | 81 | 0 | 17 | 64 |
-| Models | 128 | 0 | 15 | 113 |
+| Control types | 23 | 0 | 0 | 23 |
+| Preprocessors | 81 | 0 | 8 | 73 |
+| Models | 128 | 0 | 13 | 115 |
 
 `python scripts/controlnet_data.py` prints the current counts. Update this table when a session changes them.

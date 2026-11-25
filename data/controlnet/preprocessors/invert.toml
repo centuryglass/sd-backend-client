@@ -10,12 +10,12 @@ ComfyUI the core Invert Image node does the same thing."""
 how_it_works = """\
 Each color value is subtracted from the maximum, 255. Nothing is resized or filtered, so the map has the same \
 size and detail as the input. WebUI hides its resolution slider for this preprocessor."""
-control_types = ["canny", "lineart", "scribble", "mlsd"]
+control_types = ["canny", "lineart", "scribble", "mlsd", "qr_code"]
 effect = "Reverses brightness and color; keeps every line and detail as drawn."
 output = "The input image with black and white swapped."
 best_input = "Clean black-on-white line art, sketches and scans."
 weak_input = "Photos: inverting one gives a negative, not a line map."
-models = []
+models = ["diontimmer_qrcode_sd15"]
 
 sources = [
     "sdwebui_cn_preprocessors",
