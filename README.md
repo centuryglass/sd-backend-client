@@ -198,7 +198,7 @@ lists the server's as [`ParameterDef`](https://centuryglass.github.io/sd-backend
 ## ControlNet
 
 A [`ControlNetUnit`](https://centuryglass.github.io/sd-backend-client/reference/controlnet/#sd_backend_client.ControlNetUnit) pairs a control image with a preprocessor, a ControlNet model, or both. Add units to
-`params.controlnet_units`, and each backend converts them into its own request format. Preprocessor and model names
+[`controlnet_units`](https://centuryglass.github.io/sd-backend-client/reference/parameters/#sd_backend_client.DiffusionParams.controlnet_units), and each backend converts them into its own request format. Preprocessor and model names
 differ between backends, so look them up from the server.
 
 The example below picks a Canny preprocessor and model:

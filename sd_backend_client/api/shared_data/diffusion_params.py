@@ -188,6 +188,7 @@ class DiffusionParams(BaseModel):
     """
 
     controlnet_units: list[ControlNetUnit] = []
+    """ControlNet units to apply, in order. Each backend converts them into its own request format."""
 
     def mask_blur_extents(self) -> tuple[int, int]:
         """Return the (horizontal, vertical) mask blur, resolved the way the WebUI does.
