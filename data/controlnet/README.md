@@ -4,7 +4,7 @@ A sourced reference for SD1.5 and SDXL ControlNet control types, preprocessors a
 tooltips), artist guides and explanations of how each tool works. This directory sits outside the package. Anything
 the package ships, such as #146's one-sentence descriptions, is derived from the `summary` of `verified` records here.
 
-Open work is tracked in [#155](https://github.com/centuryglass/sd-backend-client/issues/155).
+Open questions on `drafted` records are tracked in [#176](https://github.com/centuryglass/sd-backend-client/issues/176).
 
 ## Layout
 
