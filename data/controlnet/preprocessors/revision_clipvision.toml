@@ -1,26 +1,78 @@
 id = "revision_clipvision"
 label = "Revision"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Encodes an image with CLIP ViT-bigG so SDXL reads it as a pooled prompt embedding, alongside the text prompt."
+description = """\
+Revision encodes the reference image with CLIP and gives SDXL that embedding in place of the prompt's pooled \
+summary, while keeping the text prompt's per-word tokens. The result blends the image's concept with the text. It \
+needs no control model. sd-webui-controlnet lists it as revision_clipvision; Forge and reForge call it CLIP-G \
+(Revision). Forge Neo doesn't have it.\n\n\
+sd-webui-controlnet drops the prompt anyway when both the prompt and the negative prompt are empty, which makes \
+it act like Revision Ignore Prompt. Its Noise Augmentation slider noises the embedding, loosening how closely the \
+result follows the image. reForge hides that slider, since its SDXL model has no noise augmentor."""
+how_it_works = """\
+CLIP trains an image encoder and a text encoder together so that matching pictures and captions land close \
+together. SDXL already conditions on a pooled embedding from its OpenCLIP ViT-bigG text encoder, a single vector \
+for the whole prompt. Revision runs the matching bigG image encoder and writes its image embedding into that \
+pooled slot, scaled by the unit weight. The negative side gets zeros there."""
 control_types = ["revision"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Produces an image embedding rather than a picture; nothing visible to preview."
+output = "OpenCLIP ViT-bigG/14 image embedding, written into SDXL's pooled conditioning."
+best_input = "An image whose overall subject and mood should carry over."
+weak_input = "Layout and fine detail, which a single embedding doesn't keep."
 models = []
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_legacy_processor",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
+    "sdwebui_cn_hook",
+    "sdwebui_cn_script",
     "forge_preprocessors",
+    "forge_revision",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "hf_stabilityai_control_lora",
+    "hf_lllyasviel_annotators",
+    "paper_clip",
+    "paper_sdxl",
+    "paper_openclip_scaling",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["revision_clipvision"]
 forge = ["CLIP-G (Revision)", "revision_clipvision_variant"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "OpenCLIP ViT-bigG/14 image encoder, about 3.7 GB on disk."
+speed = "moderate: one pass of a large CLIP image encoder"
+
+[[hardware.files]]
+filename = "clip_g.pth"
+size_bytes = 3690100964
+sha256 = "4364a1bb2bde19b3b212a7e2ad44381915a26f9efd26e9acef084a4d606cf37e"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/clip_g.pth"
+variant = "sd-webui-controlnet"
+
+[[hardware.files]]
+filename = "model.safetensors"
+size_bytes = 3689912664
+sha256 = "657723e09f46a7c3957df651601029f66b1748afb12b419816330f16ed45d64d"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/sdxl_models/image_encoder/model.safetensors"
+variant = "Forge and reForge, saved as CLIP-ViT-bigG.safetensors"
+
+[[parameters]]
+id = "noise_augmentation"
+label = "Noise Augmentation"
+summary = "Adds noise to the image embedding before SDXL reads it."
+names = { webui = "threshold_a", forge = "threshold_a" }
+type = "float"
+default = 0.0
+range = [0.0, 1.0]
+effect = "Higher values noise the embedding more, so the result follows the image less closely. reForge hides the slider and ignores it."
+when_to_adjust = "Raise it when the result copies the reference's concept too literally."

@@ -1,8 +1,17 @@
 id = "ip_adapter_plus_sd15"
 label = "IP-Adapter Plus SD1.5"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SD 1.5 IP-Adapter that reads the reference image's patch features, so results stay closer to it than with the standard model."
+description = """\
+IP-Adapter Plus SD1.5 uses a reference image as part of the prompt and stays closer to it than the standard \
+model, keeping more of its detail. h94 describes it as using patch image embeddings, closer to the reference \
+image than ip-adapter_sd15. ComfyUI_IPAdapter_plus calls it very strong. It pairs with the CLIP-ViT-H \
+preprocessor.\n\n\
+lllyasviel's sd_control_collection mirrors it as ip-adapter_sd15_plus.pth, the same weights."""
+how_it_works = """\
+Plus models read the features of every image patch from the CLIP ViT-H encoder's second-to-last layer instead of \
+its single summary vector. A small transformer called a resampler condenses those patches into 16 tokens, which \
+the U-Net's added cross-attention weights attend to alongside the text. Patch features keep more of the \
+reference's detail than one vector does."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +20,33 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Closer to the reference than the standard model",
+]
+weaknesses = [
+    "Very strong influence, per ComfyUI_IPAdapter_plus",
+]
+good_for = [
+    "close image variations",
+    "carrying a character or object into a new scene",
+]
 
-sources = ["hf_h94_ip_adapter", "hf_lllyasviel_sd_control_collection", "recorded_fixtures"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+    "hf_lllyasviel_sd_control_collection",
+    "recorded_fixtures",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter-plus_sd15.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 98183288
 sha256 = "a1c250be40455cc61a43da1201ec3f1edaea71214865fb47f57927e06cbe4996"
 webui_hash = "836b5c2e"
@@ -30,6 +55,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter-plus_sd15.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 158033179
 sha256 = "1cb77fc0613369b66be1531cc452b823a4af7d87ee56956000a69fc39e3817ba"
 webui_hash = "c817b455"
@@ -38,6 +64,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter_sd15_plus.pth"
 format = "pth"
+precision = "fp16"
 size_bytes = 158030471
 sha256 = "a0db87557825ac2f8888ef06ec64c85f175e8ba5467baa2722ade3b4a9feb9f5"
 webui_hash = "32cd8f7f"

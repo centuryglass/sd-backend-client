@@ -1,8 +1,17 @@
 id = "ip_adapter_plus_face_sdxl_vit_h"
 label = "IP-Adapter Plus Face SDXL"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "IP-Adapter Plus SDXL trained on cropped faces, to carry a face from the reference image into the result."
+description = """\
+IP-Adapter Plus Face SDXL is the SDXL Plus model trained with cropped face images as the condition. Give it a \
+reference cropped to the face and it carries that face into the generation. It pairs with the CLIP-ViT-H \
+preprocessor.\n\n\
+It reads CLIP image features, not a face recognition embedding, so it keeps how the face looks more than who it \
+is; the FaceID and PuLID models target identity."""
+how_it_works = """\
+Plus models read the features of every image patch from the CLIP ViT-H encoder's second-to-last layer instead of \
+its single summary vector. A small transformer called a resampler condenses those patches into 16 tokens, which \
+the U-Net's added cross-attention weights attend to alongside the text. Patch features keep more of the \
+reference's detail than one vector does."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +20,30 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "No InsightFace install needed, unlike FaceID",
+]
+weaknesses = [
+    "Expects a cropped face as the reference",
+]
+good_for = [
+    "portraits that resemble a reference face",
+]
 
-sources = ["hf_h94_ip_adapter"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter-plus-face_sdxl_vit-h.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 847517512
 sha256 = "677ad8860204f7d0bfba12d29e6c31ded9beefdf3e4bbd102518357d31a292c1"
 webui_hash = "368cf551"
@@ -30,6 +52,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter-plus-face_sdxl_vit-h.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 1013454761
 sha256 = "50e886d82940b3c5873d80c2b06d8a4b0d0fccec70bc44fd53f16ac3cfd7fc36"
 webui_hash = "c60d7d48"

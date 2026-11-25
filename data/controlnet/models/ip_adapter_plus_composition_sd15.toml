@@ -1,0 +1,50 @@
+id = "ip_adapter_plus_composition_sd15"
+label = "IP Composition Adapter SD1.5"
+summary = "Carries a reference image's general composition, such as pose and layout, while mostly ignoring its style and content."
+description = """\
+The IP Composition Adapter carries the general composition of a reference image into the result while mostly \
+ignoring its style and content. Its card's example: a portrait of someone waving their left hand gives a \
+completely different person waving their left hand. ostris trained it; the idea came from POM of Banodoco. It is \
+looser than a ControlNet, which aligns the image to the control image closely.\n\n\
+It is used like a Plus model, with the CLIP-ViT-H preprocessor. ostris suggests lowering CFG to about 3. \
+sd-webui-controlnet recognizes it only when renamed to ip-adapter_plus_composition_sd15.safetensors."""
+how_it_works = """\
+It has the Plus architecture: a resampler condenses the CLIP ViT-H patch features of the reference into 16 tokens \
+that the U-Net's added cross-attention weights attend to. ostris trained those weights so that the tokens carry \
+the arrangement of the scene rather than its look."""
+base_models = ["sd15"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_clip_h"]
+trainer = "ostris"
+license = "apache-2.0"
+homepage = "https://huggingface.co/ostris/ip-composition-adapter"
+
+strengths = [
+    "Looser than a ControlNet: follows layout and pose without copying shapes",
+]
+weaknesses = [
+    "Needs a low CFG, about 3, per its card",
+]
+good_for = [
+    "reusing a pose or layout with a new subject and style",
+]
+
+sources = [
+    "hf_ostris_ip_composition_adapter",
+    "sdwebui_cn_ipadapter_composition_discussion",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+]
+research_status = "verified"
+open_questions = []
+
+[[files]]
+filename = "ip_plus_composition_sd15.safetensors"
+also_seen_as = ["ip-adapter_plus_composition_sd15.safetensors"]
+format = "safetensors"
+precision = "fp16"
+size_bytes = 98183728
+sha256 = "4a02c9f4d2ade7c0e14db7471377ce5d326a2bfda7777231c79dc861c93f2c12"
+webui_hash = "f910d03b"
+source_url = "https://huggingface.co/ostris/ip-composition-adapter/resolve/0d2ed55c441a20c20e09da4dc086097703f26b61/ip_plus_composition_sd15.safetensors"

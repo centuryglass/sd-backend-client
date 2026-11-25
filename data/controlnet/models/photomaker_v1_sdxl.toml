@@ -1,8 +1,19 @@
 id = "photomaker_v1_sdxl"
 label = "PhotoMaker V1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC's SDXL model that ties a person from face photos to a word in the prompt; the version reForge and ComfyUI load."
+description = """\
+PhotoMaker V1 generates new photos or paintings of a person from one or a few face photos and a prompt, with no \
+training, on any SDXL-based model. TencentARC notes it does worse on Asian male faces and still struggles with \
+hands, and that more photos improve likeness.\n\n\
+reForge loads it with the PhotoMaker CLIP Vision preprocessor; the prompt needs the word photomaker after a class \
+word. ComfyUI's core PhotoMakerLoader loads it too. Both read only the file's encoder part and skip its LoRA, so \
+results can differ from TencentARC's own pipeline. TencentARC lists 11 GB of GPU memory as the minimum for its \
+own code."""
+how_it_works = """\
+The file holds two parts. The ID encoder is a fine-tuned CLIP image encoder plus a fusion network: it turns each \
+face photo into an embedding and merges the embeddings with the class word's text embedding, which then stands in \
+for that word in the prompt. The second part is a rank-64 LoRA for all of the U-Net's attention layers, which \
+TencentARC's pipeline applies alongside."""
 base_models = ["sdxl"]
 adapter = "other"
 control_types = ["photomaker"]
@@ -11,12 +22,28 @@ trainer = "TencentARC"
 license = "apache-2.0"
 homepage = "https://huggingface.co/TencentARC/PhotoMaker"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Identity from one or a few photos, with no training",
+    "Works with SDXL fine-tunes and LoRAs",
+]
+weaknesses = [
+    "Weaker on Asian male faces, per TencentARC",
+    "Struggles with hands, per TencentARC",
+    "reForge and ComfyUI skip its LoRA",
+]
+good_for = [
+    "new photos of a person",
+    "stylized portraits of a person",
+]
 
-sources = ["hf_tencentarc_photomaker"]
-research_status = "stub"
+sources = [
+    "hf_tencentarc_photomaker",
+    "paper_photomaker",
+    "gh_photomaker",
+    "reforge_photomaker",
+    "comfyui_photomaker_nodes",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

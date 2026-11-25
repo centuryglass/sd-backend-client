@@ -1,20 +1,42 @@
 id = "ip_adapter_auto"
 label = "IP-Adapter Auto"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Picks the right IP-Adapter preprocessor from the chosen model's file name; sd-webui-controlnet only."
+description = """\
+IP-Adapter Auto saves choosing a preprocessor. It looks the selected model's file name up in \
+sd-webui-controlnet's preset list and runs the preprocessor listed there, CLIP-ViT-H, CLIP-ViT-bigG, FaceID, \
+FaceID Plus or PuLID, logging which one it chose. sd-webui-controlnet sorts it first in the IP-Adapter list.\n\n\
+It works only for the model names in the preset list, such as ip-adapter_sd15 or ip-adapter-faceid-plusv2_sdxl. A \
+renamed file stops it with an error asking for the preprocessor to be picked by hand. Forge, reForge and Forge \
+Neo don't have it."""
+how_it_works = """\
+It is a lookup, not a network. sd-webui-controlnet keeps a table pairing each known IP-Adapter model file name \
+with its preprocessor. IP-Adapter Auto strips the hash from the selected model's name, finds the entry and \
+forwards the image to that preprocessor."""
 control_types = ["ip_adapter"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Whatever the chosen preprocessor produces: CLIP image features or face embeddings, nothing to preview."
+output = "The output of the preprocessor it selects."
+best_input = "Whatever the selected model's preprocessor expects."
+weak_input = "Renamed model files, which it can't match."
 models = []
 
-sources = ["recorded_fixtures", "sdwebui_cn_legacy_preprocessors", "sdwebui_cn_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_ipadapter_discussion",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+    "forge_neo_ipadapter",
+]
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["ip-adapter-auto"]
 forge = []
 comfyui = []
+
+[hardware]
+device = "none"
+speed = "fast: a name lookup, then the selected preprocessor's own cost"

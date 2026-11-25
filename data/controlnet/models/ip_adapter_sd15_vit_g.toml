@@ -1,8 +1,16 @@
 id = "ip_adapter_sd15_vit_g"
 label = "IP-Adapter SD1.5 ViT-G"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "An SD 1.5 IP-Adapter trained on the larger CLIP ViT-bigG image encoder instead of ViT-H."
+description = """\
+IP-Adapter SD1.5 ViT-G is the standard SD 1.5 adapter trained with the OpenCLIP ViT-bigG/14 image encoder. It \
+must be paired with the CLIP-ViT-bigG preprocessor, not CLIP-ViT-H. ComfyUI_IPAdapter_plus describes it as a base \
+model that requires the bigG encoder.\n\n\
+The bigG encoder is about 3.7 GB against ViT-H's 2.5 GB. For SDXL, tencent-ailab found no significant difference \
+between the two encoders."""
+how_it_works = """\
+The CLIP ViT-bigG image encoder reduces the reference to a single embedding, which a small projection turns into \
+four tokens. The U-Net's cross-attention layers gain extra key and value weights that attend to those tokens, and \
+the result is added to the text attention."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +19,33 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Small: about 46 MB at fp16",
+]
+weaknesses = [
+    "Needs the larger bigG image encoder",
+]
+good_for = [
+    "image variations",
+    "combining an image prompt with text",
+]
 
-sources = ["hf_h94_ip_adapter"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+    "hf_h94_ip_adapter_commits",
+    "gh_tencent_ailab_ip_adapter",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter_sd15_vit-G.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 46215640
 sha256 = "a26f736af07bb341a83dfea23713531d0575760e8ed947c68cb31a4c62d9c90b"
 webui_hash = "d3a31fee"
@@ -30,6 +54,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter_sd15_vit-G.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 46215689
 sha256 = "1398e9ae37cb65553a8525871830a283914dafd9ec3039716344a826399ec474"
 webui_hash = "40fee50f"

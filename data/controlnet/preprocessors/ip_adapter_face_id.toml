@@ -1,13 +1,24 @@
 id = "ip_adapter_face_id"
 label = "IP-Adapter FaceID"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Reads a face's identity with InsightFace face recognition for the FaceID and FaceID Portrait IP-Adapter models."
+description = """\
+IP-Adapter FaceID finds the face in the reference photo and passes its identity embedding, not an image, to the \
+model. It serves the plain FaceID models and the FaceID Portrait models. Only the largest face is used when the \
+photo shows several. Install the insightface Python package first; sd-webui-controlnet ships a prebuilt wheel \
+only for Windows.\n\n\
+sd-webui-controlnet lists it as ip-adapter_face_id, and reForge keeps that copy as ip-adapter_face_id_variant. \
+Forge, reForge and Forge Neo otherwise have no FaceID-only preprocessor: their InsightFace+CLIP-H (IPAdapter) \
+drives these models too, and skips the CLIP part for models that don't use it."""
+how_it_works = """\
+InsightFace's buffalo_l model pack detects the face and runs an ArcFace face recognition network on it. ArcFace \
+is trained so that photos of the same person map to nearby points and different people to distant ones, so its \
+512-number embedding describes who a face belongs to rather than the lighting, angle or style of the photo. The \
+FaceID models project that embedding into image prompt tokens."""
 control_types = ["ip_adapter"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Produces a face identity embedding rather than a picture; nothing visible to preview."
+output = "A 512-dimensional InsightFace (ArcFace) face embedding."
+best_input = "A clear, well-lit photo of one face."
+weak_input = "Images with no detectable face, which fail; stylized faces InsightFace doesn't detect."
 models = [
     "ip_adapter_faceid_sd15",
     "ip_adapter_faceid_portrait_sd15",
@@ -20,16 +31,34 @@ models = [
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_legacy_processor",
     "sdwebui_cn_preprocessors",
-    "forge_preprocessors",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_faceid_discussion",
+    "sdwebui_cn_faceid_portrait_discussion",
+    "forge_ipadapter",
     "reforge_preprocessors",
+    "reforge_ipadapter_lib",
+    "forge_neo_ipadapter",
+    "hf_h94_ip_adapter_faceid",
+    "gh_insightface_v0_7",
+    "paper_arcface",
 ]
-research_status = "stub"
-open_questions = [
-    "Forge has no native FaceID-only preprocessor name. Confirm whether \"InsightFace+CLIP-H (IPAdapter)\" also drives the non-plus FaceID models there.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["ip-adapter_face_id"]
 forge = ["ip-adapter_face_id_variant"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "InsightFace buffalo_l, about 290 MB as a download. sd-webui-controlnet runs it on CUDA when available; the Forge family runs it on the CPU."
+speed = "fast: face detection plus one recognition pass"
+
+[[hardware.files]]
+filename = "buffalo_l.zip"
+size_bytes = 288621354
+source_url = "https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip"
+variant = "downloaded by the insightface package into models/insightface"

@@ -1,8 +1,18 @@
 id = "ip_adapter_faceid_plus_sd15"
 label = "IP-Adapter FaceID Plus SD1.5"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SD 1.5 FaceID adapter that adds CLIP features of the face for its structure to the identity embedding; superseded by Plus V2."
+description = """\
+IP-Adapter FaceID Plus adds CLIP features of the face, for its structure, to FaceID's identity embedding. It \
+pairs with the IP-Adapter FaceID Plus preprocessor. ComfyUI_IPAdapter_plus marks it deprecated in favor of FaceID \
+Plus V2.\n\n\
+The companion LoRA, listed among this record's files, goes in the LoRA folder and into the prompt; \
+sd-webui-controlnet recommends a LoRA weight of 0.5 to 0.7 and doesn't load it automatically, while \
+ComfyUI_IPAdapter_plus's unified FaceID loader does."""
+how_it_works = """\
+It reads two inputs: InsightFace's 512-number identity embedding and the patch features of the face from the CLIP \
+ViT-H encoder. A small transformer combines them into four image prompt tokens for the U-Net's added \
+cross-attention weights. h94 describes the identity embedding as carrying who the person is and the CLIP features \
+as carrying the face's structure. The companion LoRA adjusts the U-Net to keep the identity consistent."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,19 +21,34 @@ trainer = "h94 (Tencent AI Lab)"
 license = ""
 homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"
 
-strengths = []
-weaknesses = []
-good_for = []
-
-sources = ["hf_h94_ip_adapter_faceid"]
-research_status = "stub"
-open_questions = [
-    "The companion LoRA is listed as a file of this record. Decide whether it needs its own record, since it loads as a LoRA, not as a ControlNet unit.",
+strengths = [
+    "Keeps face structure as well as identity",
 ]
+weaknesses = [
+    "Superseded by Plus V2, per ComfyUI_IPAdapter_plus",
+    "Research use only: h94 releases the FaceID models for non-commercial use, as InsightFace's models are",
+]
+good_for = [
+    "putting a person into new styles and scenes",
+]
+
+sources = [
+    "hf_h94_ip_adapter_faceid",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_faceid_discussion",
+    "comfyui_ipadapter_plus_readme",
+    "reforge_ipadapter_lib",
+    "paper_ip_adapter",
+    "paper_arcface",
+]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "ip-adapter-faceid-plus_sd15.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 156558503
 sha256 = "252fb53e0d018489d9e7f9b9e2001a52ff700e491894011ada7cfb471e0fadf2"
 webui_hash = "d86a490f"
@@ -32,6 +57,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/43907e6f44d07
 [[files]]
 filename = "ip-adapter-faceid-plus_sd15_lora.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 51059544
 sha256 = "3f00341d11e5e7b5aadf63cbdead09ef82eb28669156161cf1bfc2105d4ff1cd"
 webui_hash = "21e06a6c"

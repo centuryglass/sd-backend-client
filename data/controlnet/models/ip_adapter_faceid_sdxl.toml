@@ -1,8 +1,18 @@
 id = "ip_adapter_faceid_sdxl"
 label = "IP-Adapter FaceID SDXL"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SDXL IP-Adapter that keeps a person's identity from a face recognition embedding; needs its LoRA."
+description = """\
+IP-Adapter FaceID SDXL is h94's experimental SDXL version of FaceID. It keeps a person's identity from a face \
+photo while the prompt sets the style. It pairs with the IP-Adapter FaceID preprocessor and needs the insightface \
+package.\n\n\
+The companion LoRA, listed among this record's files, goes in the LoRA folder and into the prompt; \
+sd-webui-controlnet recommends a LoRA weight of 0.5 to 0.7 and doesn't load it automatically, while \
+ComfyUI_IPAdapter_plus's unified FaceID loader does."""
+how_it_works = """\
+InsightFace's face recognition network turns the face into a 512-number embedding that describes who it is rather \
+than the lighting or angle. A small projection maps that embedding to image prompt tokens, which the U-Net's \
+added cross-attention weights attend to alongside the text. The companion LoRA adjusts the U-Net itself to \
+improve how consistently the identity comes through."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,19 +21,33 @@ trainer = "h94 (Tencent AI Lab)"
 license = ""
 homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"
 
-strengths = []
-weaknesses = []
-good_for = []
-
-sources = ["hf_h94_ip_adapter_faceid"]
-research_status = "stub"
-open_questions = [
-    "The companion LoRA is listed as a file of this record. Decide whether it needs its own record, since it loads as a LoRA, not as a ControlNet unit.",
+strengths = [
+    "Identity carries across styles set by the prompt",
 ]
+weaknesses = [
+    "Experimental, per h94",
+    "Research use only: h94 releases the FaceID models for non-commercial use, as InsightFace's models are",
+]
+good_for = [
+    "putting a person into new styles and scenes",
+]
+
+sources = [
+    "hf_h94_ip_adapter_faceid",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_faceid_discussion",
+    "comfyui_ipadapter_plus_readme",
+    "reforge_ipadapter_lib",
+    "paper_arcface",
+]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "ip-adapter-faceid_sdxl.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 1071149741
 sha256 = "f455fed24e207c878ec1e0466b34a969d37bab857c5faa4e8d259a0b4ff63d7e"
 webui_hash = "59ee31a3"
@@ -32,6 +56,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/43907e6f44d07
 [[files]]
 filename = "ip-adapter-faceid_sdxl_lora.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 371842896
 sha256 = "4fcf93d6e8dc8dd18f5f9e51c8306f369486ed0aa0780ade9961308aff7f0d64"
 webui_hash = "f1af4ce4"

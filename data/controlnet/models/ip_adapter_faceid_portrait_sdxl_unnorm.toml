@@ -1,8 +1,17 @@
 id = "ip_adapter_faceid_portrait_sdxl_unnorm"
 label = "FaceID Portrait SDXL Unnorm"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "A stronger SDXL FaceID Portrait adapter built on a resampler; supported by ComfyUI_IPAdapter_plus, not the WebUI extensions."
+description = """\
+FaceID Portrait SDXL Unnorm is an SDXL portrait adapter that ComfyUI_IPAdapter_plus describes as very strong \
+style transfer, SDXL only. h94 uploaded it in April 2024 without notes. Unlike the other Portrait models, whose \
+projection is a small two-layer network, its projection is a resampler.\n\n\
+ComfyUI_IPAdapter_plus has a preset for it, selected by unnorm in the file name. sd-webui-controlnet's preset \
+list doesn't include it, so IP-Adapter Auto can't pick a preprocessor for it, and neither WebUI extension's \
+loader has a code path for a FaceID model built this way."""
+how_it_works = """\
+It reads InsightFace's 512-number identity embedding, like the other Portrait models. A resampler, a small \
+transformer with learned query tokens, turns the embedding into image prompt tokens for SDXL's added \
+cross-attention weights. There is no LoRA."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +20,37 @@ trainer = "h94 (Tencent AI Lab)"
 license = ""
 homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Strong style transfer, per ComfyUI_IPAdapter_plus",
+]
+weaknesses = [
+    "Not in sd-webui-controlnet's presets",
+    "Research use only: h94 releases the FaceID models for non-commercial use, as InsightFace's models are",
+]
+good_for = [
+    "strongly stylized portraits of a person",
+]
 
-sources = ["hf_h94_ip_adapter_faceid"]
-research_status = "stub"
-open_questions = []
+sources = [
+    "hf_h94_ip_adapter_faceid",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_faceid_discussion",
+    "comfyui_ipadapter_plus_readme",
+    "reforge_ipadapter_lib",
+    "comfyui_ipadapter_plus_readme",
+    "hf_h94_ip_adapter_faceid",
+    "forge_ipadapter",
+]
+research_status = "drafted"
+open_questions = [
+    "The file's projection is a resampler (latents, layers), which sd-webui-controlnet would load as a FaceID Plus projection and Forge as a plain Plus model. Confirm on a live backend whether either WebUI extension loads it at all.",
+]
 
 [[files]]
 filename = "ip-adapter-faceid-portrait_sdxl_unnorm.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 1009523411
 sha256 = "220bb86e205393a3d0411631cb473caddbf35fd371be2905ca9008818170db55"
 webui_hash = "2201a7ea"

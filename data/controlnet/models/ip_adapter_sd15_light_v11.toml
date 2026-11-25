@@ -1,8 +1,16 @@
 id = "ip_adapter_sd15_light_v11"
 label = "IP-Adapter SD1.5 Light V1.1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Version 1.1 of the light SD 1.5 IP-Adapter, which keeps the reference image's influence low beside the prompt."
+description = """\
+IP-Adapter Light V1.1 is the later release of the light SD 1.5 adapter, uploaded in March 2024. \
+ComfyUI_IPAdapter_plus lists it as its light impact model and marks the first Light release deprecated. It pairs \
+with the CLIP-ViT-H preprocessor and has the same file size and shape as the standard model.\n\n\
+h94 hasn't published notes on what changed from the first Light release."""
+how_it_works = """\
+The CLIP ViT-H image encoder reduces the reference to a single embedding, one vector for the whole image. A small \
+projection turns it into four tokens shaped like prompt tokens. Every cross-attention layer of the U-Net gets a \
+second set of key and value weights that attend to those tokens, and the result is added to the text attention. \
+The base model's own weights stay unchanged."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +19,29 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
+strengths = [
+    "Light influence that leaves the text prompt in charge",
+]
 weaknesses = []
-good_for = []
+good_for = [
+    "light image guidance under a detailed prompt",
+]
 
-sources = ["hf_h94_ip_adapter"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+    "hf_h94_ip_adapter_commits",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter_sd15_light_v11.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 44642977
 sha256 = "350b63a57847c163e2e984b01090f85ffe60eaae20f32b2b2c9e1ccc7ddd972b"
 webui_hash = "93aab161"

@@ -1,13 +1,39 @@
 id = "ip_adapter"
 label = "IP-Adapter"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Uses a reference image as part of the prompt, carrying its subject, style or a face into the result without copying its layout."
+description = """\
+IP-Adapter treats a reference image as a prompt. The result takes on what the image shows and how it looks, its \
+subject, palette and style, but not its exact layout, and the text prompt still works alongside it. Tencent AI \
+Lab's adapters work with any checkpoint fine-tuned from the same base model and combine with other ControlNets.\n\n\
+The models come in families. Standard and Plus models read a CLIP embedding of the whole image, with Plus closer \
+to the reference. Face models read a cropped face. FaceID and PuLID models read a face recognition embedding and \
+keep a person's identity across new styles and scenes. The composition models carry only the general layout and \
+pose. Each model pairs with one preprocessor, and sd-webui-controlnet's ip-adapter-auto picks it from the model \
+name."""
+how_it_works = """\
+An image encoder turns the reference into features: CLIP for the standard models, InsightFace face recognition \
+for FaceID. A small trained projection maps those features to a few extra tokens shaped like prompt tokens. The \
+U-Net's cross-attention layers, which normally attend only to the text, gain a second set of attention weights \
+that attend to the image tokens, and the two results are added. Only that projection and the new attention \
+weights are trained, about 22 million parameters, so the base model is unchanged."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "A reference image, unprocessed: a whole picture for the CLIP models, a photo with a clear face for the face models."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "paper_ip_adapter",
+    "hf_h94_ip_adapter",
+    "hf_h94_ip_adapter_faceid",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_ipadapter_discussion",
+    "sdwebui_cn_ipadapter_weighting_discussion",
+    "hf_ostris_ip_composition_adapter",
+    "paper_pulid",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
@@ -15,17 +41,48 @@ webui = ["IP-Adapter"]
 forge = ["IP-Adapter"]
 comfyui = []
 
+[[uses]]
+kind = "standard"
+title = "Make variations of an image"
+description = """\
+Leave the prompt empty or generic and set the weight to 1. tencent-ailab's best practice for image-only prompting \
+uses scale 1.0 with an empty prompt or one like "best quality". Lowering the weight gives more varied results \
+that follow the reference less closely."""
+
+[[uses]]
+kind = "standard"
+title = "Combine an image prompt with a text prompt"
+description = """\
+Describe the new scene in the prompt and lower the weight. tencent-ailab suggests a scale around 0.5 for \
+multimodal prompts. Pair it with a Depth, Canny or OpenPose unit to fix the layout while IP-Adapter carries the \
+look."""
+
+[[uses]]
+kind = "standard"
+title = "Keep a person's face across new images"
+description = """\
+Use a FaceID, FaceID Plus or PuLID model with a clear photo of the face, and prompt for the new style or setting. \
+FaceID models other than Portrait come with a LoRA that is loaded separately."""
+
+[[uses]]
+kind = "creative"
+title = "Borrow only style or only composition"
+description = """\
+sd-webui-controlnet's advanced weighting presets, taken from ComfyUI_IPAdapter_plus and the InstantStyle method, \
+apply the image to some U-Net blocks only. Its style transfer presets carry the look without the content. The \
+ostris composition adapters carry the layout and pose, such as a raised hand, while ignoring style and content."""
+
 [choosing]
 guide = ""
 # Unordered until a follow-up session ranks them.
 preprocessors = [
+    "ip_adapter_auto",
     "ip_adapter_clip_h",
     "ip_adapter_clip_g",
     "ip_adapter_face_id",
     "ip_adapter_face_id_plus",
     "ip_adapter_pulid",
     "facexlib",
-    "ip_adapter_auto",
 ]
 models = [
     "ip_adapter_sd15",
@@ -35,10 +92,12 @@ models = [
     "ip_adapter_plus_face_sd15",
     "ip_adapter_full_face_sd15",
     "ip_adapter_sd15_light_v11",
+    "ip_adapter_plus_composition_sd15",
     "ip_adapter_sdxl",
     "ip_adapter_sdxl_vit_h",
     "ip_adapter_plus_sdxl_vit_h",
     "ip_adapter_plus_face_sdxl_vit_h",
+    "ip_adapter_plus_composition_sdxl",
     "ip_adapter_faceid_sd15",
     "ip_adapter_faceid_plus_sd15",
     "ip_adapter_faceid_plusv2_sd15",

@@ -1,30 +1,81 @@
 id = "ip_adapter_face_id_plus"
 label = "IP-Adapter FaceID Plus"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Reads a face's identity with InsightFace and its structure with CLIP ViT-H, for the FaceID Plus and Plus V2 models."
+description = """\
+IP-Adapter FaceID Plus passes two things to the model: an InsightFace identity embedding, as FaceID does, and \
+CLIP ViT-H features of the face. h94 describes the first as carrying who the person is and the second as carrying \
+the face's structure. It serves FaceID Plus and Plus V2, on SD 1.5 and SDXL.\n\n\
+sd-webui-controlnet lists it as ip-adapter_face_id_plus. Forge, reForge and Forge Neo call it InsightFace+CLIP-H \
+(IPAdapter), and there it also drives the plain FaceID and Portrait models. The insightface Python package must \
+be installed, and the CLIP-ViT-H encoder downloads on first use."""
+how_it_works = """\
+InsightFace's buffalo_l pack detects the face and gives its ArcFace identity embedding. The image also goes \
+through the OpenCLIP ViT-H/14 image encoder, and the patch features from its second-to-last layer are kept. \
+sd-webui-controlnet encodes the whole image this way; Forge first crops and aligns the detected face to 224 \
+pixels. The Plus models combine both inputs into image prompt tokens."""
 control_types = ["ip_adapter"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Produces face embeddings rather than a picture; nothing visible to preview."
+output = "An InsightFace face embedding plus OpenCLIP ViT-H/14 patch features."
+best_input = "A clear, well-lit photo of one face."
+weak_input = "Images with no detectable face, which fail."
 models = [
     "ip_adapter_faceid_plus_sd15",
     "ip_adapter_faceid_plusv2_sd15",
     "ip_adapter_faceid_plusv2_sdxl",
+    "ip_adapter_faceid_sd15",
+    "ip_adapter_faceid_sdxl",
+    "ip_adapter_faceid_portrait_sd15",
+    "ip_adapter_faceid_portrait_v11_sd15",
+    "ip_adapter_faceid_portrait_sdxl",
+    "ip_adapter_faceid_portrait_sdxl_unnorm",
 ]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_legacy_processor",
     "sdwebui_cn_preprocessors",
-    "forge_preprocessors",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_faceid_discussion",
+    "forge_ipadapter",
     "reforge_preprocessors",
+    "reforge_ipadapter_lib",
+    "forge_neo_ipadapter",
+    "hf_h94_ip_adapter_faceid",
+    "hf_h94_ip_adapter",
+    "gh_insightface_v0_7",
+    "paper_arcface",
+    "paper_clip",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["ip-adapter_face_id_plus"]
 forge = ["InsightFace+CLIP-H (IPAdapter)", "ip-adapter_face_id_plus_variant"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "InsightFace buffalo_l plus the OpenCLIP ViT-H/14 image encoder, about 2.8 GB of downloads together."
+speed = "fast: face detection, one recognition pass and one CLIP pass"
+
+[[hardware.files]]
+filename = "buffalo_l.zip"
+size_bytes = 288621354
+source_url = "https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip"
+variant = "downloaded by the insightface package into models/insightface"
+
+[[hardware.files]]
+filename = "pytorch_model.bin"
+size_bytes = 2528481905
+sha256 = "3d3ec1e66737f77a4f3bc2df3c52eacefc69ce7825e2784183b1d4e9877d9193"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/image_encoder/pytorch_model.bin"
+variant = "sd-webui-controlnet, saved as clip_h.pth"
+
+[[hardware.files]]
+filename = "model.safetensors"
+size_bytes = 2528373448
+sha256 = "6ca9667da1ca9e0b0f75e46bb030f7e011f44f86cbfb8d5a36590fcd7507b030"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/image_encoder/model.safetensors"
+variant = "Forge, reForge and Forge Neo, saved as CLIP-ViT-H-14.safetensors"

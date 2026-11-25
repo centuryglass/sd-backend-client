@@ -1143,3 +1143,240 @@ title = "AnimateDiff SparseCtrl inference configs (image and latent condition) a
 url = "https://github.com/guoyww/AnimateDiff/tree/e92bd5671ba62c0d774a32951453e328018b7c5b/configs"
 kind = "repo_code"
 accessed = "2026-11-25"
+
+[sdwebui_cn_ipadapter]
+title = "sd-webui-controlnet IP-Adapter presets, model loader and weight types"
+url = "https://github.com/Mikubill/sd-webui-controlnet/tree/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/ipadapter"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/ipadapter/"
+
+[sdwebui_cn_legacy_processor]
+title = "sd-webui-controlnet legacy preprocessor functions (CLIP vision, InsightFace, FaceID Plus)"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/preprocessor/legacy/processor.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/preprocessor/legacy/processor.py"
+
+[sdwebui_cn_model_guess]
+title = "sd-webui-controlnet control model type detection"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/controlnet_model_guess.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/controlnet_model_guess.py"
+
+[sdwebui_cn_ipadapter_discussion]
+title = "sd-webui-controlnet discussion #2723: IP-Adapter CLIP mask and the ip-adapter-auto preprocessor"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2723"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_faceid_discussion]
+title = "sd-webui-controlnet discussion #2442: IP-Adapter FaceID"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2442"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_faceid_portrait_discussion]
+title = "sd-webui-controlnet discussion #2530: IP-Adapter FaceID Portrait"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2530"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_instantid_discussion]
+title = "sd-webui-controlnet discussion #2589: Instant ID"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2589"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_pulid_discussion]
+title = "sd-webui-controlnet discussion #2841: PuLID"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2841"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_ipadapter_composition_discussion]
+title = "sd-webui-controlnet discussion #2781: IP-Adapter composition models"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2781"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_ipadapter_weighting_discussion]
+title = "sd-webui-controlnet discussion #2770: IP-Adapter advanced weighting (InstantStyle)"
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2770"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_evaclip]
+title = "sd-webui-controlnet-evaclip extension (EVA02-CLIP-L-14-336 preprocessor for PuLID)"
+url = "https://github.com/huchenlei/sd-webui-controlnet-evaclip/tree/39966e79a5291b9fef8b42de69057dd3b19f4c23"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[forge_ipadapter]
+title = "Forge IP-Adapter and InstantID preprocessors"
+url = "https://github.com/lllyasviel/stable-diffusion-webui-forge/blob/dfdcbab685e57677014f05a3309b48cc87383167/extensions-builtin/sd_forge_ipadapter/scripts/forge_ipadapter.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "stable-diffusion-webui-forge"
+commit = "dfdcbab685e57677014f05a3309b48cc87383167"
+path = "extensions-builtin/sd_forge_ipadapter/scripts/forge_ipadapter.py"
+
+[forge_revision]
+title = "Forge Revision preprocessors"
+url = "https://github.com/lllyasviel/stable-diffusion-webui-forge/blob/dfdcbab685e57677014f05a3309b48cc87383167/extensions-builtin/forge_preprocessor_revision/scripts/preprocessor_revision.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "stable-diffusion-webui-forge"
+commit = "dfdcbab685e57677014f05a3309b48cc87383167"
+path = "extensions-builtin/forge_preprocessor_revision/scripts/preprocessor_revision.py"
+
+[reforge_ipadapter_lib]
+title = "reForge IP-Adapter implementation (IPAdapterApply, InsightFace loader)"
+url = "https://github.com/Panchovix/stable-diffusion-webui-reForge/blob/739b2e1d9ab63160eaff9c8f73172c8da68424e1/extensions-builtin/sd_forge_ipadapter/lib_ipadapter/IPAdapterPlus.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "stable-diffusion-webui-reForge"
+commit = "739b2e1d9ab63160eaff9c8f73172c8da68424e1"
+path = "extensions-builtin/sd_forge_ipadapter/lib_ipadapter/IPAdapterPlus.py"
+
+[reforge_photomaker]
+title = "reForge PhotoMaker preprocessor and control model, with its PhotoMaker encoder node"
+url = "https://github.com/Panchovix/stable-diffusion-webui-reForge/blob/739b2e1d9ab63160eaff9c8f73172c8da68424e1/extensions-builtin/sd_forge_photomaker/scripts/forge_photomaker.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "stable-diffusion-webui-reForge"
+commit = "739b2e1d9ab63160eaff9c8f73172c8da68424e1"
+path = "extensions-builtin/sd_forge_photomaker/scripts/forge_photomaker.py, ldm_patched/contrib/nodes_photomaker.py"
+
+[forge_neo_ipadapter]
+title = "Forge Neo IP-Adapter and InstantID preprocessors"
+url = "https://github.com/Haoming02/sd-webui-forge-classic/blob/46af880c003d31846bbea984ce00fc7be247ce5b/extensions-builtin/sd_forge_ipadapter/scripts/forge_ipadapter.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-forge-classic (Forge Neo)"
+commit = "46af880c003d31846bbea984ce00fc7be247ce5b"
+path = "extensions-builtin/sd_forge_ipadapter/scripts/forge_ipadapter.py"
+
+[comfyui_photomaker_nodes]
+title = "ComfyUI core PhotoMakerLoader and PhotoMakerEncode nodes"
+url = "https://github.com/comfyanonymous/ComfyUI/blob/46493d824fd7eac25a741e505159e4c9e0ef0ebd/comfy_extras/nodes_photomaker.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "ComfyUI"
+commit = "46493d824fd7eac25a741e505159e4c9e0ef0ebd"
+path = "comfy_extras/nodes_photomaker.py"
+
+[comfyui_ipadapter_plus_readme]
+title = "ComfyUI_IPAdapter_plus README (model list and file names)"
+url = "https://github.com/cubiq/ComfyUI_IPAdapter_plus/blob/a0f451a5113cf9becb0847b92884cb10cbdec0ef/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[gh_tencent_ailab_ip_adapter]
+title = "tencent-ailab/IP-Adapter README (release notes, best practice, non-square images)"
+url = "https://github.com/tencent-ailab/IP-Adapter/blob/62e4af9d0c1ac7d5f8dd386a0ccf2211346af1a2/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[hf_h94_ip_adapter_commits]
+title = "h94/IP-Adapter commit history (light, ViT-G, full-face and light v1.1 uploads)"
+url = "https://huggingface.co/h94/IP-Adapter/commits/main"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[hf_ostris_ip_composition_adapter]
+title = "ostris/ip-composition-adapter model card"
+url = "https://huggingface.co/ostris/ip-composition-adapter"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[gh_pulid]
+title = "ToTheBeginning/PuLID README and v1.1 notes"
+url = "https://github.com/ToTheBeginning/PuLID/tree/1aa2fc7df4bf51080df39f355f9abdc1cbfefbaa"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[gh_photomaker]
+title = "TencentARC/PhotoMaker README, V2 notes and model code"
+url = "https://github.com/TencentARC/PhotoMaker/tree/060b4fcb10b76a4554edf565d6106b7e36c968f0"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[paper_ip_adapter]
+title = "IP-Adapter: Text Compatible Image Prompt Adapter for Text-to-Image Diffusion Models"
+url = "https://arxiv.org/abs/2308.06721"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_instantid]
+title = "InstantID: Zero-shot Identity-Preserving Generation in Seconds"
+url = "https://arxiv.org/abs/2401.07519"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_photomaker]
+title = "PhotoMaker: Customizing Realistic Human Photos via Stacked ID Embedding"
+url = "https://arxiv.org/abs/2312.04461"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_pulid]
+title = "PuLID: Pure and Lightning ID Customization via Contrastive Alignment"
+url = "https://arxiv.org/abs/2404.16022"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_arcface]
+title = "ArcFace: Additive Angular Margin Loss for Deep Face Recognition"
+url = "https://arxiv.org/abs/1801.07698"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_eva_clip]
+title = "EVA-CLIP: Improved Training Techniques for CLIP at Scale"
+url = "https://arxiv.org/abs/2303.15389"
+kind = "paper"
+accessed = "2026-11-25"
+
+[paper_openclip_scaling]
+title = "Reproducible scaling laws for contrastive language-image learning (OpenCLIP)"
+url = "https://arxiv.org/abs/2212.07143"
+kind = "paper"
+accessed = "2026-11-25"
+
+[hf_diamonik_antelopev2]
+title = "DIAMONIK7777/antelopev2 (InsightFace antelopev2 mirror)"
+url = "https://huggingface.co/DIAMONIK7777/antelopev2/tree/ba0c3e10f4548361eb9a63265d87ce1140ab5a05"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[gh_insightface_v0_7]
+title = "InsightFace v0.7 release (buffalo_l and antelopev2 model packs)"
+url = "https://github.com/deepinsight/insightface/releases/tag/v0.7"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[gh_facexlib_releases]
+title = "facexlib releases (RetinaFace detection and BiSeNet parsing weights)"
+url = "https://github.com/xinntao/facexlib/releases"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[hf_quansun_eva_clip]
+title = "QuanSun/EVA-CLIP model files"
+url = "https://huggingface.co/QuanSun/EVA-CLIP/tree/11afd202f2ae80869d6cef18b1ec775e79bd8d12"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[paper_sdxl]
+title = "SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis"
+url = "https://arxiv.org/abs/2307.01952"
+kind = "paper"
+accessed = "2026-11-25"

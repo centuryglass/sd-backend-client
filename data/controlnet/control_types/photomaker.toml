@@ -1,21 +1,55 @@
 id = "photomaker"
 label = "PhotoMaker"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Puts a person from a face photo into the result by tying their identity to a word in the prompt; reForge only."
+description = """\
+PhotoMaker generates new photos or paintings of a person from face photos and a prompt, with no training. The \
+identity attaches to a class word in the prompt, such as "man" or "woman", followed by a trigger word, so the \
+rest of the prompt controls the scene and style.\n\n\
+Of the backends here, only reForge presents it as a control type. There, the trigger word is "photomaker", as in \
+"a photo of a woman photomaker", and the unit reads one image. Without the trigger word the unit does nothing. \
+reForge loads only the PhotoMaker V1 file. PhotoMaker is SDXL only. ComfyUI has core PhotoMakerLoader and \
+PhotoMakerEncode nodes that work the same way."""
+how_it_works = """\
+The PhotoMaker file holds a fine-tuned CLIP image encoder and a small fusion network. The encoder turns each face \
+photo into an embedding. The fusion network merges those embeddings with the class word's own text embedding, and \
+the merged result replaces that word's token in the prompt, which the paper calls a stacked ID embedding. The \
+U-Net then reads the prompt as usual, with the class word now meaning this person. Official PhotoMaker also \
+applies a LoRA to the U-Net; reForge and ComfyUI's core nodes load only the encoder."""
 base_models = ["sdxl"]
-control_image = ""
+control_image = "A photo of the person, with the face clearly visible."
 
-sources = ["recorded_fixtures", "forge_preprocessors"]
-research_status = "stub"
-open_questions = [
-    "Only reForge presents PhotoMaker. Confirm whether Forge or Forge Neo support it some other way.",
+sources = [
+    "recorded_fixtures",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+    "reforge_photomaker",
+    "comfyui_photomaker_nodes",
+    "paper_photomaker",
+    "hf_tencentarc_photomaker",
+    "gh_photomaker",
+    "forge_neo_preprocessors",
 ]
+research_status = "drafted"
+open_questions = []
 
 [names]
 webui = []
 forge = ["PhotoMaker"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Make new photos of a person"
+description = """\
+Write a prompt with the class word followed by the trigger word and describe the scene. TencentARC's tips: more \
+photos of the person improve likeness, and for an Asian face, adding "Asian" before the class word can help."""
+
+[[uses]]
+kind = "creative"
+title = "Bring a painted or old-photo face to life"
+description = """\
+TencentARC shows PhotoMaker turning characters from paintings and old photos into realistic portraits, and \
+changing a person's apparent age or gender through the prompt."""
 
 [choosing]
 guide = ""

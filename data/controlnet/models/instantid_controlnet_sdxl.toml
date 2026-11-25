@@ -1,28 +1,55 @@
 id = "instantid_controlnet_sdxl"
 label = "InstantID ControlNet"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The ControlNet half of InstantID, called IdentityNet: steers the face toward the identity, placed by five keypoints."
+description = """\
+The InstantID ControlNet is the second of InstantID's two models. Its control image is the five-point keypoint \
+drawing from InstantID Face Keypoints, which sets the face's position and angle, and it must follow the InstantID \
+IP-Adapter unit. InstantX's tips: raise both weights for more likeness, and lower this one if colors stay \
+oversaturated after lowering the adapter. sd-webui-controlnet recommends a CFG of about 4 to 5.\n\n\
+The WebUI extensions need instant_id in its file name: sd-webui-controlnet's announcement renames it to \
+control_instant_id_sdxl, and reForge only feeds face tokens to ControlNets named that way."""
+how_it_works = """\
+It is a ControlNet for SDXL that the paper calls IdentityNet. Its spatial input is only the five-keypoint \
+drawing, a weak cue for where the face is. In place of the text prompt, its cross-attention reads the face tokens \
+from the InstantID adapter, a strong cue for who it is. Its output joins the U-Net like any ControlNet's."""
 base_models = ["sdxl"]
 adapter = "controlnet"
-control_types = ["instant_id"]
+control_types = ["ip_adapter"]
 preprocessors = ["instant_id_face_keypoints"]
 trainer = "InstantX"
 license = "apache-2.0"
 homepage = "https://huggingface.co/InstantX/InstantID"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Keypoints can come from a different photo than the identity",
+]
+weaknesses = [
+    "Works only together with the InstantID IP-Adapter unit",
+    "Must be renamed for the WebUI extensions",
+    "More likely to add a watermark or logo at 1024 by 1024, per sd-webui-controlnet",
+]
+good_for = [
+    "placing a known face at a chosen angle",
+]
 
-sources = ["hf_instantx_instantid"]
-research_status = "stub"
+sources = [
+    "hf_instantx_instantid",
+    "paper_instantid",
+    "sdwebui_cn_instantid_discussion",
+    "sdwebui_cn_model_guess",
+    "sdwebui_cn_script",
+    "reforge_ipadapter_lib",
+    "forge_ipadapter",
+    "forge_neo_ipadapter",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model.safetensors"
 also_seen_as = ["control_instant_id_sdxl.safetensors"]
 format = "safetensors"
+precision = "fp16"
 size_bytes = 2502139136
 sha256 = "c8127be9f174101ebdafee9964d856b49b634435cf6daa396d3f593cf0bbbb05"
 webui_hash = "c5c25a50"

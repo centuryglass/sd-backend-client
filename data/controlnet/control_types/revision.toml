@@ -1,19 +1,61 @@
 id = "revision"
 label = "Revision"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Prompts SDXL with an image's CLIP embedding, alongside or in place of text; no model file needed."
+description = """\
+Revision prompts SDXL with an image. The result is conceptually similar to the input, its subject and mood, but \
+not a copy of it. Stability AI released it with its SDXL Control-LoRAs and says it works in addition to a text \
+prompt or in place of one.\n\n\
+There is no control model to download. sd-webui-controlnet offers two preprocessors, which download the CLIP \
+ViT-bigG image encoder on first use. Revision Ignore Prompt drops the text prompt entirely. Plain Revision keeps \
+it, though sd-webui-controlnet also drops it when both the prompt and the negative prompt are empty. Several \
+Revision units add together, which blends their images. Revision works on SDXL only. Forge and reForge have it; \
+Forge Neo doesn't."""
+how_it_works = """\
+SDXL takes a pooled embedding of the prompt from its OpenCLIP ViT-bigG text encoder, a single vector summarizing \
+the whole prompt, as an extra input beside the per-word tokens. CLIP trains its image and text encoders to land \
+matching pictures and captions close together, so an image embedding from the bigG image encoder can stand in for \
+that text summary. Revision overwrites the pooled embedding with the image's, scaled by the unit weight, and the \
+ignore-prompt variant also zeroes the per-word tokens."""
 base_models = ["sdxl"]
-control_image = ""
+control_image = "A reference image, unprocessed."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "hf_stabilityai_control_lora",
+    "sdwebui_cn_hook",
+    "sdwebui_cn_script",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_1_1_400_discussion",
+    "forge_revision",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "paper_openclip_scaling",
+    "paper_clip",
+    "paper_sdxl",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Revision"]
 forge = ["Revision"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Generate variations with no prompt"
+description = """\
+Use Revision Ignore Prompt with an empty prompt. The 1.1.400 announcement shows SDXL generating from an image \
+alone this way."""
+
+[[uses]]
+kind = "creative"
+title = "Blend two images into one concept"
+description = """\
+Add a Revision unit for each image. Their embeddings add together, weighted by each unit's weight, so the result \
+mixes both concepts. Stability describes this blending for positive and negative prompts."""
 
 [choosing]
 guide = ""

@@ -1,20 +1,41 @@
 id = "photomaker_clipvision"
 label = "PhotoMaker CLIP Vision"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Passes the face photo unchanged to the PhotoMaker model, whose own image encoder reads it; reForge only."
+description = """\
+PhotoMaker CLIP Vision is reForge's preprocessor for the PhotoMaker type, listed as ClipVision (Photomaker). It \
+doesn't change the image or load anything. The PhotoMaker model file carries its own fine-tuned CLIP image \
+encoder, which reads the photo when generation starts.\n\n\
+The unit only has an effect when the prompt contains the word "photomaker" right after a class word, as in "a \
+woman photomaker". reForge uses the first prompt of a batch, and one image per unit. It has no resolution or \
+control mode settings."""
+how_it_works = """\
+The preprocessor step passes the image through unchanged. At generation time reForge resizes it to 224 by 224 \
+with a center crop, runs PhotoMaker's encoder on it and fuses the result into the class word's token embedding. \
+The word "photomaker" itself is removed from the prompt before encoding."""
 control_types = ["photomaker"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
-models = ["photomaker_v1_sdxl", "photomaker_v2_sdxl"]
+effect = "None: the image passes through unchanged."
+output = "The input image, unchanged."
+best_input = "A photo of the person with the face clear and near the center."
+weak_input = "Photos where the face sits near an edge, which the center crop can cut off."
+models = ["photomaker_v1_sdxl"]
 
-sources = ["recorded_fixtures", "reforge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "reforge_preprocessors",
+    "reforge_photomaker",
+    "comfyui_photomaker_nodes",
+    "hf_tencentarc_photomaker",
+    "forge_preprocessors",
+    "forge_neo_preprocessors",
+]
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = []
 forge = ["ClipVision (Photomaker)"]
 comfyui = []
+
+[hardware]
+device = "none"
+speed = "fast: no processing; the model's encoder runs during generation"

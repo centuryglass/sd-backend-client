@@ -1,8 +1,16 @@
 id = "ip_adapter_sd15_light"
 label = "IP-Adapter SD1.5 Light"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "A lighter-touch SD 1.5 IP-Adapter that leaves the text prompt more say, even at full weight."
+description = """\
+IP-Adapter Light is a version of the standard SD 1.5 adapter that interferes less with the text prompt. h94 \
+describes it as more compatible with the text prompt even at scale 1.0. It pairs with the CLIP-ViT-H \
+preprocessor.\n\n\
+ComfyUI_IPAdapter_plus marks this first Light release deprecated in favor of IP-Adapter SD1.5 Light V1.1."""
+how_it_works = """\
+The CLIP ViT-H image encoder reduces the reference to a single embedding, one vector for the whole image. A small \
+projection turns it into four tokens shaped like prompt tokens. Every cross-attention layer of the U-Net gets a \
+second set of key and value weights that attend to those tokens, and the result is added to the text attention. \
+The base model's own weights stay unchanged."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +19,31 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "The text prompt keeps more influence than with the standard model",
+]
+weaknesses = [
+    "Superseded by Light V1.1, per ComfyUI_IPAdapter_plus",
+]
+good_for = [
+    "light image guidance under a detailed prompt",
+]
 
-sources = ["hf_h94_ip_adapter"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+    "hf_h94_ip_adapter_commits",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter_sd15_light.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 44642768
 sha256 = "0747d08db670535bfa286452a77d93cebad5c677b46d038543f9f2de8690bb26"
 webui_hash = "932b88cf"
@@ -30,6 +52,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter_sd15_light.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 44642819
 sha256 = "f71bfbdd937f2edad0c894ec72d12db02b3be0316f62988e5fc669ca4da6b7e1"
 webui_hash = "be1c9b97"
