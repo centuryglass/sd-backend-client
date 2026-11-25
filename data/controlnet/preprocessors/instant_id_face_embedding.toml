@@ -1,26 +1,87 @@
 id = "instant_id_face_embedding"
 label = "InstantID Face Embedding"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Reads a face's identity with InsightFace antelopev2 for the InstantID adapter, the first of InstantID's two units."
+description = """\
+InstantID Face Embedding finds the largest face in the photo and passes its identity embedding, not an image, to \
+the InstantID IP-Adapter. Use it in the first of InstantID's two units. sd-webui-controlnet lists it as \
+instant_id_face_embedding; Forge, reForge and Forge Neo call it InsightFace (InstantID).\n\n\
+It uses InsightFace's antelopev2 model pack, not the buffalo_l pack the FaceID preprocessors use. Insightface's \
+own release link for antelopev2 is down, so the WebUI extensions fetch it from a Hugging Face mirror on first \
+use, about 430 MB. The insightface Python package must be installed. Forge retries detection at smaller sizes \
+when no face is found at 640 pixels; sd-webui-controlnet does not."""
+how_it_works = """\
+InsightFace's antelopev2 pack detects the face and runs a face recognition network on it. Like ArcFace, it is \
+trained so that photos of the same person land close together, so its 512-number embedding describes whose face \
+it is rather than the lighting or angle. The InstantID adapter projects that embedding into 16 tokens, which feed \
+both the U-Net and the InstantID ControlNet."""
 control_types = ["instant_id"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Produces a face identity embedding rather than a picture; nothing visible to preview."
+output = "A 512-dimensional InsightFace antelopev2 face embedding."
+best_input = "A clear photo of one face."
+weak_input = "Images with no detectable face, which fail."
 models = ["instantid_ip_adapter_sdxl"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_legacy_processor",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_instantid_discussion",
+    "sdwebui_cn_ipadapter",
     "forge_preprocessors",
+    "forge_ipadapter",
     "reforge_preprocessors",
+    "reforge_ipadapter_lib",
+    "forge_neo_ipadapter",
+    "hf_instantx_instantid",
+    "hf_diamonik_antelopev2",
+    "paper_instantid",
+    "paper_arcface",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["instant_id_face_embedding"]
 forge = ["InsightFace (InstantID)", "instant_id_face_embedding"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "InsightFace antelopev2, about 430 MB of ONNX weights. sd-webui-controlnet runs it on CUDA when available; the Forge family runs it on the CPU."
+speed = "fast: face detection plus one recognition pass"
+
+[[hardware.files]]
+filename = "1k3d68.onnx"
+size_bytes = 143607619
+sha256 = "df5c06b8a0c12e422b2ed8947b8869faa4105387f199c477af038aa01f9a45cc"
+source_url = "https://huggingface.co/DIAMONIK7777/antelopev2/resolve/ba0c3e10f4548361eb9a63265d87ce1140ab5a05/1k3d68.onnx"
+variant = "3D landmarks"
+
+[[hardware.files]]
+filename = "2d106det.onnx"
+size_bytes = 5030888
+sha256 = "f001b856447c413801ef5c42091ed0cd516fcd21f2d6b79635b1e733a7109dbf"
+source_url = "https://huggingface.co/DIAMONIK7777/antelopev2/resolve/ba0c3e10f4548361eb9a63265d87ce1140ab5a05/2d106det.onnx"
+variant = "2D landmarks"
+
+[[hardware.files]]
+filename = "genderage.onnx"
+size_bytes = 1322532
+sha256 = "4fde69b1c810857b88c64a335084f1c3fe8f01246c9a191b48c7bb756d6652fb"
+source_url = "https://huggingface.co/DIAMONIK7777/antelopev2/resolve/ba0c3e10f4548361eb9a63265d87ce1140ab5a05/genderage.onnx"
+variant = "gender and age"
+
+[[hardware.files]]
+filename = "glintr100.onnx"
+size_bytes = 260665334
+sha256 = "4ab1d6435d639628a6f3e5008dd4f929edf4c4124b1a7169e1048f9fef534cdf"
+source_url = "https://huggingface.co/DIAMONIK7777/antelopev2/resolve/ba0c3e10f4548361eb9a63265d87ce1140ab5a05/glintr100.onnx"
+variant = "recognition"
+
+[[hardware.files]]
+filename = "scrfd_10g_bnkps.onnx"
+size_bytes = 16923827
+sha256 = "5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91"
+source_url = "https://huggingface.co/DIAMONIK7777/antelopev2/resolve/ba0c3e10f4548361eb9a63265d87ce1140ab5a05/scrfd_10g_bnkps.onnx"
+variant = "detection"

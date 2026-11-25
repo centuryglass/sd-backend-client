@@ -1,8 +1,16 @@
 id = "ip_adapter_plus_sdxl_vit_h"
 label = "IP-Adapter Plus SDXL ViT-H"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SDXL IP-Adapter that reads the reference image's patch features, staying closer to it than the standard SDXL models."
+description = """\
+IP-Adapter Plus SDXL uses a reference image as part of the prompt for SDXL and stays closer to it than the \
+standard SDXL adapters. h94 describes it as using patch image embeddings from OpenCLIP ViT-H, closer to the \
+reference than ip-adapter_sdxl and ip-adapter_sdxl_vit-h. It pairs with the CLIP-ViT-H preprocessor; \
+sd-webui-controlnet's older name for it there is ip-adapter_clip_sdxl_plus_vith."""
+how_it_works = """\
+Plus models read the features of every image patch from the CLIP ViT-H encoder's second-to-last layer instead of \
+its single summary vector. A small transformer called a resampler condenses those patches into 16 tokens, which \
+the U-Net's added cross-attention weights attend to alongside the text. Patch features keep more of the \
+reference's detail than one vector does."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +19,29 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
+strengths = [
+    "Closer to the reference than the standard SDXL adapters",
+]
 weaknesses = []
-good_for = []
+good_for = [
+    "close image variations",
+    "carrying a character or object into a new scene",
+]
 
-sources = ["hf_h94_ip_adapter"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter-plus_sdxl_vit-h.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 847517512
 sha256 = "3f5062b8400c94b7159665b21ba5c62acdcd7682262743d7f2aefedef00e6581"
 webui_hash = "bc449f62"
@@ -30,6 +50,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter-plus_sdxl_vit-h.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 1013454427
 sha256 = "ec70edb7cc8e769c9388d94eeaea3e4526352c9fae793a608782d1d8951fde90"
 webui_hash = "f1f19f7d"

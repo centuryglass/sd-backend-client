@@ -1,8 +1,18 @@
 id = "ip_adapter_sd15"
 label = "IP-Adapter SD1.5"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The original SD 1.5 IP-Adapter: uses a reference image as part of the prompt, from its overall CLIP embedding."
+description = """\
+The standard SD 1.5 IP-Adapter makes the result resemble a reference image in subject and style. It reads one \
+CLIP embedding of the whole image, so it carries the gist rather than fine detail; Plus stays closer to the \
+reference. It pairs with the CLIP-ViT-H preprocessor.\n\n\
+tencent-ailab suggests weight 1.0 with an empty or generic prompt for image-only prompting, and about 0.5 when \
+combining it with a text prompt. It works with any SD 1.5 fine-tune. lllyasviel's sd_control_collection mirrors \
+it as ip-adapter_sd15.pth, the same weights."""
+how_it_works = """\
+The CLIP ViT-H image encoder reduces the reference to a single embedding, one vector for the whole image. A small \
+projection turns it into four tokens shaped like prompt tokens. Every cross-attention layer of the U-Net gets a \
+second set of key and value weights that attend to those tokens, and the result is added to the text attention. \
+The base model's own weights stay unchanged."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +21,34 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Small: about 22 million parameters, 44 MB at fp16",
+    "Works with text prompts and other ControlNets",
+]
+weaknesses = [
+    "Carries the overall look more than exact details, compared with Plus",
+]
+good_for = [
+    "image variations",
+    "combining an image prompt with text",
+]
 
-sources = ["hf_h94_ip_adapter", "hf_lllyasviel_sd_control_collection", "recorded_fixtures"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+    "hf_lllyasviel_sd_control_collection",
+    "recorded_fixtures",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter_sd15.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 44642768
 sha256 = "289b45f16d043d0bf542e45831f971dcdaabe18b656f11e86d9dfba7e9ee3369"
 webui_hash = "dbbc7cfe"
@@ -30,6 +57,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter_sd15.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 44642825
 sha256 = "68e1df30d760f280e578c302f1e73b37ea08654eff16a31153588047affe0058"
 webui_hash = "6a3f6166"
@@ -38,6 +66,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter_sd15.pth"
 format = "pth"
+precision = "fp16"
 size_bytes = 44642819
 sha256 = "a3e0c0b9b5a48326c69508dde8206f957ff5e9379cf392d5a0ae2486b19c9097"
 webui_hash = "6a3f6166"

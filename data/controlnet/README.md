@@ -40,7 +40,8 @@ Each model forbids unknown keys, so a misspelled field fails to load.
   `name_parameters`, `hardware` and `parameters`.
 - **A model** is one trained network. It adds `base_models`, `adapter`, `control_types`, `preprocessors`, `trainer`,
   `license`, `homepage`, `strengths`, `weaknesses`, `good_for` and `files`. Each pruned, fp16, renamed or
-  LoRA-extracted copy is a `files` entry, with `variant` saying what sets it apart.
+  LoRA-extracted copy is a `files` entry, with `variant` saying what sets it apart. A LoRA trained to be loaded
+  alongside the model, such as each FaceID model's, is a `files` entry of that model too.
 - **`name_parameters` tells apart preprocessors that share a backend name.** ComfyUI folds several WebUI
   preprocessors into one node with a switch. For example, `LineArtPreprocessor` with `coarse = "enable"` is
   `lineart_coarse`. Every record sharing a name sets it, except the one matching the node's defaults.
@@ -122,12 +123,12 @@ Each model forbids unknown keys, so a misspelled field fails to load.
   preprocessors are its copies of the A1111 legacy implementations. They are aliases in the base record's
   `names.forge`.
 - **Models: the families a user is likely to have downloaded.** These are lllyasviel ControlNet 1.0 and 1.1, TencentARC
-  T2I-Adapters (SD1.x and SDXL), diffusers SDXL ControlNets, every file in `lllyasviel/sd_control_collection`
-  (SargeZT, kohya LLLite, Stability control-LoRAs, thibaud), xinsir (including union and ProMax), TTPlanet tile,
-  monster-labs, DionTimmer, Nacholmo and latentcat/ioclab QR and brightness models, h94 IP-Adapter and FaceID,
-  PuLID, InstantID, PhotoMaker, MistoLine, SparseCtrl, MediaPipe Face, the SDXL inpainting ControlNets in the
-  recorded fixtures, and the three SD1.5 ControlNets that comfyui_controlnet_aux's table pairs with preprocessors
-  (the Depth Anything ControlNet, HandRefiner's inpaint depth hand model and the animal pose ControlNet).
+  T2I-Adapters (SD1.x and SDXL), diffusers SDXL ControlNets, every file in `lllyasviel/sd_control_collection` (SargeZT,
+  kohya LLLite, Stability control-LoRAs, thibaud), xinsir (including union and ProMax), TTPlanet tile, monster-labs,
+  DionTimmer, Nacholmo and latentcat/ioclab QR and brightness models, h94 IP-Adapter and FaceID, the ostris IP
+  composition adapters, PuLID, InstantID, PhotoMaker, MistoLine, SparseCtrl, MediaPipe Face, the SDXL inpainting
+  ControlNets in the recorded fixtures, and the three SD1.5 ControlNets that comfyui_controlnet_aux's table pairs with
+  preprocessors (the Depth Anything ControlNet, HandRefiner's inpaint depth hand model and the animal pose ControlNet).
 
 ### Left out
 
@@ -145,8 +146,8 @@ Each model forbids unknown keys, so a misspelled field fails to load.
 
 | Kind | Records | Stub | Drafted | Verified |
 |---|---|---|---|---|
-| Control types | 23 | 6 | 17 | 0 |
-| Preprocessors | 81 | 12 | 17 | 52 |
-| Models | 126 | 34 | 15 | 77 |
+| Control types | 23 | 2 | 21 | 0 |
+| Preprocessors | 81 | 0 | 17 | 64 |
+| Models | 128 | 8 | 16 | 104 |
 
 `python scripts/controlnet_data.py` prints the current counts. Update this table when a session changes them.

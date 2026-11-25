@@ -1,8 +1,18 @@
 id = "pulid_v1_sdxl"
 label = "PuLID V1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ByteDance's SDXL identity adapter: keeps a person's face from a photo while changing the rest of the image as little as possible."
+description = """\
+PuLID inserts a person's identity from a face photo into an SDXL generation, aiming to change the rest of the \
+image, background, lighting, composition and style, as little as possible compared with the same prompt without \
+it. V1 is the paper's model. Its authors still recommend it over V1.1 on the SDXL-Lightning 4-step base model.\n\n\
+sd-webui-controlnet loads only huchenlei's fp16 conversion, listed among this record's files, with the PuLID \
+preprocessor and the sd-webui-controlnet-evaclip extension. The original pulid_v1.bin keeps PuLID's own weight \
+names, which neither WebUI extension reads. huchenlei found PuLID needs a stronger style prompt than InstantID."""
+how_it_works = """\
+Like FaceID Plus, it reads an InsightFace identity embedding and CLIP features of the face, here from EVA-CLIP on \
+a face cut out from its background. These become tokens for extra cross-attention weights in SDXL. In training, a \
+fast Lightning branch generates the image with and without the identity, and a contrastive alignment loss keeps \
+the two alike apart from the face, while an identity loss checks the face against the photo."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +21,35 @@ trainer = "guozinan (ByteDance)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/guozinan/PuLID"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Changes the rest of the image little when the identity is added, per its paper",
+    "Works on SDXL-Lightning 4-step models",
+]
+weaknesses = [
+    "Needs a separate extension for EVA-CLIP in sd-webui-controlnet",
+    "Needs a stronger style prompt than InstantID, per huchenlei",
+]
+good_for = [
+    "putting a person into a generation without changing its style or layout",
+]
 
-sources = ["hf_guozinan_pulid", "hf_huchenlei_ipadapter_pulid"]
-research_status = "stub"
-open_questions = ["Confirm which PuLID release huchenlei/ipadapter_pulid converted."]
+sources = [
+    "hf_guozinan_pulid",
+    "gh_pulid",
+    "paper_pulid",
+    "hf_huchenlei_ipadapter_pulid",
+    "sdwebui_cn_pulid_discussion",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_evaclip",
+    "forge_ipadapter",
+]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "pulid_v1.bin"
 format = "bin"
+precision = "fp32"
 size_bytes = 1582858505
 sha256 = "245d05d8f11cd030d52562282332f912a2d5001b111873a40214163f33ab3f5d"
 webui_hash = "36efcfb9"
@@ -35,4 +63,4 @@ size_bytes = 791372856
 sha256 = "b258a5cd2c0c7d35f4d3e59909d7648498686afae4d0c74917e9c47d7704fbf5"
 webui_hash = "d86d05ea"
 source_url = "https://huggingface.co/huchenlei/ipadapter_pulid/resolve/810eab2a6746efb73ed7f2502bf46b1c453d5cf1/ip-adapter_pulid_sdxl_fp16.safetensors"
-variant = "sd-webui-controlnet conversion"
+variant = "huchenlei's fp16 conversion with IP-Adapter weight names, the copy sd-webui-controlnet loads"

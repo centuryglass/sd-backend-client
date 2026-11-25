@@ -1,22 +1,54 @@
 id = "facexlib"
 label = "FaceXLib Face Alignment"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Crops, aligns and masks a face, grayscale on white: the face-cutting step inside PuLID, also selectable alone to preview it."
+description = """\
+FaceXLib Face Alignment is one step of the PuLID preprocessor. It finds the face nearest the center, aligns it to \
+a 512-pixel square, turns it grayscale and paints the background white. PuLID runs it automatically, so an artist \
+never needs to pick it.\n\n\
+sd-webui-controlnet registers it with no control type tag, so it appears only under the All type. Selected there, \
+it produces that masked face as an image, which is useful to check what PuLID will see. Its output doesn't drive \
+any model on its own: the PuLID models need the full ip-adapter_pulid preprocessor. It fails when no face is \
+found."""
+how_it_works = """\
+facexlib is a face-processing toolkit. Its RetinaFace detector finds the face and five landmarks, which set a \
+warp that straightens and centers the face in a 512 by 512 crop. Its BiSeNet face parser then labels each pixel; \
+pixels labeled as background become white, and the face is converted to grayscale."""
 control_types = ["ip_adapter"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
-models = ["pulid_v1_sdxl", "pulid_v1_1_sdxl"]
+effect = "Outputs the aligned face as a 512 by 512 grayscale image on a white background."
+output = "Grayscale aligned face crop, background white."
+best_input = "A photo with one clear face near the center."
+weak_input = "Images where RetinaFace finds no face, which fail."
+models = ["pulid_v1_sdxl"]
 
-sources = ["recorded_fixtures", "sdwebui_cn_legacy_preprocessors", "sdwebui_cn_preprocessors"]
-research_status = "stub"
-open_questions = [
-    "sd-webui-controlnet registers facexlib with no tags, as a helper of ip-adapter_pulid. Confirm whether an artist ever selects it directly.",
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_pulid_discussion",
+    "gh_facexlib_releases",
+    "paper_pulid",
 ]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["facexlib"]
 forge = []
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "RetinaFace ResNet-50 and BiSeNet, about 160 MB of weights."
+speed = "fast: one detection and one parsing pass"
+
+[[hardware.files]]
+filename = "detection_Resnet50_Final.pth"
+size_bytes = 109497761
+source_url = "https://github.com/xinntao/facexlib/releases/download/v0.1.0/detection_Resnet50_Final.pth"
+variant = "RetinaFace detector"
+
+[[hardware.files]]
+filename = "parsing_bisenet.pth"
+size_bytes = 53289463
+source_url = "https://github.com/xinntao/facexlib/releases/download/v0.2.0/parsing_bisenet.pth"
+variant = "BiSeNet face parser"

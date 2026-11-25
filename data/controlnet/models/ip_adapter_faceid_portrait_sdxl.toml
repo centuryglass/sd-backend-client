@@ -1,8 +1,15 @@
 id = "ip_adapter_faceid_portrait_sdxl"
 label = "IP-Adapter FaceID Portrait SDXL"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SDXL FaceID Portrait adapter: identity from one or more face photos, style from the prompt, no LoRA."
+description = """\
+IP-Adapter FaceID Portrait SDXL is the SDXL version of the Portrait adapter, uploaded in March 2024. \
+ComfyUI_IPAdapter_plus describes it as SDXL text-prompt style transfer: the identity comes from the face photos \
+and the style from the prompt. It needs no LoRA, takes several photos and pairs with the IP-Adapter FaceID \
+preprocessor."""
+how_it_works = """\
+It reads only InsightFace's 512-number identity embedding, projected into 16 image prompt tokens for the U-Net's \
+added cross-attention weights. It accepts several reference photos, which h94 says improves likeness. There is no \
+LoRA and no ControlNet."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +18,34 @@ trainer = "h94 (Tencent AI Lab)"
 license = ""
 homepage = "https://huggingface.co/h94/IP-Adapter-FaceID"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "No LoRA needed",
+    "Uses several reference photos together",
+]
+weaknesses = [
+    "Research use only: h94 releases the FaceID models for non-commercial use, as InsightFace's models are",
+]
+good_for = [
+    "portraits from several photos of one person",
+    "restyling a portrait through the prompt",
+]
 
-sources = ["hf_h94_ip_adapter_faceid"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter_faceid",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_faceid_discussion",
+    "comfyui_ipadapter_plus_readme",
+    "reforge_ipadapter_lib",
+    "paper_arcface",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter-faceid-portrait_sdxl.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 749822515
 sha256 = "5631ce7824cdafd2db37c5e85b985730a95ff59c5b4fc80c2b79b0bee5711512"
 webui_hash = "8c9efc20"

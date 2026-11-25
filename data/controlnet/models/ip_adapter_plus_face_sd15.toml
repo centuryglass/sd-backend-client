@@ -1,8 +1,17 @@
 id = "ip_adapter_plus_face_sd15"
 label = "IP-Adapter Plus Face SD1.5"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "IP-Adapter Plus trained on cropped faces, to carry a face from the reference image into the result."
+description = """\
+IP-Adapter Plus Face SD1.5 is the Plus model trained with cropped face images as the condition. Give it a \
+reference cropped to the face and it carries that face, its features and look, into the generation, while the \
+prompt sets the rest. It pairs with the CLIP-ViT-H preprocessor.\n\n\
+It reads CLIP image features, not a face recognition embedding, so it keeps how the face looks more than who it \
+is; the FaceID models target identity."""
+how_it_works = """\
+Plus models read the features of every image patch from the CLIP ViT-H encoder's second-to-last layer instead of \
+its single summary vector. A small transformer called a resampler condenses those patches into 16 tokens, which \
+the U-Net's added cross-attention weights attend to alongside the text. Patch features keep more of the \
+reference's detail than one vector does."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +20,31 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "No InsightFace install needed, unlike FaceID",
+]
+weaknesses = [
+    "Expects a cropped face as the reference",
+]
+good_for = [
+    "portraits that resemble a reference face",
+]
 
-sources = ["hf_h94_ip_adapter", "recorded_fixtures"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+    "recorded_fixtures",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter-plus-face_sd15.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 98183288
 sha256 = "1c9edc21af6f737dc1d6e0e734190e976cfacf802d6b024b77aa3be922f7569b"
 webui_hash = "7f7a633a"
@@ -30,6 +53,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter-plus-face_sd15.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 98183381
 sha256 = "aa09c22b49ef63474dcde12f26a35b8b8e9b755b716a553aa29e8dbe8d21e0c9"
 webui_hash = "71693645"

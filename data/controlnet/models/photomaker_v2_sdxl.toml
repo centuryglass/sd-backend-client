@@ -1,22 +1,46 @@
 id = "photomaker_v2_sdxl"
 label = "PhotoMaker V2"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "PhotoMaker V2 for SDXL: better likeness than V1 from an added face recognition encoder; reForge and ComfyUI core can't load it."
+description = """\
+PhotoMaker V2 is TencentARC's update to PhotoMaker, with better likeness, especially from a single photo and for \
+Asian faces, from new training, more portrait data and a stronger ID encoder. TencentARC shows it working with \
+ControlNet, T2I-Adapter and IP-Adapter, and alongside IP-Adapter FaceID or InstantID for more likeness.\n\n\
+Neither reForge's PhotoMaker unit nor ComfyUI's core PhotoMakerLoader can load it: both build the V1 encoder, and \
+V2's file adds weights V1 doesn't have. Because V2 relies on InsightFace, TencentARC says its use must also \
+follow InsightFace's license."""
+how_it_works = """\
+V2 keeps V1's design, a fine-tuned CLIP image encoder whose output is fused into the class word's token, plus a \
+rank-64 U-Net LoRA. It adds an InsightFace face recognition embedding of each photo, which a small transformer \
+module combines with the CLIP features before the fusion step."""
 base_models = ["sdxl"]
 adapter = "other"
 control_types = ["photomaker"]
-preprocessors = ["photomaker_clipvision"]
+preprocessors = []
 trainer = "TencentARC"
 license = "apache-2.0"
 homepage = "https://huggingface.co/TencentARC/PhotoMaker-V2"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Better likeness than V1, especially from one photo, per TencentARC",
+    "Combines with ControlNet, T2I-Adapter and IP-Adapter",
+]
+weaknesses = [
+    "Not loadable in reForge or ComfyUI's core nodes",
+    "Use must also follow InsightFace's license",
+]
+good_for = [
+    "new photos of a person",
+    "stylized portraits of a person",
+]
 
-sources = ["hf_tencentarc_photomaker_v2"]
-research_status = "stub"
+sources = [
+    "hf_tencentarc_photomaker_v2",
+    "paper_photomaker",
+    "gh_photomaker",
+    "reforge_photomaker",
+    "comfyui_photomaker_nodes",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

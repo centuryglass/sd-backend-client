@@ -1,20 +1,95 @@
 id = "ip_adapter_pulid"
 label = "PuLID"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Reads a face with InsightFace, masks it with facexlib and encodes it with EVA-CLIP, for the PuLID models; sd-webui-controlnet only."
+description = """\
+The PuLID preprocessor prepares a face photo for the PuLID model. It combines an InsightFace identity embedding \
+with EVA-CLIP features of the face alone, cut out from its background by facexlib. Its preview shows that cut-out \
+face in grayscale on white.\n\n\
+Only sd-webui-controlnet has it, and it needs the separate sd-webui-controlnet-evaclip extension installed. \
+Together facexlib and EVA-CLIP take about 2 to 3 GB of VRAM, by huchenlei's count, which matters on small cards. \
+The unit's PuLID mode switch, Fidelity or Extremely style, changes how the model mixes the face in."""
+how_it_works = """\
+Three networks run in turn. InsightFace's antelopev2 pack gives the face's identity embedding. facexlib's \
+RetinaFace finds and aligns the face to 512 pixels, and its BiSeNet face parser paints the background white, \
+keeping the face features in grayscale. EVA02-CLIP-L/14 at 336 pixels then encodes that cut-out, so the CLIP \
+features describe the face without the background or the colors of the photo. The model turns both into tokens."""
 control_types = ["ip_adapter"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
-models = ["pulid_v1_sdxl", "pulid_v1_1_sdxl"]
+effect = "Produces face embeddings for the model; the preview is the aligned face in grayscale on a white background."
+output = "An InsightFace antelopev2 embedding plus EVA02-CLIP-L/14 features of the masked face."
+best_input = "A clear photo of one face; only the face near the center is used."
+weak_input = "Images where facexlib finds no face, which fail."
+models = ["pulid_v1_sdxl"]
 
-sources = ["recorded_fixtures", "sdwebui_cn_legacy_preprocessors", "sdwebui_cn_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_legacy_processor",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_pulid_discussion",
+    "sdwebui_cn_evaclip",
+    "forge_preprocessors",
+    "reforge_preprocessors",
+    "forge_neo_ipadapter",
+    "paper_pulid",
+    "paper_eva_clip",
+    "hf_quansun_eva_clip",
+    "hf_diamonik_antelopev2",
+    "gh_facexlib_releases",
+]
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["ip-adapter_pulid"]
 forge = []
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "InsightFace antelopev2, facexlib and EVA02-CLIP-L/14-336; facexlib and EVA-CLIP take about 2 to 3 GB together."
+speed = "moderate: three networks in a row"
+
+[[hardware.files]]
+filename = "EVA02_CLIP_L_336_psz14_s6B.pt"
+size_bytes = 856461210
+sha256 = "84c3a17a228c567a155259b2245b0b59072bf7da510260a0a02ec54de6d50b05"
+source_url = "https://huggingface.co/QuanSun/EVA-CLIP/resolve/11afd202f2ae80869d6cef18b1ec775e79bd8d12/EVA02_CLIP_L_336_psz14_s6B.pt"
+variant = "downloaded by sd-webui-controlnet-evaclip"
+
+[[hardware.files]]
+filename = "glintr100.onnx"
+size_bytes = 260665334
+sha256 = "4ab1d6435d639628a6f3e5008dd4f929edf4c4124b1a7169e1048f9fef534cdf"
+source_url = "https://huggingface.co/DIAMONIK7777/antelopev2/resolve/ba0c3e10f4548361eb9a63265d87ce1140ab5a05/glintr100.onnx"
+variant = "antelopev2 recognition; see instant_id_face_embedding for the whole pack"
+
+[[hardware.files]]
+filename = "scrfd_10g_bnkps.onnx"
+size_bytes = 16923827
+sha256 = "5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91"
+source_url = "https://huggingface.co/DIAMONIK7777/antelopev2/resolve/ba0c3e10f4548361eb9a63265d87ce1140ab5a05/scrfd_10g_bnkps.onnx"
+variant = "antelopev2 detection"
+
+[[hardware.files]]
+filename = "detection_Resnet50_Final.pth"
+size_bytes = 109497761
+source_url = "https://github.com/xinntao/facexlib/releases/download/v0.1.0/detection_Resnet50_Final.pth"
+variant = "facexlib RetinaFace"
+
+[[hardware.files]]
+filename = "parsing_bisenet.pth"
+size_bytes = 53289463
+source_url = "https://github.com/xinntao/facexlib/releases/download/v0.2.0/parsing_bisenet.pth"
+variant = "facexlib BiSeNet"
+
+[[parameters]]
+id = "pulid_mode"
+label = "PuLID Mode"
+summary = "Fidelity keeps the face closer to the photo; Extremely style lets the prompt restyle it further."
+names = { webui = "pulid_mode" }
+type = "enum"
+default = "Fidelity"
+choices = ["Fidelity", "Extremely style"]
+effect = "Changes how many padding tokens the model's attention gets and how the face features are projected into the image."
+when_to_adjust = "Switch to Extremely style when a strong style prompt isn't taking hold. huchenlei found the two modes differ only slightly."

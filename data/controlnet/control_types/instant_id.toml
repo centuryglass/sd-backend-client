@@ -1,19 +1,56 @@
 id = "instant_id"
 label = "InstantID"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Keeps a person's identity from a single face photo while the prompt sets the style, using an IP-Adapter and a ControlNet together."
+description = """\
+InstantID generates new images of a person from one face photo, in whatever style or setting the prompt \
+describes, with no training. It needs two units, in order. The first is an IP-Adapter unit with the InstantID \
+adapter and the face embedding preprocessor. The second, right after it, is a ControlNet unit with the InstantID \
+ControlNet and the face keypoints preprocessor. The keypoints may come from a different photo, which sets the \
+face's position and angle.\n\n\
+It is SDXL only. sd-webui-controlnet recommends a CFG of about 4 to 5, lower than usual. The WebUI extensions \
+recognize the models by file name, so they must be renamed: see each model record."""
+how_it_works = """\
+InsightFace's antelopev2 face recognition model reads the photo, giving an identity embedding and five facial \
+keypoints: eyes, nose and mouth corners. The adapter turns the embedding into 16 image prompt tokens for the \
+U-Net, as IP-Adapter does. The ControlNet, which the paper calls IdentityNet, sees only the keypoint drawing, a \
+weak spatial cue. In place of the text prompt its cross-attention reads the identity tokens, a strong semantic \
+cue, so the ControlNet steers toward that face."""
 base_models = ["sdxl"]
-control_image = ""
+control_image = "A photo with a clear face for the adapter unit; a photo whose face position and angle to copy for the ControlNet unit."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "paper_instantid",
+    "hf_instantx_instantid",
+    "sdwebui_cn_instantid_discussion",
+    "sdwebui_cn_legacy_processor",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_script",
+    "reforge_ipadapter_lib",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Instant-ID"]
 forge = ["Instant-ID"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Put a person into a new style or scene"
+description = """\
+Give both units the same face photo and prompt for the style. If the likeness is weak, raise both unit weights; \
+if colors look oversaturated or the prompt is ignored, lower the adapter weight first, per InstantX's tips."""
+
+[[uses]]
+kind = "creative"
+title = "Copy a face onto another person's pose"
+description = """\
+Give the ControlNet unit a photo of someone else. Its keypoints set where the face sits and which way it turns, \
+while the adapter unit supplies who it is. sd-webui-controlnet's announcement shows this."""
 
 [choosing]
 guide = ""

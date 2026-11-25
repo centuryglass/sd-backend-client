@@ -1,27 +1,50 @@
 id = "pulid_v1_1_sdxl"
 label = "PuLID V1.1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "PuLID V1.1 for SDXL: better editability, naturalness and community model support than V1; no WebUI extension loads it."
+description = """\
+PuLID V1.1 is the October 2024 release of ByteDance's SDXL identity adapter. Its authors report stronger editing \
+of style, viewpoint, expression and lighting, better compatibility with community models such as Juggernaut-XL \
+and RealVisXL, more natural faces and slightly better likeness. They recommend V1 instead on the SDXL-Lightning \
+4-step model.\n\n\
+Neither WebUI ControlNet extension loads it. Its identity encoder differs from V1's, its weights keep PuLID's own \
+names, and sd-webui-controlnet's PuLID support covers only the converted V1 file. It runs in PuLID's own code."""
+how_it_works = """\
+Like V1, it reads an InsightFace identity embedding and EVA-CLIP features of the face and turns them into tokens \
+for extra cross-attention weights in SDXL. Its identity encoder is a different design from V1's, built around \
+learned query tokens."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
-preprocessors = ["ip_adapter_pulid", "facexlib"]
+preprocessors = []
 trainer = "guozinan (ByteDance)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/guozinan/PuLID"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Better editability and naturalness than V1, per its authors",
+]
+weaknesses = [
+    "Not loadable in any WebUI ControlNet extension",
+    "Worse than V1 on SDXL-Lightning 4-step, per its authors",
+]
+good_for = [
+    "putting a person into a generation with flexible style and expression",
+]
 
-sources = ["hf_guozinan_pulid"]
-research_status = "stub"
+sources = [
+    "hf_guozinan_pulid",
+    "gh_pulid",
+    "paper_pulid",
+    "sdwebui_cn_ipadapter",
+    "forge_ipadapter",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "pulid_v1.1.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 984405232
 sha256 = "4cb8ceec1078e0165399b88332ab3c5971619111b8e1730e6bae64144aabae41"
 webui_hash = "feebb26d"

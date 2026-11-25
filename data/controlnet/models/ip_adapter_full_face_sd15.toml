@@ -1,8 +1,14 @@
 id = "ip_adapter_full_face_sd15"
 label = "IP-Adapter Full Face SD1.5"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "An updated SD 1.5 face IP-Adapter that passes every CLIP patch of the face through, for a stronger face likeness."
+description = """\
+IP-Adapter Full Face SD1.5 is tencent-ailab's updated version of the face adapter, released in November 2023. It \
+takes a cropped face as reference, like Plus Face. ComfyUI_IPAdapter_plus describes it as a stronger face model, \
+not necessarily better. It pairs with the CLIP-ViT-H preprocessor."""
+how_it_works = """\
+Like Plus Face, it reads the patch features from the CLIP ViT-H encoder's second-to-last layer. In place of a \
+resampler that condenses them into 16 tokens, a small two-layer network maps each patch feature to a token \
+directly, so the U-Net's added cross-attention sees all of them."""
 base_models = ["sd15"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +17,31 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Stronger face influence than Plus Face",
+]
+weaknesses = [
+    "Stronger is not always better, per ComfyUI_IPAdapter_plus",
+]
+good_for = [
+    "portraits that resemble a reference face",
+]
 
-sources = ["hf_h94_ip_adapter"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+    "hf_h94_ip_adapter_commits",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter-full-face_sd15.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 43592352
 sha256 = "f4a17fb643bf876235a45a0e87a49da2855be6584b28ca04c62a97ab5ff1c6f3"
 webui_hash = "852b9843"
@@ -30,6 +50,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter-full-face_sd15.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 43592551
 sha256 = "47ec4644114f3bfe25b2fc830af6b0dd8dcad9a0371a238b9cc919465c60d1dc"
 webui_hash = "3459c5eb"

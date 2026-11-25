@@ -1,8 +1,17 @@
 id = "ip_adapter_sdxl"
 label = "IP-Adapter SDXL"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The original SDXL IP-Adapter, which reads the reference image with the large CLIP ViT-bigG encoder."
+description = """\
+IP-Adapter SDXL uses a reference image as part of the prompt for SDXL, from one CLIP embedding of the whole \
+image. It is the first SDXL release and the only SDXL adapter that uses the CLIP-ViT-bigG preprocessor. \
+tencent-ailab's later SDXL models switched to the smaller ViT-H encoder, finding no significant difference in \
+results.\n\n\
+lllyasviel's sd_control_collection mirrors it as ip-adapter_xl.pth, the same weights, and sd-webui-controlnet's \
+1.1.400 announcement demonstrates that copy."""
+how_it_works = """\
+The CLIP ViT-bigG image encoder reduces the reference to a single embedding, which a small projection turns into \
+four tokens. Each of SDXL's cross-attention layers gains extra key and value weights that attend to those tokens, \
+and the result is added to the text attention."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +20,34 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Works with any SDXL fine-tune and with other ControlNets",
+]
+weaknesses = [
+    "Needs the 3.7 GB bigG image encoder, where the vit-h models need the 2.5 GB ViT-H one",
+]
+good_for = [
+    "image variations",
+    "combining an image prompt with text",
+]
 
-sources = ["hf_h94_ip_adapter", "hf_lllyasviel_sd_control_collection", "recorded_fixtures"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+    "hf_lllyasviel_sd_control_collection",
+    "sdwebui_cn_1_1_400_discussion",
+    "recorded_fixtures",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter_sdxl.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 702585376
 sha256 = "ba1002529e783604c5f326d49f0122025392d1d20ac8d573b3eeb3e6dea4ebb6"
 webui_hash = "af81326a"
@@ -30,6 +56,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter_sdxl.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 702585097
 sha256 = "7525f2731e9e86d1368e0b68467615d55dda459691965bdd7d37fa3d7fd84c12"
 webui_hash = "d5d53548"
@@ -38,6 +65,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter_xl.pth"
 format = "pth"
+precision = "fp16"
 size_bytes = 702585021
 sha256 = "c2e9f1ed4ff231b9f78de8158d63ac4b031e599d26d524e9171ccb9c16305fc3"
 webui_hash = "4209e9f7"

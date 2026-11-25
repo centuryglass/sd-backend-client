@@ -1,8 +1,15 @@
 id = "ip_adapter_sdxl_vit_h"
 label = "IP-Adapter SDXL ViT-H"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "SDXL IP-Adapter that reads the reference with the smaller CLIP ViT-H encoder; otherwise like IP-Adapter SDXL."
+description = """\
+IP-Adapter SDXL ViT-H is the SDXL adapter retrained with the OpenCLIP ViT-H/14 image encoder. h94 describes it as \
+the same as ip-adapter_sdxl but using ViT-H; tencent-ailab found no significant difference in results and chose \
+the smaller encoder to save memory. It pairs with the CLIP-ViT-H preprocessor, the same one the SD 1.5 models \
+use."""
+how_it_works = """\
+The CLIP ViT-H image encoder reduces the reference to a single embedding, which a small projection turns into \
+four tokens. Each of SDXL's cross-attention layers gains extra key and value weights that attend to those tokens, \
+and the result is added to the text attention."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
 control_types = ["ip_adapter"]
@@ -11,17 +18,29 @@ trainer = "h94 (Tencent AI Lab)"
 license = "apache-2.0"
 homepage = "https://huggingface.co/h94/IP-Adapter"
 
-strengths = []
+strengths = [
+    "Uses the smaller ViT-H encoder, shared with the SD 1.5 models",
+]
 weaknesses = []
-good_for = []
+good_for = [
+    "image variations",
+    "combining an image prompt with text",
+]
 
-sources = ["hf_h94_ip_adapter"]
-research_status = "stub"
+sources = [
+    "hf_h94_ip_adapter",
+    "paper_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter_sdxl_vit-h.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 698391064
 sha256 = "ebf05d918348aec7abb02a5e9ecef77e0aaea6914a5c4ea13f50d45eb1681831"
 webui_hash = "68f9f08d"
@@ -30,6 +49,7 @@ source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd6060
 [[files]]
 filename = "ip-adapter_sdxl_vit-h.bin"
 format = "bin"
+precision = "fp16"
 size_bytes = 698390793
 sha256 = "6b382e2501d0ab3fe2e09312e561a59cd3f21262aff25373700e0cd62c635929"
 webui_hash = "75a08f84"

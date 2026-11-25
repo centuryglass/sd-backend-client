@@ -1,26 +1,67 @@
 id = "ip_adapter_clip_g"
 label = "IP-Adapter CLIP-ViT-bigG"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Encodes the reference image with OpenCLIP ViT-bigG/14 for the two IP-Adapter models trained on it: SDXL base and SD 1.5 ViT-G."
+description = """\
+CLIP-ViT-bigG reads an IP-Adapter reference image and passes its CLIP embedding, not an image, to the model. Only \
+two models use it: the original ip-adapter_sdxl and ip-adapter_sd15_vit-G. The other SDXL models, the ones with \
+vit-h in their names, use CLIP-ViT-H instead. sd-webui-controlnet lists it as ip-adapter_clip_g, with the older \
+module name ip-adapter_clip_sdxl; Forge, reForge and Forge Neo call it CLIP-ViT-bigG (IPAdapter).\n\n\
+Like CLIP-ViT-H, it center-crops the image to a square and, in sd-webui-controlnet, accepts a mask. The encoder \
+is about 3.7 GB and downloads on first use. tencent-ailab found no significant difference from ViT-H in its SDXL \
+tests and switched to the smaller encoder."""
+how_it_works = """\
+CLIP is a pair of networks trained so that matching images and captions land close together, which makes its \
+image features a summary of what an image shows and how it looks. The preprocessor resizes the image so its \
+shorter side is 224 pixels, crops the center square and runs LAION's OpenCLIP ViT-bigG/14 image encoder. The two \
+models it serves take its single image embedding."""
 control_types = ["ip_adapter"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Produces image features rather than a picture; nothing visible to preview."
+output = "OpenCLIP ViT-bigG/14 image embedding."
+best_input = "An image whose subject sits in the center, or a square crop."
+weak_input = "Wide or tall images with the subject near an edge, which the center crop cuts off."
 models = ["ip_adapter_sd15_vit_g", "ip_adapter_sdxl"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_legacy_processor",
+    "sdwebui_cn_annotators",
     "sdwebui_cn_preprocessors",
-    "forge_preprocessors",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_ipadapter_discussion",
+    "forge_ipadapter",
     "reforge_preprocessors",
+    "forge_neo_ipadapter",
+    "hf_h94_ip_adapter",
+    "gh_tencent_ailab_ip_adapter",
+    "comfyui_ipadapter_plus_readme",
+    "hf_lllyasviel_annotators",
+    "paper_clip",
+    "paper_openclip_scaling",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["ip-adapter_clip_sdxl", "ip-adapter_clip_g"]
 forge = ["CLIP-ViT-bigG (IPAdapter)", "ip-adapter_clip_sdxl_variant"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "OpenCLIP ViT-bigG/14 image encoder, about 1.8 billion parameters and 3.7 GB on disk."
+speed = "moderate: one pass of a large CLIP image encoder"
+
+[[hardware.files]]
+filename = "clip_g.pth"
+size_bytes = 3690100964
+sha256 = "4364a1bb2bde19b3b212a7e2ad44381915a26f9efd26e9acef084a4d606cf37e"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/clip_g.pth"
+variant = "sd-webui-controlnet"
+
+[[hardware.files]]
+filename = "model.safetensors"
+size_bytes = 3689912664
+sha256 = "657723e09f46a7c3957df651601029f66b1748afb12b419816330f16ed45d64d"
+source_url = "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/sdxl_models/image_encoder/model.safetensors"
+variant = "Forge, reForge and Forge Neo, saved as CLIP-ViT-bigG.safetensors"

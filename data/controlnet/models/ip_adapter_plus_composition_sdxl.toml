@@ -1,0 +1,48 @@
+id = "ip_adapter_plus_composition_sdxl"
+label = "IP Composition Adapter SDXL"
+summary = "SDXL version of the IP Composition Adapter: carries a reference's pose and layout while mostly ignoring its style and content."
+description = """\
+The SDXL IP Composition Adapter carries the general composition of a reference image into the result while mostly \
+ignoring its style and content, like its SD 1.5 sibling. It is used like a Plus model, with the CLIP-ViT-H \
+preprocessor. ostris suggests lowering CFG to about 3, especially for this SDXL version.\n\n\
+sd-webui-controlnet recognizes it only when renamed to ip-adapter_plus_composition_sdxl.safetensors."""
+how_it_works = """\
+It has the Plus architecture: a resampler condenses the CLIP ViT-H patch features of the reference into 16 tokens \
+that SDXL's added cross-attention weights attend to. ostris trained those weights so that the tokens carry the \
+arrangement of the scene rather than its look."""
+base_models = ["sdxl"]
+adapter = "ip_adapter"
+control_types = ["ip_adapter"]
+preprocessors = ["ip_adapter_clip_h"]
+trainer = "ostris"
+license = "apache-2.0"
+homepage = "https://huggingface.co/ostris/ip-composition-adapter"
+
+strengths = [
+    "Looser than a ControlNet: follows layout and pose without copying shapes",
+]
+weaknesses = [
+    "Needs a low CFG, about 3, per its card",
+]
+good_for = [
+    "reusing a pose or layout with a new subject and style",
+]
+
+sources = [
+    "hf_ostris_ip_composition_adapter",
+    "sdwebui_cn_ipadapter_composition_discussion",
+    "sdwebui_cn_ipadapter",
+    "comfyui_ipadapter_plus_readme",
+]
+research_status = "verified"
+open_questions = []
+
+[[files]]
+filename = "ip_plus_composition_sdxl.safetensors"
+also_seen_as = ["ip-adapter_plus_composition_sdxl.safetensors"]
+format = "safetensors"
+precision = "fp16"
+size_bytes = 847517960
+sha256 = "e92dc36cc273bac3200b2e41807ebdc174076185d95a45238558d4c236b6da74"
+webui_hash = "7af1e3cf"
+source_url = "https://huggingface.co/ostris/ip-composition-adapter/resolve/0d2ed55c441a20c20e09da4dc086097703f26b61/ip_plus_composition_sdxl.safetensors"

@@ -1,25 +1,58 @@
 id = "instant_id_face_keypoints"
 label = "InstantID Face Keypoints"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Draws five facial keypoints, eyes, nose and mouth corners, as colored dots on black for the InstantID ControlNet."
+description = """\
+InstantID Face Keypoints finds the largest face in the photo and draws where its eyes, nose tip and mouth corners \
+are, as colored dots joined by lines on a black image. That drawing is the control image for the InstantID \
+ControlNet, the second of InstantID's two units. It sets where the face sits and which way it turns, so it can \
+come from a different photo than the identity.\n\n\
+sd-webui-controlnet, Forge, reForge and Forge Neo list it as instant_id_face_keypoints; it shares the antelopev2 \
+model pack with InstantID Face Embedding. In sd-webui-controlnet, the image is resized to the unit's resolution \
+before detection."""
+how_it_works = """\
+InsightFace's antelopev2 detector returns five keypoints with each face it finds. The preprocessor keeps the \
+largest face and draws its keypoints as dots in fixed colors, red, green, blue, yellow and magenta, over lines at \
+60 percent brightness joining each eye and mouth corner to the nose. The ControlNet learned to read that pattern \
+as the face's position, size and angle."""
 control_types = ["instant_id"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Replaces the photo with five colored dots and four lines on black, showing only where the face's features are."
+output = "Five colored keypoints joined to the nose, on black."
+best_input = "A photo with one clear face whose position and angle should carry over."
+weak_input = "Images with no detectable face, which fail."
 models = ["instantid_controlnet_sdxl"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_legacy_processor",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_instantid_discussion",
     "forge_preprocessors",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "hf_diamonik_antelopev2",
+    "paper_instantid",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["instant_id_face_keypoints"]
 forge = ["instant_id_face_keypoints"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "InsightFace antelopev2, about 430 MB of ONNX weights, shared with InstantID Face Embedding."
+speed = "fast: one face detection pass"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size the photo is resized to before the face is detected and the keypoints drawn."
+names = { webui = "processor_res" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = "Sets the size of the keypoint drawing before it is fitted to the generation."
+when_to_adjust = "Rarely; Pixel Perfect matches it to the output size."

@@ -1,28 +1,54 @@
 id = "instantid_ip_adapter_sdxl"
 label = "InstantID IP-Adapter"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The adapter half of InstantID: turns a face embedding into tokens for SDXL and for the InstantID ControlNet."
+description = """\
+The InstantID IP-Adapter is the first of InstantID's two models. It reads the face embedding from the InstantID \
+Face Embedding preprocessor and must sit in the unit right before the InstantID ControlNet. InstantX's tips: \
+lower its weight first when colors look oversaturated or the text prompt is ignored.\n\n\
+sd-webui-controlnet recognizes it only when its file name contains instant_id, and its announcement says to \
+rename ip-adapter.bin to ip-adapter_instant_id_sdxl.bin. Forge and Forge Neo pass its face tokens to every \
+ControlNet unit in the generation, not only InstantID's."""
+how_it_works = """\
+A resampler, a small transformer with 16 learned query tokens, turns InsightFace's 512-number antelopev2 \
+embedding into 16 tokens. SDXL's cross-attention layers gain extra weights that attend to them, as in IP-Adapter. \
+The same tokens replace the text prompt in the InstantID ControlNet's cross-attention."""
 base_models = ["sdxl"]
 adapter = "ip_adapter"
-control_types = ["instant_id"]
+control_types = ["ip_adapter"]
 preprocessors = ["instant_id_face_embedding"]
 trainer = "InstantX"
 license = "apache-2.0"
 homepage = "https://huggingface.co/InstantX/InstantID"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Identity from a single photo, with no training",
+]
+weaknesses = [
+    "Works only together with the InstantID ControlNet unit",
+    "Must be renamed for sd-webui-controlnet",
+]
+good_for = [
+    "putting a person into new styles and scenes",
+]
 
-sources = ["hf_instantx_instantid"]
-research_status = "stub"
+sources = [
+    "hf_instantx_instantid",
+    "paper_instantid",
+    "sdwebui_cn_instantid_discussion",
+    "sdwebui_cn_ipadapter",
+    "sdwebui_cn_script",
+    "forge_ipadapter",
+    "reforge_ipadapter_lib",
+    "forge_neo_ipadapter",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "ip-adapter.bin"
 also_seen_as = ["ip-adapter_instant_id_sdxl.bin"]
 format = "bin"
+precision = "fp32"
 size_bytes = 1691134141
 sha256 = "02b3618e36d803784166660520098089a81388e61a93ef8002aa79a5b1c546e1"
 webui_hash = "eb2d3ec0"
