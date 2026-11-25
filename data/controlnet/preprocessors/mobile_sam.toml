@@ -1,27 +1,69 @@
 id = "mobile_sam"
 label = "MobileSAM"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Splits an image into every object and region Segment Anything finds, each filled with a random color."
+description = """\
+MobileSAM finds every distinct object and region in an image, without naming them, and fills each one with a \
+random flat color. Large regions are drawn first and smaller ones on top. Areas no mask covers stay black.\n\n\
+Unlike the OneFormer and UniFormer preprocessors, the colors carry no class: a sky and a wall can get any \
+color. sd-webui-controlnet seeds them from the generation seed, so a run repeats with the same seed. The SD 1.5 \
+segmentation ControlNets learned fixed class colors, and no model in this reference lists MobileSAM as a \
+preprocessor. sd-webui-controlnet files it under Segmentation, and ComfyUI under its other preprocessors."""
+how_it_works = """\
+Segment Anything (SAM) is a network trained on over a billion masks to cut out whatever object a \
+prompt points at. MobileSAM keeps SAM's pipeline and replaces its 632-million-parameter image encoder with a \
+5-million-parameter TinyViT, trained to imitate the original. Here it runs in automatic mode: it prompts \
+itself with a 32 by 32 grid of points across the image, keeps the masks it is confident in, and paints each \
+one a random color."""
 control_types = ["segmentation"]
-effect = ""
-output = ""
+effect = "Replaces the image with flat regions in random colors, one per object or region found, with black where no mask falls."
+output = "Flat regions in random colors on black, with no class meaning."
 best_input = ""
 weak_input = ""
 models = []
 
 sources = [
     "recorded_fixtures",
-    "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_supported_preprocessor",
+    "sdwebui_cn_script",
+    "sdwebui_cn_annotators",
+    "gh_controlnet_aux_sam",
     "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "hf_dhkim2810_mobilesam",
+    "paper_sam",
+    "paper_mobile_sam",
+    "gh_mobile_sam_readme",
+    "cn11_readme",
 ]
-research_status = "stub"
-open_questions = [
-    "Confirm that comfyui_controlnet_aux SAMPreprocessor runs the same MobileSAM weights as the WebUI mobile_sam module.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["mobile_sam"]
 forge = []
 comfyui = ["SAMPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+vram = "5M-parameter image encoder per MobileSAM's README; the weights file is about 41 MB."
+
+[[hardware.files]]
+filename = "mobile_sam.pt"
+size_bytes = 40728226
+sha256 = "6dbb90523a35330fedd7f1d3dfc66f995213d81b29a5ca8108dbcdd4e37d6c2f"
+source_url = "https://huggingface.co/dhkim2810/MobileSAM/resolve/4e2e5245fe9dc63096d575d36e70eb39b03b3aba/mobile_sam.pt"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and segmented. The \
+returned map has that size. ComfyUI accepts up to 16384."""
+when_to_adjust = "Match it to the generation's short side to avoid rescaling the map later."

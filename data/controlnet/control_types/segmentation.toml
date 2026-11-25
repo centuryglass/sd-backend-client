@@ -1,19 +1,66 @@
 id = "segmentation"
 label = "Segmentation"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Keeps the layout of a scene as flat color regions, one color per kind of thing: sky, wall, tree, person, road."
+description = """\
+Segmentation keeps where each kind of thing sits in a scene. The control image divides the picture into flat \
+regions, and each region's color names a class: one color for sky, another for building, another for person. \
+The generated image puts those things in those places, while their look, lighting and style come from the \
+prompt.\n\n\
+Colors are fixed per class, so a map has to use the palette its model was trained on. The SD 1.5 ControlNets \
+read the 150-class ADE20K palette, and ControlNet 1.1 also reads COCO colors. Because each region is a class \
+rather than an outline, a map can be painted by hand in flat colors."""
+how_it_works = """\
+A semantic segmentation network labels every pixel of a photo with one class from a fixed list, such as the \
+150 classes of the ADE20K scene dataset. The preprocessor paints each class in its palette color. A \
+segmentation model is trained on pairs of images and their class maps, with a caption for each, and learns \
+which color means which kind of thing. During generation it reads the map at every denoising step and steers \
+each region toward its class. ControlNet 1.1's README notes that telling the ADE20K and COCO palettes apart \
+is easy for the model."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Flat color regions, one fixed palette color per class: the ADE20K palette, or COCO's for models trained on it."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet_v1",
+    "paper_t2i_adapter",
+    "paper_ade20k",
+    "paper_coco_stuff",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_readme",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["Segmentation"]
 forge = ["Segmentation"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Restyle a scene and keep its layout"
+description = """\
+Run a segmentation preprocessor on a photo, then prompt for a different time, season or style. Sky, buildings, \
+road and people stay where they were, while their surfaces and details are redrawn."""
+
+[[uses]]
+kind = "standard"
+title = "Swap what fills a region"
+description = """\
+Since only classes are kept, not edges, the model is free to redraw everything inside a region. A street of \
+houses can become a street of different houses, with the same arrangement of road, sky and trees."""
+
+[[uses]]
+kind = "creative"
+title = "Paint a layout by hand"
+description = """\
+The ControlNet 1.0 README notes that the model deserves a UI for drawing segmentations directly, and the 1.1 \
+README accepts manually created masks. Paint flat regions in the palette's class colors and use the result \
+as the control image with no preprocessor."""
 
 [choosing]
 guide = ""
