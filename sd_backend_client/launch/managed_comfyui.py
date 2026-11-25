@@ -1,8 +1,8 @@
 """Starts, health-checks, streams output from and stops a ComfyUI install on disk.
 
 `ManagedComfyUI` runs the install with `subprocess` and owns only the process it started: it never stops or reports
-on a ComfyUI that something else started. Readiness means the server on the port reports this process's own
-arguments, so another ComfyUI already listening there never counts as ready.
+on a ComfyUI that something else started. `start` refuses a port where a ComfyUI already answers, and readiness means
+the server on the port reports this process's own arguments, so another ComfyUI on the port never counts as ready.
 """
 from __future__ import annotations
 
@@ -126,10 +126,10 @@ def _script_arguments(arguments: Sequence[str]) -> list[str]:
 class ManagedComfyUI:
     """One ComfyUI install on disk, run as a child process serving on `host` and `port`.
 
-    `start` launches the process in the `STARTING` state, and `wait_until_ready` blocks until it serves, moving it to
-    `READY`. `stop` ends it. A process that exits without `stop` moves to `EXITED` or `CRASHED`. Only the process this
-    instance started is ever stopped. Destroying a running instance leaves its process running, so the owner calls
-    `stop` before quitting.
+    `start` launches the process in the `STARTING` state, unless a ComfyUI already answers on the port, and
+    `wait_until_ready` blocks until it serves, moving it to `READY`. `stop` ends it. A process that exits without
+    `stop` moves to `EXITED` or `CRASHED`. Only the process this instance started is ever stopped. Destroying a
+    running instance leaves its process running, so the owner calls `stop` before quitting.
 
     Callbacks run on the thread that caused the change, and must not block:
 
@@ -245,17 +245,23 @@ class ManagedComfyUI:
     def start(self) -> None:
         """Launch the process in the `STARTING` state and return without waiting for it to serve.
 
-        An instance whose process ended can start again.
+        Runs one health check first, which blocks for up to a few seconds. An instance whose process ended can start
+        again.
 
         Raises
         ------
         RuntimeError
             If this instance's process is already running.
         BackendLaunchError
-            If the process could not be launched, such as when the interpreter is missing. The state is `CRASHED`.
+            If a ComfyUI already answers at `url`, with no process launched and the state unchanged. Or if the process
+            could not be launched, such as when the interpreter is missing, with the state `CRASHED`.
         """
         if self.is_running:
             raise RuntimeError(f'ComfyUI at {self.url} is already running')
+        # A ComfyUI started with the same arguments would pass `wait_until_ready` as this process.
+        if self._health_check(self.url) is not None:
+            raise BackendLaunchError(f'A ComfyUI server is already running at {self.url}. Connect to it, stop it, or '
+                                     'start this one on another port.', None, [])
         # The last reader thread has set an exit state, so it is finishing and the join is short:
         self._join_reader()
         with self._lock:

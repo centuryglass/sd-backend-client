@@ -22,7 +22,7 @@ from PIL import Image
 import sd_backend_client
 from sd_backend_client import A1111Webservice, Backend, BackendKind, ComfyUiWebservice, DetectedInstall, \
     DetectedServer, DetectionResult, Finding, FindingCode, GenerationHandle, GenerationProgress, GenerationResult, \
-    GenerationStatus, InstallOwner, ManagedComfyUI, PreprocessorParams
+    GenerationStatus, InstallOwner, ManagedComfyUI, ManagedState, PreprocessorParams
 
 from .fake_process import FakeProcessFactory
 from .recorded_replay import recordings, replay
@@ -106,14 +106,17 @@ def _offline_backend(recording: dict[str, Any]) -> Backend:
 
 
 def _offline_managed_comfyui(backend: Backend) -> type[ManagedComfyUI]:
-    """A `ManagedComfyUI` that runs a fake process, is ready on its first health check and connects to `backend`."""
+    """A `ManagedComfyUI` that runs a fake process, is ready once started and connects to `backend`."""
 
     class OfflineManagedComfyUI(ManagedComfyUI):
         """Runs a fake process instead of the install, and connects to the recording's client."""
 
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             super().__init__(*args, process_factory=FakeProcessFactory(),
-                             health_check=lambda _url: self.command[1:], **kwargs)
+                             health_check=self._answer, **kwargs)
+
+        def _answer(self, _url: str) -> Optional[list[str]]:
+            return self.command[1:] if self.state == ManagedState.STARTING else None
 
         def connect(self, **kwargs: Any) -> Any:
             return backend

@@ -21,14 +21,15 @@ EXIT_STATES = (ManagedState.STOPPED, ManagedState.EXITED, ManagedState.CRASHED)
 class Harness:
     """A `ManagedComfyUI` with fakes, recording its log lines and states.
 
-    `answers` holds what each health check returns, in order; an empty queue answers `None`. Each sleep advances the
-    fake clock by its interval.
+    `answers` holds what each health check while `STARTING` returns, in order; an empty queue answers `None`. The
+    check `start` runs before launching returns `occupant`. Each sleep advances the fake clock by its interval.
     """
 
     def __init__(self, launch_command: Optional[list[str]] = None, ignores_terminate: bool = False,
                  launch_error: Optional[OSError] = None) -> None:
         self.factory = FakeProcessFactory(ignores_terminate, launch_error)
         self.answers: list[Optional[list[str]] | Callable[[], Optional[list[str]]]] = []
+        self.occupant: Optional[list[str]] = None
         self.checked_urls: list[str] = []
         self.now = 0.0
         self.logs: list[str] = []
@@ -45,6 +46,8 @@ class Harness:
             self.exited.set()
 
     def _health_check(self, url: str) -> Optional[list[str]]:
+        if self.managed.state != ManagedState.STARTING:
+            return self.occupant
         self.checked_urls.append(url)
         if not self.answers:
             return None
@@ -72,6 +75,19 @@ def test_start_then_ready():
     assert harness.checked_urls == ['http://127.0.0.1:8189'] * 3
     assert harness.now == 2
     harness.managed.stop()
+
+
+@pytest.mark.parametrize('occupant', [SERVED_ARGV, ['/elsewhere/main.py']])
+def test_start_refuses_a_port_a_comfyui_serves(occupant: list[str]):
+    """A ComfyUI already on the port, even one with this instance's arguments, fails `start` without launching."""
+    harness = Harness()
+    harness.occupant = occupant
+    with pytest.raises(BackendLaunchError) as raised:
+        harness.managed.start()
+    assert raised.value.exit_code is None
+    assert not harness.factory.processes
+    assert harness.managed.state == ManagedState.STOPPED
+    assert not harness.states
 
 
 def test_start_sets_command_cwd_and_environment():
@@ -311,7 +327,7 @@ def test_default_wait_ends_early_on_exit():
     """Without an injected sleep, the wait between polls ends as soon as the process exits."""
     factory = FakeProcessFactory()
     managed = ManagedComfyUI(LAUNCH_COMMAND, '/sd', PORT, process_factory=factory,
-                             health_check=lambda _url: factory.last.exit(1))
+                             health_check=lambda _url: factory.last.exit(1) if factory.processes else None)
     managed.start()
     with pytest.raises(BackendLaunchError):
         managed.wait_until_ready(timeout=600, poll_interval=600)

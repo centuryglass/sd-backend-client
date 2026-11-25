@@ -14,7 +14,6 @@ parser.add_argument('--listen', default='127.0.0.1')
 parser.add_argument('--port', type=int, default=8188)
 parser.add_argument('--crash', action='store_true')
 parser.add_argument('--ignore-term', action='store_true')
-parser.add_argument('--lowvram-stub', action='store_true')
 args = parser.parse_args()
 
 print('\x1b[32m[INFO]\x1b[0m Starting stub server', flush=True)

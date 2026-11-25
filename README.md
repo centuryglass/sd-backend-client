@@ -243,8 +243,9 @@ comfyui.stop()
 ```
 
 `ManagedComfyUI` starts the install with `--listen` and `--port` set, and counts it as ready only when the server on
-that port reports its own arguments, so a ComfyUI something else started there never counts. It raises
-`BackendLaunchError`, with the exit code and last output lines, if the process exits first. `on_log` and `on_state`
+that port reports its own arguments. `start` raises `BackendLaunchError` if a ComfyUI already answers on the port, so
+check `detect().servers` or pick a free port first. `wait_until_ready` raises it, with the exit code and last output
+lines, if the process exits before serving. `on_log` and `on_state`
 run on a reader thread, so a GUI app hands them over to its own thread. `stop` only ever ends the process this
 instance started.
 

@@ -115,7 +115,8 @@ class GenerationError(SDBackendError):
 class BackendLaunchError(SDBackendError):
     """A backend process this package started exited, or failed to launch, before it served.
 
-    The last output lines usually say why, such as a missing dependency or a port already in use.
+    Also raised without launching when a server of that backend already answers on the port. Otherwise the last output
+    lines usually say why, such as a missing dependency or a port already in use.
 
     Attributes
     ----------
