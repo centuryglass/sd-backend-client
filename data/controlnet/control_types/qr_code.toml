@@ -1,26 +1,82 @@
 id = "qr_code"
 label = "QR Code and Illusion"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Hides a QR code, text or shape in a generated image by steering its light and dark areas, so the code still scans."
+description = """\
+QR models turn a black-and-white QR code into artwork that a phone can still scan. The prompt decides what the \
+image shows, and the code's pattern decides where it is light or dark. The same models hide text, symbols or \
+shapes in a scene, and the SDXL QR Code Monster card says illusions work too.\n\n\
+No backend has a QR type: the models appear under All, and need no preprocessor. Control weight trades \
+scannability against creativity, and the step range where control applies changes how far the image can drift. \
+QR Code Monster V2 and SDXL treat mid-gray (#808080) as background that the code blends into. The ioclab \
+Brightness and Illumination models also follow a brightness map, and QR guides pair Brightness with a QR model."""
+how_it_works = """\
+A QR ControlNet is trained to read a high-contrast black-and-white image and keep its dark and light areas in \
+the result, while the prompt and checkpoint decide what those areas show. QR Pattern V2, for example, was \
+conditioned only on the quarter of pixels closest to black and the quarter closest to white. When the tones \
+follow the code closely enough, a scanner still reads it. A higher control weight holds the pattern harder and \
+a lower one leaves the prompt more room."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "A black-and-white QR code, text or shape, optionally on a mid-gray (#808080) background."
 
-sources = ["recorded_fixtures"]
-research_status = "stub"
-open_questions = [
-    "No backend presents this type; QR and illusion models land under \"All\". Keep it as a reference-only grouping, or fold the models into Tile or Recolor?",
+sources = [
+    "recorded_fixtures",
+    "hf_monster_labs_control_v1p_sd15_qrcode_monster",
+    "hf_monster_labs_control_v1p_sdxl_qrcode_monster",
+    "hf_diontimmer_controlnet_qrcode_control_v1p_sd15",
+    "hf_nacholmo_controlnet_qr_pattern_v2",
+    "hf_latentcat_control_v1p_sd15_brightness",
+    "ioclab_illumination_guide",
+    "sdwebui_cn_global_state",
+    "antfu_ai_qrcode_101",
 ]
+research_status = "drafted"
+open_questions = []
 
 [names]
 webui = []
 forge = []
 comfyui = []
 
+[[uses]]
+kind = "standard"
+title = "Make a scannable artistic QR code"
+description = """\
+Use a QR code with high error correction (level H) and 16-pixel modules as the control image, with no \
+preprocessor. Raise the control weight until the code scans, lower it for a more creative image, and generate \
+several to pick from. The QR Code Monster card gives this advice, and DionTimmer's card also recommends level H."""
+
+[[uses]]
+kind = "standard"
+title = "Rescue a code that doesn't scan"
+description = """\
+Send the image to img2img with the same QR code as control image. The QR Code Monster card's workflow: max out \
+the control weight, set denoising low, then raise denoising until the code scans."""
+
+[[uses]]
+kind = "standard"
+title = "Keep the composition with a second model"
+description = """\
+The QR Code 101 guide adds ioclab Brightness as a second unit at low weight, around 0.15 to 0.25, so QR Code \
+Monster can stay at weight 1 and the composition changes less."""
+
+[[uses]]
+kind = "creative"
+title = "Hide text or a shape in a scene"
+description = """\
+Use white text, a logo or any high-contrast shape as the control image. The result reads as an ordinary scene \
+up close and shows the shape when viewed small or from a distance."""
+
+[[uses]]
+kind = "creative"
+title = "Make only part of the code strict"
+description = """\
+Gray areas leave the content free in QR Code Monster and QR Pattern V2. The QR Code 101 guide runs two units: \
+the full code at medium weight, and only its position markers and format areas at high weight for fewer steps."""
+
 [choosing]
 guide = ""
 # Unordered until a follow-up session ranks them.
-preprocessors = []
+preprocessors = ["invert"]
 models = [
     "qrcode_monster_sd15",
     "qrcode_monster_v2_sd15",

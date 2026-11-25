@@ -16,7 +16,13 @@ effect = "Keeps contours and main interior lines with varying weight; drops colo
 output = "Black image with white lines of varying weight."
 best_input = "Photos and realistic renders."
 weak_input = ""
-models = ["control_v11p_sd15_lineart", "t2i_adapter_lineart_sdxl", "xinsir_scribble_sdxl"]
+models = [
+    "control_v11p_sd15_lineart",
+    "t2i_adapter_lineart_sdxl",
+    "xinsir_scribble_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+]
 
 sources = [
     "cn11_readme",

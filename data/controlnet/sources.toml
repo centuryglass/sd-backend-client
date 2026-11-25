@@ -1380,3 +1380,84 @@ title = "SDXL: Improving Latent Diffusion Models for High-Resolution Image Synth
 url = "https://arxiv.org/abs/2307.01952"
 kind = "paper"
 accessed = "2026-11-25"
+
+[gh_xinsir_controlnetplus_readme]
+title = "xinsir6/ControlNetPlus README (ControlNet++ architecture and control type ids)"
+url = "https://github.com/xinsir6/ControlNetPlus/blob/b48420576eac63c04388cb65fb74513cbd17405a/README.md"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[gh_xinsir_controlnetplus_scripts]
+title = "xinsir6/ControlNetPlus inference scripts (per-type union examples and ProMax tile, inpainting and outpainting)"
+url = "https://github.com/xinsir6/ControlNetPlus/tree/b48420576eac63c04388cb65fb74513cbd17405a"
+kind = "repo_code"
+accessed = "2026-11-25"
+
+[sdwebui_cn_union]
+title = "sd-webui-controlnet union model support (type enum, UI wiring and API field)"
+url = "https://github.com/Mikubill/sd-webui-controlnet/blob/56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81/scripts/enums.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-controlnet"
+commit = "56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81"
+path = "scripts/enums.py, scripts/controlnet.py, scripts/cldm.py, scripts/controlnet_ui/controlnet_ui_group.py, internal_controlnet/args.py"
+
+[forge_controlnet_loader]
+title = "Forge ControlNet model loader"
+url = "https://github.com/lllyasviel/stable-diffusion-webui-forge/blob/dfdcbab685e57677014f05a3309b48cc87383167/modules_forge/supported_controlnet.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "stable-diffusion-webui-forge"
+commit = "dfdcbab685e57677014f05a3309b48cc87383167"
+path = "modules_forge/supported_controlnet.py"
+
+[reforge_union]
+title = "reForge union model support (loader, network and unused UI field)"
+url = "https://github.com/Panchovix/stable-diffusion-webui-reForge/blob/739b2e1d9ab63160eaff9c8f73172c8da68424e1/ldm_patched/controlnet/cldm.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "stable-diffusion-webui-reForge"
+commit = "739b2e1d9ab63160eaff9c8f73172c8da68424e1"
+path = "ldm_patched/controlnet/cldm.py, ldm_patched/modules/controlnet.py, extensions-builtin/sd_forge_controlnet/lib_controlnet/controlnet_ui/controlnet_ui_group.py"
+
+[forge_neo_union]
+title = "Forge Neo union model support (type mapping and model filter)"
+url = "https://github.com/Haoming02/sd-webui-forge-classic/blob/46af880c003d31846bbea984ce00fc7be247ce5b/backend/nn/cnets/control_types.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-forge-classic (Forge Neo)"
+commit = "46af880c003d31846bbea984ce00fc7be247ce5b"
+path = "backend/nn/cnets/control_types.py, backend/nn/cnets/cldm.py, extensions-builtin/sd_forge_controlnet/scripts/controlnet.py, extensions-builtin/sd_forge_controlnet/lib_controlnet/global_state.py"
+
+[comfyui_union_node]
+title = "ComfyUI core SetUnionControlNetType node and union type table"
+url = "https://github.com/comfyanonymous/ComfyUI/blob/46493d824fd7eac25a741e505159e4c9e0ef0ebd/comfy_extras/nodes_controlnet.py"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "ComfyUI"
+commit = "46493d824fd7eac25a741e505159e4c9e0ef0ebd"
+path = "comfy_extras/nodes_controlnet.py, comfy/cldm/control_types.py, comfy/cldm/cldm.py"
+
+[hf_latentcat_control_v1u_sd15_illumination_webui]
+title = "latentcat/control_v1u_sd15_illumination_webui model card"
+url = "https://huggingface.co/latentcat/control_v1u_sd15_illumination_webui"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[ioclab_illumination_guide]
+title = "ioclab, Light Composition ControlNet usage guide and training notes (Chinese)"
+url = "https://aigc.ioclab.com/sd-showcase/light_controlnet.html"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[civitai_illumination]
+title = "Lighting based picture control controlnet (Civitai model page, posted by LatentCat)"
+url = "https://civitai.com/models/80536"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[antfu_ai_qrcode_101]
+title = "Anthony Fu et al., Stable Diffusion QR Code 101"
+url = "https://antfu.me/posts/ai-qrcode-101"
+kind = "tutorial"
+accessed = "2026-11-25"

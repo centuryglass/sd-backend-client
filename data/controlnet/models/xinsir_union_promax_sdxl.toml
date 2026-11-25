@@ -1,8 +1,21 @@
 id = "xinsir_union_promax_sdxl"
 label = "Xinsir SDXL Union ProMax"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "xinsir's all-in-one SDXL ControlNet with tile and repaint types added, for deblurring, upscaling, inpainting and outpainting."
+description = """\
+The ProMax version of xinsir's union ControlNet keeps its six control types and adds two: tile and repaint. Its \
+card shows tile deblurring, tile variations, super-resolution from one to nine megapixels, inpainting and \
+outpainting. Its example scripts blur and downscale the image for tile, and paint the masked area black for \
+repaint. ComfyUI's Inpaint Preprocessor with black_pixel_for_xinsir_cn and Inpaint NoobAI make that image. \
+sd-webui-controlnet's inpaint preprocessors fill it with -1. The outpainting script only extends straight edges.\n\n\
+Choosing the type works as for the union model: ComfyUI's Set Union ControlNet Type, or the unit's Control Type in \
+sd-webui-controlnet and Forge Neo. reForge never \
+passes it, and Forge loads the model without its union layers."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero. Like the union model, this one turns the control type into an embedding \
+added to the timestep embedding, and mixes control image features with a condition transformer, all through \
+one shared condition encoder. Its type embedding has eight slots, not six: the extra tile and repaint types let \
+it rebuild a degraded image or fill a blacked-out area."""
 base_models = ["sdxl"]
 adapter = "union"
 control_types = [
@@ -18,24 +31,63 @@ control_types = [
     "tile",
     "inpaint",
 ]
-preprocessors = []
+preprocessors = [
+    "openpose",
+    "depth_midas",
+    "depth_zoe",
+    "hed",
+    "pidinet",
+    "scribble_hed",
+    "teed",
+    "canny",
+    "lineart_realistic",
+    "lineart_anime",
+    "mlsd",
+    "normal_bae",
+    "mobile_sam",
+    "tile_resample",
+    "blur_gaussian",
+    "inpaint_noobai",
+]
 trainer = "xinsir"
 license = "apache-2.0"
 homepage = "https://huggingface.co/xinsir/controlnet-union-sdxl-1.0"
 
-strengths = []
-weaknesses = []
-good_for = []
-
-sources = ["hf_xinsir_controlnet_union_sdxl_1_0"]
-research_status = "stub"
-open_questions = [
-    "List the control types the ProMax model card names, and check them against control_types.",
+strengths = [
+    "One file covers eleven control types, tile and inpaint included",
+    "Its card shows inpainting, outpainting, deblurring and 9x super-resolution",
 ]
+weaknesses = [
+    "Its outpainting script extends only straight edges parallel to the image border",
+    "sd-webui-controlnet's inpaint preprocessors fill the mask with -1, not the black its scripts use",
+    "reForge runs it without a control type, and Forge without its union layers",
+]
+good_for = [
+    "replacing a set of SDXL ControlNets with one file",
+    "inpainting and outpainting",
+    "tiled upscaling and deblurring",
+]
+
+sources = [
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "comfyui_controlnet_aux_nodes",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "paper_controlnet",
+]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model_promax.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 2513342408
 sha256 = "9fae2e50cb431bfcbe05822b59ec2228df545ef27f711dea8949e9f4ed9f7cdc"
 webui_hash = "9460e4db"

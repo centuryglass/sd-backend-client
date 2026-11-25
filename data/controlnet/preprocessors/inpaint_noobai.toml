@@ -16,7 +16,7 @@ effect = "Paints the masked area solid black; the visible area is context for th
 output = "The source image with masked pixels set to black."
 best_input = "Images generated with NoobAI, Illustrious or other SDXL models, with a mask over the area to repaint."
 weak_input = ""
-models = ["noobai_inpaint_sdxl"]
+models = ["noobai_inpaint_sdxl", "xinsir_union_promax_sdxl"]
 
 sources = [
     "recorded_fixtures",

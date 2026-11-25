@@ -52,5 +52,4 @@ preprocessors = ["recolor_luminance", "recolor_intensity"]
 models = [
     "sai_control_lora_recolor_sdxl",
     "latentcat_brightness_sd15",
-    "latentcat_illumination_sd15",
 ]

@@ -6,8 +6,8 @@ MobileSAM finds every distinct object and region in an image, without naming the
 random flat color. Large regions are drawn first and smaller ones on top. Areas no mask covers stay black.\n\n\
 Unlike the OneFormer and UniFormer preprocessors, the colors carry no class: a sky and a wall can get any \
 color. sd-webui-controlnet seeds them from the generation seed, so a run repeats with the same seed. The SD 1.5 \
-segmentation ControlNets learned fixed class colors, and no model in this reference lists MobileSAM as a \
-preprocessor. sd-webui-controlnet files it under Segmentation, and ComfyUI under its other preprocessors."""
+segmentation ControlNets learned fixed class colors; xinsir's union models use MobileSAM maps in their \
+segmentation example. sd-webui-controlnet files it under Segmentation, and ComfyUI under its other preprocessors."""
 how_it_works = """\
 Segment Anything (SAM) is a network trained on over a billion masks to cut out whatever object a \
 prompt points at. MobileSAM keeps SAM's pipeline and replaces its 632-million-parameter image encoder with a \
@@ -19,10 +19,11 @@ effect = "Replaces the image with flat regions in random colors, one per object 
 output = "Flat regions in random colors on black, with no class meaning."
 best_input = ""
 weak_input = ""
-models = []
+models = ["xinsir_union_sdxl", "xinsir_union_promax_sdxl"]
 
 sources = [
     "recorded_fixtures",
+    "gh_xinsir_controlnetplus_scripts",
     "sdwebui_cn_preprocessors",
     "sdwebui_cn_supported_preprocessor",
     "sdwebui_cn_script",

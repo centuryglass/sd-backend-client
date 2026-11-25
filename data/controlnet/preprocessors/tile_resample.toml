@@ -25,6 +25,7 @@ models = [
     "control_v11u_sd15_tile",
     "ttplanet_tile_realistic_v1_sdxl",
     "ttplanet_tile_realistic_v2_sdxl",
+    "xinsir_union_promax_sdxl",
 ]
 
 sources = [

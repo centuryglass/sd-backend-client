@@ -32,6 +32,8 @@ models = [
     "sai_control_lora_canny_sdxl",
     "kohya_lllite_canny_sdxl",
     "kohya_lllite_canny_anime_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
 ]
 
 sources = [

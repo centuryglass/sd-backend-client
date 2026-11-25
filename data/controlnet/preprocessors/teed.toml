@@ -15,7 +15,12 @@ effect = "Keeps object edges as crisp graded lines in a few flat levels."
 output = "Black image with white edge lines."
 best_input = "Photos and renders."
 weak_input = ""
-models = ["sargezt_xl_softedge", "control_v11p_sd15_softedge"]
+models = [
+    "sargezt_xl_softedge",
+    "control_v11p_sd15_softedge",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+]
 
 sources = [
     "paper_teed",

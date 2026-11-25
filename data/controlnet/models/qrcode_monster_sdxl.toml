@@ -1,8 +1,19 @@
 id = "qrcode_monster_sdxl"
 label = "QR Code Monster SDXL"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "monster-labs' SDXL QR ControlNet: creative QR codes that still scan, and optical illusions."
+description = """\
+monster-labs' QR Code Monster for SDXL, version 1, made to generate creative QR codes that still scan. Its card \
+says illusions should work well too: hidden shapes, text or patterns in a scene. Not every result scans, so \
+generate several and pick.\n\n\
+Pass the QR code as the control image with 16-pixel modules and a high error correction level, on a gray \
+background so the code blends in. A higher control weight makes the code more readable, a lower one more \
+creative. Its card also gives an img2img rescue: control weight at maximum, denoising raised from low until the \
+code scans."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads a QR code or other high-contrast pattern and keeps its dark and light areas in the generated \
+image, while the prompt decides what the image shows."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["qr_code"]
@@ -11,17 +22,18 @@ trainer = "monster-labs"
 license = "openrail++"
 homepage = "https://huggingface.co/monster-labs/control_v1p_sdxl_qrcode_monster"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Handles optical illusions as well as QR codes, per its card"]
+weaknesses = ["Ships only as a full-precision 5 GB file"]
+good_for = ["artistic QR codes", "optical illusions", "hidden text and shapes"]
 
-sources = ["hf_monster_labs_control_v1p_sdxl_qrcode_monster"]
-research_status = "stub"
+sources = ["hf_monster_labs_control_v1p_sdxl_qrcode_monster", "paper_controlnet"]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model.safetensors"
 format = "safetensors"
+precision = "fp32"
 size_bytes = 5004167864
 sha256 = "11e49b4e272fabda60094b35be6fd3e215e551211210938e381d27497fd2215c"
 webui_hash = "1c44f547"
