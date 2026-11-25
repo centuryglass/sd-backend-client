@@ -19,7 +19,11 @@ effect = "Replaces the image with a color map of the direction each surface face
 output = "RGB normal map: blue faces the camera, red faces left, green faces up."
 best_input = ""
 weak_input = ""
-models = ["control_v11p_sd15_normalbae"]
+models = [
+    "control_v11p_sd15_normalbae",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+]
 
 sources = [
     "recorded_fixtures",

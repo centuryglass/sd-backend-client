@@ -28,6 +28,8 @@ models = [
     "xinsir_openpose_twins_sdxl",
     "kohya_lllite_pose_anime_sdxl",
     "kohya_lllite_pose_anime_v2_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
 ]
 
 sources = [

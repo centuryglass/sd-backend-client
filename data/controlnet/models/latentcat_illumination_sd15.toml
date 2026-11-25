@@ -1,27 +1,51 @@
 id = "latentcat_illumination_sd15"
 label = "Illumination"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ioclab's SD 1.5 light composition ControlNet: places light and shadow from a blurry grayscale sketch."
+description = """\
+ioclab's Illumination ControlNet, also called Light Composition and now hosted by latentcat, places light and \
+shadow from a rough grayscale image. Its trainer describes it as similar to depth: paint or blur a black-and-white \
+sketch of where light falls, and the prompt decides what fills it. Bright words such as floating stars, sparks or \
+splashes land on the brightest spots.\n\n\
+The trainer recommends a control weight of 0.4 to 0.9 and ending control at 0.4 to 0.9 of the steps, lowering \
+both if the result overfits. Blurry inputs leave more detail to the model. When a subject lands in the wrong \
+place, a second unit such as a segmentation map fixes its position. QR guides also list it as a QR model."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one was \
+trained on images paired with heavily degraded grayscale copies: contrast raised, blurred several times, \
+histogram-equalized and pixelated, so only broad light and shadow remain."""
 base_models = ["sd15"]
 adapter = "controlnet"
-control_types = ["recolor", "qr_code"]
+control_types = ["qr_code"]
 preprocessors = []
 trainer = "ioclab (latentcat)"
-license = ""
-homepage = "https://huggingface.co/latentcat/latentcat-controlnet"
+license = "creativeml-openrail-m"
+homepage = "https://huggingface.co/latentcat/control_v1u_sd15_illumination_webui"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Steers where light, shadow and bright objects appear from a rough sketch, per its trainer",
+    "Keeps its lighting across checkpoints, per its trainer",
+]
+weaknesses = ["Can overfit at high weight or a late end step, per its trainer"]
+good_for = ["composing light and shadow", "adding light sources and glowing objects", "QR codes"]
 
-sources = ["hf_latentcat_latentcat_controlnet"]
-research_status = "stub"
+sources = [
+    "hf_latentcat_control_v1u_sd15_illumination_webui",
+    "hf_latentcat_latentcat_controlnet",
+    "ioclab_illumination_guide",
+    "civitai_illumination",
+    "antfu_ai_qrcode_101",
+    "paper_controlnet",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "control_v1p_sd15_illumination.safetensors"
+also_seen_as = ["illumination20000.safetensors"]
 format = "safetensors"
+precision = "fp32"
 size_bytes = 1445154814
 sha256 = "f0524d0cca37e98a5402c22c729ee86da76cd4e44449cf6a90b0619b1f8b3b23"
 webui_hash = "0c4bd571"

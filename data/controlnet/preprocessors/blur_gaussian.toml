@@ -20,6 +20,7 @@ models = [
     "kohya_lllite_blur_sdxl",
     "kohya_lllite_blur_anime_sdxl",
     "kohya_lllite_blur_anime_beta_sdxl",
+    "xinsir_union_promax_sdxl",
 ]
 
 sources = [

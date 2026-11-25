@@ -19,6 +19,8 @@ models = [
     "control_sd15_scribble",
     "sparsectrl_scribble_sd15",
     "xinsir_scribble_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
 ]
 
 sources = [

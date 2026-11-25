@@ -42,6 +42,8 @@ Each model forbids unknown keys, so a misspelled field fails to load.
   `license`, `homepage`, `strengths`, `weaknesses`, `good_for` and `files`. Each pruned, fp16, renamed or
   LoRA-extracted copy is a `files` entry, with `variant` saying what sets it apart. A LoRA trained to be loaded
   alongside the model, such as each FaceID model's, is a `files` entry of that model too.
+- **A union model is one record across every type it covers.** Its own prose holds how it groups types and how each
+  backend chooses one. Each control type it covers lists it in `choosing.models`, with no per-type fields.
 - **`name_parameters` tells apart preprocessors that share a backend name.** ComfyUI folds several WebUI
   preprocessors into one node with a switch. For example, `LineArtPreprocessor` with `coarse = "enable"` is
   `lineart_coarse`. Every record sharing a name sets it, except the one matching the node's defaults.
@@ -140,14 +142,17 @@ Each model forbids unknown keys, so a misspelled field fails to load.
   to have it.
 - **The SFW NoobAI inpainting ControlNet** (`Wenaka/NoobAI_XL_Inpainting_ControlNet_SFW`): an earlier, separate
   training. The full release is `noobai_inpaint_sdxl`.
+- **Training checkpoints other than the released file,** such as QR Pattern V2's "Other strength levels" and its
+  repository's `checkpoint-*` folders, and `illumination11000` and `illumination15000` beside Illumination's
+  webui file. Their weights differ from the released file's.
 - **Other Civitai fine-tunes,** and SD2.1 releases of the same families.
 
 ## Status
 
 | Kind | Records | Stub | Drafted | Verified |
 |---|---|---|---|---|
-| Control types | 23 | 2 | 21 | 0 |
+| Control types | 23 | 1 | 22 | 0 |
 | Preprocessors | 81 | 0 | 17 | 64 |
-| Models | 128 | 8 | 16 | 104 |
+| Models | 128 | 0 | 15 | 113 |
 
 `python scripts/controlnet_data.py` prints the current counts. Update this table when a session changes them.

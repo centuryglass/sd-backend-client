@@ -1,8 +1,18 @@
 id = "qrcode_monster_sd15"
 label = "QR Code Monster"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "monster-labs' first SD 1.5 QR ControlNet: generates creative QR codes that still scan. V2 replaces it."
+description = """\
+monster-labs' first QR Code Monster ControlNet for SD 1.5, made to generate creative QR codes that still scan. \
+Not every result scans, so its card suggests generating several and trying other prompts and settings.\n\n\
+Its card's advice covers both versions. Pass the QR code as the control image with 16-pixel modules and a high \
+error correction level, on a gray background. A higher control weight makes the code more readable, a lower one \
+more creative. Version 2, in the same repository's v2 folder, is a large upgrade in scannability and \
+creativity per the card."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads a QR code and keeps its pattern of dark and light modules in the generated image, while the \
+prompt decides what the image shows."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["qr_code"]
@@ -11,17 +21,18 @@ trainer = "monster-labs"
 license = "openrail++"
 homepage = "https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monster"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Control weight trades scannability against creativity, per its card"]
+weaknesses = ["Superseded by V2, which its card calls a large upgrade in scannability and creativity"]
+good_for = ["artistic QR codes"]
 
-sources = ["hf_monster_labs_control_v1p_sd15_qrcode_monster"]
-research_status = "stub"
+sources = ["hf_monster_labs_control_v1p_sd15_qrcode_monster", "paper_controlnet"]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "control_v1p_sd15_qrcode_monster.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 722596344
 sha256 = "c7f43f70e266153d12f5e1bb1c9e7be3f4513cf0eef0432661b1331bfe11cadf"
 webui_hash = "a6e58995"
@@ -30,6 +41,7 @@ source_url = "https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monste
 [[files]]
 filename = "control_v1p_sd15_qrcode_monster.ckpt"
 format = "ckpt"
+precision = "fp32"
 size_bytes = 1445200597
 sha256 = "1b5d69da6d00efd8eb8d1f4ba56152ae1b420d6fd55c65813bdb5773c487d4dd"
 webui_hash = "5b9eef97"
@@ -38,6 +50,7 @@ source_url = "https://huggingface.co/monster-labs/control_v1p_sd15_qrcode_monste
 [[files]]
 filename = "diffusion_pytorch_model.safetensors"
 format = "safetensors"
+precision = "fp32"
 size_bytes = 1445157120
 sha256 = "8c10457d104cf6adc318fee3a981d3a1a2e60796259e54420a0f933a68dbdeda"
 webui_hash = "ff0e6388"

@@ -14,7 +14,11 @@ effect = "Keeps character outlines and main interior lines; drops color and shad
 output = "Black image with white lines."
 best_input = "Anime, manga and cel-shaded illustrations."
 weak_input = ""
-models = ["control_v11p_sd15s2_lineart_anime"]
+models = [
+    "control_v11p_sd15s2_lineart_anime",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+]
 
 sources = [
     "cn11_readme",

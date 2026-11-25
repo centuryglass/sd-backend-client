@@ -1,27 +1,40 @@
 id = "diontimmer_qrcode_sd15"
 label = "DionTimmer QR Code"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "DionTimmer's SD 1.5 QR code ControlNet, trained on the same dataset as their SD 2.1 version, for QR art at 768 pixels."
+description = """\
+DionTimmer's QR code ControlNet for SD 1.5. It was trained on the same dataset as DionTimmer's SD 2.1 model, \
+which the card calls marginally more effective. It needs no preprocessor; Invert gives a different variation.\n\n\
+The card recommends error correction level H (30%) and generating at 768 pixels for more detail. Raising the \
+control weight brings out the code's shape at some cost to style, and some prompts only work at a much higher \
+weight. Its example runs img2img from an unrelated starting image, with control weight 1.5 and denoising 0.9."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads a QR code and keeps its pattern in the generated image, while the prompt and starting image \
+set the content and style."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["qr_code"]
-preprocessors = []
+preprocessors = ["invert"]
 trainer = "DionTimmer"
 license = "openrail++"
 homepage = "https://huggingface.co/DionTimmer/controlnet_qrcode-control_v1p_sd15"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Works with or without Invert, which gives a different variation, per its card"]
+weaknesses = [
+    "The code's shape doesn't always come through, per its card",
+    "Some prompts need a much higher control weight, which hurts the style",
+]
+good_for = ["artistic QR codes", "QR codes blended into a starting image with img2img"]
 
-sources = ["hf_diontimmer_controlnet_qrcode_control_v1p_sd15"]
-research_status = "stub"
+sources = ["hf_diontimmer_controlnet_qrcode_control_v1p_sd15", "paper_controlnet"]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "control_v1p_sd15_qrcode.safetensors"
 format = "safetensors"
+precision = "fp32"
 size_bytes = 1445154814
 sha256 = "5d8059dfffccfcaee5b827c4f0f126baf4d6ab66f9a80b2ec4ef0ed451a62ead"
 webui_hash = "9c780d03"
@@ -30,6 +43,7 @@ source_url = "https://huggingface.co/DionTimmer/controlnet_qrcode-control_v1p_sd
 [[files]]
 filename = "diffusion_pytorch_model.safetensors"
 format = "safetensors"
+precision = "fp32"
 size_bytes = 1445157120
 sha256 = "5b5a1379389660462b7b2c093d3a1b934ea410dc0275f68db1bd4cdf0f031e53"
 webui_hash = "15b95218"

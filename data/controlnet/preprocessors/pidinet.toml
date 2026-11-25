@@ -21,6 +21,8 @@ models = [
     "t2i_adapter_sketch_sdxl",
     "sai_control_lora_sketch_sdxl",
     "xinsir_scribble_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
 ]
 
 sources = [

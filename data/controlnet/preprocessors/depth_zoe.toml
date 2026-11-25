@@ -29,6 +29,8 @@ models = [
     "t2iadapter_depth_sd15v2",
     "t2iadapter_zoedepth_sd15v1",
     "xinsir_depth_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
 ]
 
 sources = [

@@ -1,8 +1,21 @@
 id = "xinsir_union_sdxl"
 label = "Xinsir SDXL Union"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "xinsir's all-in-one SDXL ControlNet: one model for pose, depth, soft and hard lines, normal maps and segmentation."
+description = """\
+One SDXL ControlNet, ControlNet++, that replaces a set of single-type models. It groups its conditions into six \
+control types: pose, depth, thick lines (scribble, HED, PiDiNet, TEED), thin lines (Canny, lineart, anime \
+lineart, M-LSD), normal map and segmentation. Its card reports no clear quality drop against models trained on \
+one condition, and says it works with other SDXL checkpoints and LoRAs.\n\n\
+Each unit tells the model which type its control image is. ComfyUI sets it with Set Union ControlNet Type. \
+sd-webui-controlnet and Forge Neo take it from the unit's Control Type, so choosing All leaves it unset. reForge \
+never passes it, and Forge loads the model without its union layers."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero. This one adds two parts. A control encoder turns the control type into an \
+embedding added to the timestep embedding, which steers the whole network. A condition transformer mixes the \
+features of the control images and predicts a correction to each one. All types share one condition encoder. \
+It was trained on over 10 million images, captioned with CogVLM, at many aspect ratios, \
+with single and combined conditions in one stage."""
 base_models = ["sdxl"]
 adapter = "union"
 control_types = [
@@ -16,24 +29,55 @@ control_types = [
     "normal_map",
     "segmentation",
 ]
-preprocessors = []
+preprocessors = [
+    "openpose",
+    "depth_midas",
+    "depth_zoe",
+    "hed",
+    "pidinet",
+    "scribble_hed",
+    "teed",
+    "canny",
+    "lineart_realistic",
+    "lineart_anime",
+    "mlsd",
+    "normal_bae",
+    "mobile_sam",
+]
 trainer = "xinsir"
 license = "apache-2.0"
 homepage = "https://huggingface.co/xinsir/controlnet-union-sdxl-1.0"
 
-strengths = []
-weaknesses = []
-good_for = []
-
-sources = ["hf_xinsir_controlnet_union_sdxl_1_0"]
-research_status = "stub"
-open_questions = [
-    "List the control types the union model card names, and check them against control_types.",
+strengths = [
+    "One file covers nine control types",
+    "No clear quality drop against single-condition models, per its card",
+    "Trained to combine conditions, such as pose with depth or with lines",
 ]
+weaknesses = [
+    "Has no tile or inpaint type; the ProMax model adds them",
+    "reForge runs it without a control type, and Forge without its union layers",
+    "Every backend here passes one control image per unit, never several in one pass",
+]
+good_for = ["replacing a set of SDXL ControlNets with one file", "pose plus line or depth control"]
+
+sources = [
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "paper_controlnet",
+]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 2512030408
 sha256 = "a9e13fd61f3193887791c8a0dd07a07202174dc47d5ddaea94ea1344f07c7467"
 webui_hash = "15e6ad5d"

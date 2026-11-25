@@ -1,8 +1,18 @@
 id = "nacholmo_qr_pattern_v2_sd15"
 label = "QR Pattern V2"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Nacholmo's SD 1.5 QR ControlNet, conditioned only on the darkest and lightest quarters of the image's pixels."
+description = """\
+Nacholmo's QR Pattern V2, an SD 1.5 ControlNet for QR codes. It controls only the darkest and lightest areas of \
+the control image, so mid-tones and gray leave the content free. The automatic1111 folder holds the WebUI file, \
+saved at training step 9500, and other step counts as other strength levels. Civitai distributes the same file \
+as controlnetQRPatternQR_v2Sd15.\n\n\
+The QR Code 101 guide uses it alone or as a low-weight third unit beside QR Code Monster and Brightness. One \
+contributor there found it changes the image's style more than QR Code Monster does."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. Its control images kept only the 25% of pixels closest to black and the 25% closest to white, so the model \
+learns to hold just those extremes. It was trained on Pexels photos with generated captions."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["qr_code"]
@@ -11,20 +21,24 @@ trainer = "Nacholmo"
 license = "creativeml-openrail-m"
 homepage = "https://huggingface.co/Nacholmo/controlnet-qr-pattern-v2"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Gray in the control image leaves that area free"]
+weaknesses = ["Changes the image's style more than QR Code Monster, per one QR guide contributor"]
+good_for = ["artistic QR codes", "a light second QR unit"]
 
-sources = ["hf_nacholmo_controlnet_qr_pattern_v2", "recorded_fixtures"]
-research_status = "stub"
-open_questions = [
-    "The repo also holds the same training at other step counts (\"Other strength levels\"). Decide whether to list them as files of this record.",
+sources = [
+    "hf_nacholmo_controlnet_qr_pattern_v2",
+    "recorded_fixtures",
+    "antfu_ai_qrcode_101",
+    "paper_controlnet",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "QRPattern_v2_9500.safetensors"
 also_seen_as = ["controlnetQRPatternQR_v2Sd15.safetensors"]
 format = "safetensors"
+precision = "fp32"
 size_bytes = 1445154816
 sha256 = "f0648652d783aae9cba26193b598b47607e2cd48b8e63f994cdd2d8cfbc516bd"
 webui_hash = "2d8d5750"

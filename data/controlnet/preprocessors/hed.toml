@@ -18,7 +18,13 @@ effect = "Keeps object boundaries as soft graded lines; drops most texture and n
 output = "Black image with soft white boundary lines."
 best_input = "Photos and renders."
 weak_input = ""
-models = ["control_sd15_hed", "control_v11p_sd15_softedge", "xinsir_scribble_sdxl"]
+models = [
+    "control_sd15_hed",
+    "control_v11p_sd15_softedge",
+    "xinsir_scribble_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_union_promax_sdxl",
+]
 
 sources = [
     "paper_hed",

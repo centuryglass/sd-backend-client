@@ -6,7 +6,8 @@ ioclab's Brightness ControlNet, now hosted by latentcat, makes a generated image
 brightness. Its card names two uses: colorizing grayscale images and recoloring generated ones. It was trained \
 on ioclab's grayscale_image_aesthetic_3M dataset.\n\n\
 sd_control_collection mirrors it in fp16 as ioclab_sd15_recolor, and sd-webui-controlnet's SD 1.5 recolor \
-example pairs that copy with Recolor Luminance."""
+example pairs that copy with Recolor Luminance. QR code guides use it as a low-weight second unit beside a QR \
+model, to raise local contrast so the code scans without changing the composition much."""
 how_it_works = """\
 A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
 convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
@@ -23,7 +24,7 @@ homepage = "https://huggingface.co/latentcat/control_v1p_sd15_brightness"
 
 strengths = []
 weaknesses = []
-good_for = ["colorizing grayscale images", "recoloring images"]
+good_for = ["colorizing grayscale images", "recoloring images", "a helper unit for QR codes"]
 
 sources = [
     "hf_latentcat_control_v1p_sd15_brightness",
@@ -31,9 +32,10 @@ sources = [
     "hf_lllyasviel_sd_control_collection",
     "sdwebui_cn_1_1_400_discussion",
     "comfyui_controlnet_aux_readme",
+    "antfu_ai_qrcode_101",
     "paper_controlnet",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [[files]]
