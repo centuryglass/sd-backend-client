@@ -1,8 +1,17 @@
 id = "t2i_adapter_openpose_sdxl"
 label = "T2I-Adapter SDXL OpenPose"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC's SDXL T2I-Adapter for OpenPose skeletons; small, about 158 MB in fp16."
+description = """\
+An SDXL adapter for OpenPose stick figures from TencentARC, trained with OpenPose bone images. Its card's \
+example runs OpenPose at 512 pixels, scales the result to 1024, and uses an adapter strength of 1.\n\n\
+TencentARC's original-format adapter-xl-openpose.pth holds the same network. Its fp16 copy in \
+sd_control_collection, t2i-adapter_xl_openpose, matches the diffusers copy tensor for tensor, so every file \
+below loads the same weights."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. This one was trained on 3 million high-resolution image and caption pairs from \
+LAION-Aesthetics V2, for 35,000 steps at a total batch size of 256."""
 base_models = ["sdxl"]
 adapter = "t2i_adapter"
 control_types = ["openpose"]
@@ -11,17 +20,23 @@ trainer = "TencentARC"
 license = "apache-2.0"
 homepage = "https://huggingface.co/TencentARC/t2i-adapter-openpose-sdxl-1.0"
 
-strengths = []
+strengths = ["Small and fast compared with an SDXL ControlNet"]
 weaknesses = []
-good_for = []
+good_for = ["copying a pose from a photo"]
 
-sources = ["hf_tencentarc_t2i_adapter_openpose_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_tencentarc_t2i_adapter_openpose_sdxl_1_0",
+    "hf_tencentarc_t2i_adapter",
+    "hf_lllyasviel_sd_control_collection",
+    "paper_t2i_adapter",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model.safetensors"
 format = "safetensors"
+precision = "fp32"
 size_bytes = 316116784
 sha256 = "24c55f4b4f4903a50caaae7e3e11f4008bd51d24041385a5ca94e8d05be6311e"
 webui_hash = "274bb89a"
@@ -30,7 +45,28 @@ source_url = "https://huggingface.co/TencentARC/t2i-adapter-openpose-sdxl-1.0/re
 [[files]]
 filename = "t2i-adapter_diffusers_xl_openpose.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 158060416
 sha256 = "a0d2bd581340e2f8b5d83ae9b13ba44efe2618783e0c4597e0f18411ad57e3da"
 webui_hash = "adfb64aa"
 source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_diffusers_xl_openpose.safetensors"
+
+[[files]]
+filename = "adapter-xl-openpose.pth"
+format = "pth"
+precision = "fp32"
+size_bytes = 316125787
+sha256 = "0a379405bb2544e82f4bc87e0ae001f38da3c3fdf7b02a85fa638c8a3d6ef71f"
+webui_hash = "28e0c170"
+source_url = "https://huggingface.co/TencentARC/T2I-Adapter/resolve/003997adaae088a8311e25f6d395e821b5398a11/models_XL/adapter-xl-openpose.pth"
+variant = "original T2I-Adapter format"
+
+[[files]]
+filename = "t2i-adapter_xl_openpose.safetensors"
+variant = "original T2I-Adapter format"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 158059792
+sha256 = "a5abadd721608e74717cd2e83751e983fd98a4bf1489f1667f52c3b585841cb3"
+webui_hash = "18cb12c1"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/t2i-adapter_xl_openpose.safetensors"

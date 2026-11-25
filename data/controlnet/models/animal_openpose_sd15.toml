@@ -1,0 +1,54 @@
+id = "animal_openpose_sd15"
+label = "Animal Pose ControlNet"
+summary = "An SD 1.5 ControlNet that poses four-legged animals from an AP-10K animal skeleton."
+description = """\
+An SD 1.5 ControlNet for four-legged animals, made by abehonest as a graduate school project and trained on \
+skeletons from an RTMPose AP-10K estimator. It reads the colored animal skeleton that the Animal Pose \
+preprocessor draws, not OpenPose's human skeleton.\n\n\
+The original checkpoint is about 8 GB. huchenlei, a WebUI ControlNet maintainer, pruned it and uploaded the \
+copies listed here when WebUI added the preprocessor; comfyui_controlnet_aux's table pairs the preprocessor \
+with the fp16 copy. The skeleton has no ears and no tail beyond its root."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This one was \
+trained in a fork of lllyasviel's ControlNet code on animal skeletons from MMPose's RTMPose AP-10K model."""
+base_models = ["sd15"]
+adapter = "controlnet"
+control_types = ["openpose"]
+preprocessors = ["animal_openpose"]
+trainer = "abehonest"
+license = "apache-2.0"
+homepage = "https://huggingface.co/huchenlei/animal_openpose"
+
+strengths = ["The only model here trained on animal skeletons"]
+weaknesses = ["The skeleton carries no ears or tail"]
+good_for = ["posing four-legged animals"]
+
+sources = [
+    "hf_huchenlei_animal_openpose",
+    "gh_controlnet_animalpose_readme",
+    "sdwebui_cn_animal_openpose_discussion",
+    "comfyui_controlnet_aux_readme",
+    "paper_controlnet",
+    "paper_ap10k",
+]
+research_status = "verified"
+open_questions = []
+
+[[files]]
+filename = "control_sd15_animal_openpose_fp16.pth"
+format = "pth"
+precision = "fp16"
+size_bytes = 722705655
+sha256 = "4311e4155e218cf863e26a886ac1e89939d4a46410fcc8047c78f5796e9f1134"
+webui_hash = "293713ec"
+source_url = "https://huggingface.co/huchenlei/animal_openpose/resolve/9beca3d37d88b1d584ea6f5f1c2d6571f243e048/control_sd15_animal_openpose_fp16.pth"
+
+[[files]]
+filename = "control_sd15_animal_openpose.pth"
+format = "pth"
+size_bytes = 1445268727
+sha256 = "8147ad1b19a090fb33d7b3195af99ee61feabf18348bcfea821deaec91f8917e"
+webui_hash = "2f821411"
+source_url = "https://huggingface.co/huchenlei/animal_openpose/resolve/9beca3d37d88b1d584ea6f5f1c2d6571f243e048/control_sd15_animal_openpose.pth"

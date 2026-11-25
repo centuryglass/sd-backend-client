@@ -1,11 +1,22 @@
 id = "densepose"
 label = "DensePose"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Paints each person as a map of 24 body parts in the viridis colors, on purple, the form MagicAnimate uses."
+description = """\
+DensePose paints every person in the image as a flat map of body parts, each part in its own shade from the \
+viridis color scale, which runs from purple through blue and green to yellow. The background is the darkest \
+purple. Unlike a stick figure it carries the body's outline, so it holds body shape as well as pose.\n\n\
+WebUI labels it "densepose (pruple bg & purple torso)", with the typo. The pull request that added it names \
+MagicAnimate's DensePose input as the match for these colors. No ControlNet in this reference was trained on \
+DensePose maps."""
+how_it_works = """\
+DensePose is a network that maps every pixel of a person to a point on a surface model of the human body. \
+Its authors annotated 50,000 people in COCO photos to train it. The surface is split into 24 parts. The \
+preprocessor keeps only which part each pixel belongs to and paints the parts in evenly spaced steps of a \
+color map. Backends ship a TorchScript copy of the network, so the Detectron2 library it was built with is not \
+needed."""
 control_types = ["openpose"]
-effect = ""
-output = ""
+effect = "Replaces each person with a flat body-part map in viridis colors; the background turns dark purple."
+output = "24 body parts in viridis colors on a dark purple background."
 best_input = ""
 weak_input = ""
 models = []
@@ -15,12 +26,71 @@ sources = [
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
+    "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_densepose_pr",
+    "paper_densepose",
+    "hf_layernorm_densepose_torchscript",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["densepose", "densepose (pruple bg & purple torso)"]
 forge = ["densepose (pruple bg & purple torso)"]
 comfyui = ["DensePosePreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "densepose_r50_fpn_dl.torchscript"
+size_bytes = 265257836
+sha256 = "4f7260daa498ce8d4b4679f0692ef2f1f426e39121a907181eab37b8b0585878"
+source_url = "https://huggingface.co/LayerNorm/DensePose-TorchScript-with-hint-image/resolve/65446422ea6225b9d72f93f3d2e2ad55e78b0b78/densepose_r50_fpn_dl.torchscript"
+variant = "ResNet-50 (WebUI, Forge, ComfyUI default)"
+
+[[hardware.files]]
+filename = "densepose_r101_fpn_dl.torchscript"
+size_bytes = 341795467
+sha256 = "4fe0d458d7ad25bd97d03605f693a2547219e4bae4de9aa727ebb7ecbaaf65a3"
+source_url = "https://huggingface.co/LayerNorm/DensePose-TorchScript-with-hint-image/resolve/65446422ea6225b9d72f93f3d2e2ad55e78b0b78/densepose_r101_fpn_dl.torchscript"
+variant = "ResNet-101 (ComfyUI option)"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and processed at that \
+size. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it when small or distant people are missed, at the cost of a slower run."
+
+[[parameters]]
+id = "model"
+label = "Model"
+summary = "Which DensePose network runs: ResNet-50 or the larger ResNet-101."
+names = { comfyui = "model" }
+type = "enum"
+default = "densepose_r50_fpn_dl.torchscript"
+choices = ["densepose_r50_fpn_dl.torchscript", "densepose_r101_fpn_dl.torchscript"]
+effect = "Selects the network's backbone. WebUI and Forge always use the ResNet-50 file."
+when_to_adjust = ""
+
+[[parameters]]
+id = "cmap"
+label = "Color Map"
+summary = "Which color scale paints the body parts: viridis on purple, or parula on black."
+names = { comfyui = "cmap" }
+type = "enum"
+default = "Viridis (MagicAnimate)"
+choices = ["Viridis (MagicAnimate)", "Parula (CivitAI)"]
+effect = "Selects between the DensePose and DensePose Parula outputs. WebUI and Forge list them as two preprocessors."
+when_to_adjust = "Match the colors the DensePose model in use was trained on."

@@ -1,26 +1,44 @@
 id = "control_sd15_openpose"
 label = "ControlNet 1.0 OpenPose"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The original ControlNet 1.0 pose model for SD 1.5, which follows OpenPose body skeletons."
+description = """\
+The first pose ControlNet for Stable Diffusion 1.5, from lllyasviel's ControlNet 1.0 release. It reads an \
+OpenPose stick figure and puts a person in that pose, while the prompt sets who they are and where. The 1.0 \
+README shows it posing a chef in a kitchen and an astronaut on the moon, and notes the model deserves a UI for \
+posing the skeleton directly.\n\n\
+ControlNet 1.1 replaced it with control_v11p_sd15_openpose. The 1.1 README says the 1.0 training data had \
+grayscale people duplicated thousands of times, low-quality images and wrong captions, and that 1.1 adds hand \
+and face input and a more accurate OpenPose implementation."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was trained on pairs of \
+images and the OpenPose skeletons detected in them, with a caption for each."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["openpose"]
-preprocessors = ["openpose"]
+preprocessors = ["openpose", "dw_openpose_full"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet"
 
 strengths = []
-weaknesses = []
-good_for = []
+weaknesses = [
+    "The 1.0 training data had duplicated grayscale human images, so grayscale people were likelier",
+    "Body skeletons only; 1.1 adds hands and face",
+]
+good_for = ["copying a pose from a photo"]
 
 sources = [
     "hf_lllyasviel_controlnet",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

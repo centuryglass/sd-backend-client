@@ -1,19 +1,66 @@
 id = "openpose"
 label = "OpenPose"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Copies the pose of people in an image, drawn as a colored stick figure, and leaves everything else to the prompt."
+description = """\
+OpenPose keeps the pose of each person in a reference image: where the head, shoulders, elbows, hips, knees and \
+feet are. The control image is a stick figure on black, one color per limb, with optional dots for the hands and \
+face. The generated image puts a figure in that pose, while clothing, body shape, setting and style come from the \
+prompt.\n\n\
+Because only joints are kept, OpenPose leaves the model more freedom than an edge or depth type. It suits \
+reposing a character or copying a pose from a photo. Backends file several related preprocessors under it: \
+DWPose, which draws the same skeleton, animal pose, DensePose and MediaPipe face landmarks. Each needs a model \
+trained on its own kind of map."""
+how_it_works = """\
+A pose estimator is a neural network that finds body joints in a photo and links them into skeletons, one per \
+person. The preprocessor draws those skeletons in fixed colors. Pose models are trained on pairs of images and \
+the skeletons an estimator found in them, with a caption for each. During generation the model reads the \
+skeleton alongside the noisy image at every step and nudges the result so a body forms along each limb. Since \
+the skeleton is just a drawing, it can also be posed by hand in an editor."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Stick figures on black, one color per limb, in OpenPose's 18-point body layout, with optional hand and face points."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "cn10_readme",
+    "cn11_readme",
+    "paper_controlnet",
+    "paper_openpose",
+    "gh_openpose_readme",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_readme",
+    "comfyui_controlnet_aux_src",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["OpenPose"]
 forge = ["OpenPose"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Copy a pose from a photo"
+description = """\
+Run a pose preprocessor on a photo of someone in the pose you want, then prompt for a different person, outfit \
+or setting. The figure takes the same stance without copying the photo's look."""
+
+[[uses]]
+kind = "standard"
+title = "Pose a group"
+description = """\
+The estimators find several people at once and draw a skeleton for each, so one reference can place a whole \
+group. ControlNet 1.1's README shows a batch of multiple people in the wild."""
+
+[[uses]]
+kind = "creative"
+title = "Draw or edit the skeleton by hand"
+description = """\
+The ControlNet 1.0 README notes that the model deserves a UI for posing the skeleton directly. Pose editors do \
+this: drag the joints of a stick figure, or edit one a preprocessor made, and use the result as the control \
+image with no preprocessor."""
 
 [choosing]
 guide = ""
@@ -36,7 +83,6 @@ models = [
     "t2iadapter_keypose_sd14v1",
     "t2iadapter_openpose_sd14v1",
     "t2i_adapter_openpose_sdxl",
-    "t2i_adapter_xl_openpose",
     "xinsir_openpose_sdxl",
     "xinsir_openpose_twins_sdxl",
     "xinsir_union_sdxl",
@@ -44,5 +90,6 @@ models = [
     "thibaud_openpose_xl2",
     "kohya_lllite_pose_anime_sdxl",
     "kohya_lllite_pose_anime_v2_sdxl",
+    "animal_openpose_sd15",
     "crucibleai_mediapipe_face_sd15",
 ]

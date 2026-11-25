@@ -711,3 +711,111 @@ title = "SargeZT/controlnet-sd-xl-1.0-depth-zeed model card"
 url = "https://huggingface.co/SargeZT/controlnet-sd-xl-1.0-depth-zeed"
 kind = "model_card"
 accessed = "2026-11-23"
+
+[paper_openpose]
+title = "Cao, Hidalgo, Simon, Wei and Sheikh, OpenPose: Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields (2018)"
+url = "https://arxiv.org/abs/1812.08008"
+kind = "paper"
+accessed = "2026-11-25"
+
+[gh_openpose_readme]
+title = "CMU-Perceptual-Computing-Lab/openpose README (keypoint counts, license)"
+url = "https://github.com/CMU-Perceptual-Computing-Lab/openpose"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[paper_dwpose]
+title = "Yang, Zeng, Yuan and Li, Effective Whole-body Pose Estimation with Two-stages Distillation (2023)"
+url = "https://arxiv.org/abs/2307.15880"
+kind = "paper"
+accessed = "2026-11-25"
+
+[gh_dwpose_readme]
+title = "IDEA-Research/DWPose README"
+url = "https://github.com/IDEA-Research/DWPose"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_dwpose_discussion]
+title = "sd-webui-controlnet discussion #1863, \"[1.1.236] Support DW Openpose preprocessor\""
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/1863"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[hf_yzd_v_dwpose]
+title = "yzd-v/DWPose (DWPose and YOLOX weights)"
+url = "https://huggingface.co/yzd-v/DWPose/tree/1a7144101628d69ee7a3768d1ee3a094070dc388"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[hf_hr16_dwpose_torchscript_bs5]
+title = "hr16/DWPose-TorchScript-BatchSize5 (TorchScript DWPose and AP-10K weights)"
+url = "https://huggingface.co/hr16/DWPose-TorchScript-BatchSize5/tree/359d662a9b33b73f6d0f21732baf8845f17bb4be"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[hf_hr16_yolox_onnx]
+title = "hr16/yolox-onnx (YOLOX person detector weights)"
+url = "https://huggingface.co/hr16/yolox-onnx/tree/a124b32c3b7c5cebda1c7cd96178f0f9d2050125"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[hf_hr16_unjit_dwpose]
+title = "hr16/UnJIT-DWPose (ONNX DWPose and AP-10K weights)"
+url = "https://huggingface.co/hr16/UnJIT-DWPose/tree/7a69fe1d5e7fa512798c2492dc7489c1a0e2ceee"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[paper_densepose]
+title = "Guler, Neverova and Kokkinos, DensePose: Dense Human Pose Estimation In The Wild (2018)"
+url = "https://arxiv.org/abs/1802.00434"
+kind = "paper"
+accessed = "2026-11-25"
+
+[sdwebui_cn_densepose_pr]
+title = "sd-webui-controlnet pull request #2314, \"Add Densepose (TorchScript)\""
+url = "https://github.com/Mikubill/sd-webui-controlnet/pull/2314"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[hf_layernorm_densepose_torchscript]
+title = "LayerNorm/DensePose-TorchScript-with-hint-image (DensePose weights)"
+url = "https://huggingface.co/LayerNorm/DensePose-TorchScript-with-hint-image/tree/65446422ea6225b9d72f93f3d2e2ad55e78b0b78"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[paper_ap10k]
+title = "Yu, Xu, Zhang, Zhao, Guan and Tao, AP-10K: A Benchmark for Animal Pose Estimation in the Wild (2021)"
+url = "https://arxiv.org/abs/2108.12617"
+kind = "paper"
+accessed = "2026-11-25"
+
+[gh_controlnet_animalpose_readme]
+title = "abehonest/ControlNet_AnimalPose README"
+url = "https://github.com/abehonest/ControlNet_AnimalPose"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[sdwebui_cn_animal_openpose_discussion]
+title = "sd-webui-controlnet discussion #2351, \"[1.1.424] Animal openpose support added\""
+url = "https://github.com/Mikubill/sd-webui-controlnet/discussions/2351"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[hf_huchenlei_animal_openpose]
+title = "huchenlei/animal_openpose model card"
+url = "https://huggingface.co/huchenlei/animal_openpose"
+kind = "model_card"
+accessed = "2026-11-25"
+
+[mediapipe_face_landmarker]
+title = "MediaPipe Face Landmarker guide (Google AI Edge)"
+url = "https://developers.google.com/edge/mediapipe/solutions/vision/face_landmarker"
+kind = "official_docs"
+accessed = "2026-11-25"
+
+[hf_xinsir_openpose_discussion_3]
+title = "xinsir/controlnet-openpose-sdxl-1.0 discussion #3, \"what is this model diffusion_pytorch_model_twins.safetensors\" (author reply)"
+url = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0/discussions/3"
+kind = "official_docs"
+accessed = "2026-11-25"

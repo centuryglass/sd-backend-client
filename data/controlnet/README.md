@@ -107,6 +107,10 @@ Each model forbids unknown keys, so a misspelled field fails to load.
 - Take hashes from Hugging Face's file listing (`/api/models/<repo>/tree/main?recursive=true` gives `size` and
   `lfs.oid`), from a range request (see "Model hashes"), or from hashing a local copy. Don't download large files
   just to hash them.
+- **Two files are one record only when their weights match.** A file name or a similar size doesn't settle it.
+  Range-request each safetensors header (an 8-byte length, then JSON listing every tensor's dtype, shape and byte
+  offsets), then fetch a few small tensors from both files and compare their values. A dtype conversion leaves
+  differences at fp16 or bf16 rounding; a separate training differs by the size of the weights themselves.
 
 ## Scope
 
@@ -122,8 +126,8 @@ Each model forbids unknown keys, so a misspelled field fails to load.
   (SargeZT, kohya LLLite, Stability control-LoRAs, thibaud), xinsir (including union and ProMax), TTPlanet tile,
   monster-labs, DionTimmer, Nacholmo and latentcat/ioclab QR and brightness models, h94 IP-Adapter and FaceID,
   PuLID, InstantID, PhotoMaker, MistoLine, SparseCtrl, MediaPipe Face, the SDXL inpainting ControlNets in the
-  recorded fixtures, and the two SD1.5 ControlNets that comfyui_controlnet_aux's table pairs with preprocessors
-  (the Depth Anything ControlNet and HandRefiner's inpaint depth hand model).
+  recorded fixtures, and the three SD1.5 ControlNets that comfyui_controlnet_aux's table pairs with preprocessors
+  (the Depth Anything ControlNet, HandRefiner's inpaint depth hand model and the animal pose ControlNet).
 
 ### Left out
 
@@ -139,8 +143,8 @@ Each model forbids unknown keys, so a misspelled field fails to load.
 
 | Kind | Records | Stub | Drafted | Verified |
 |---|---|---|---|---|
-| Control types | 23 | 16 | 7 | 0 |
-| Preprocessors | 81 | 45 | 14 | 22 |
-| Models | 127 | 73 | 7 | 47 |
+| Control types | 23 | 15 | 8 | 0 |
+| Preprocessors | 81 | 35 | 16 | 30 |
+| Models | 127 | 61 | 10 | 56 |
 
 `python scripts/controlnet_data.py` prints the current counts. Update this table when a session changes them.

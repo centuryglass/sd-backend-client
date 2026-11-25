@@ -1,8 +1,16 @@
 id = "kohya_lllite_pose_anime_v2_sdxl"
 label = "LLLite SDXL Pose Anime V2"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "kohya-ss's small, experimental SDXL ControlNet-LLLite for poses, trained on anime images; about 46 MB."
+description = """\
+A ControlNet-LLLite pose model for SDXL from kohya-ss, the author of the sd-scripts trainer. It was trained on \
+1,415 generated images with MMPose preprocessing, on kohya-ss's own anime SDXL checkpoint, not SDXL base. The _500-1000 in its file name means it is meant to control only the first half of the sampling \
+steps.\n\n\
+lllyasviel's sd_control_collection mirrors it as kohya_controllllite_xl_openpose_anime_v2, an fp16 copy of the bf16 \
+original with the same values."""
+how_it_works = """\
+ControlNet-LLLite is kohya-ss's lightweight alternative to ControlNet: small conditioning modules attached to \
+the SDXL U-Net. Its model card calls the structure highly experimental and subject to change. This model was trained on \
+pose maps made with MMPose, a pose toolkit separate from OpenPose."""
 base_models = ["sdxl"]
 adapter = "controlnet_lllite"
 control_types = ["openpose"]
@@ -11,19 +19,23 @@ trainer = "kohya-ss"
 license = "apache-2.0"
 homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Very small"]
+weaknesses = ["Experimental architecture", "Small training set of 1,415 images", "Trained on an anime checkpoint"]
+good_for = ["posing anime characters"]
 
-sources = ["hf_kohya_ss_controlnet_lllite", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_kohya_ss_controlnet_lllite",
+    "hf_lllyasviel_sd_control_collection",
+]
+research_status = "drafted"
 open_questions = [
-    "The sd_control_collection copy is matched to the kohya-ss file by name only, and their sizes differ slightly. Confirm they hold the same network.",
+    "Find which backend preprocessor matches the MMPose pose maps it was trained on. The card names none.",
 ]
 
 [[files]]
 filename = "controllllite_v01032064e_sdxl_pose_anime_v2_500-1000.safetensors"
 format = "safetensors"
+precision = "bf16"
 size_bytes = 46174176
 sha256 = "23bf4691bf2e2c09131ec92cb2fe0119a31432fd74789b60c654de87f5f304be"
 webui_hash = "be5c1472"
@@ -32,6 +44,7 @@ source_url = "https://huggingface.co/kohya-ss/controlnet-lllite/resolve/d14d1353
 [[files]]
 filename = "kohya_controllllite_xl_openpose_anime_v2.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 46172168
 sha256 = "6abee66f7787a3416c25c13fa9d4a4a9b56248b7d9832a7e3162d641237da125"
 webui_hash = "b0fa10bb"

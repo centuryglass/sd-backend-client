@@ -1,8 +1,19 @@
 id = "crucibleai_mediapipe_face_sd15"
 label = "MediaPipe Face"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "CrucibleAI's ControlNet for facial expression and gaze, from MediaPipe face landmarks; SD 1.5 version."
+description = """\
+A ControlNet for faces from CrucibleAI. It reads the MediaPipe Face drawing, face outline, eyes, brows, lips \
+and pupils, and copies expression and gaze direction. The pupil points are what let it follow where the eyes \
+look.\n\n\
+Its card recommends the SD 2.1 base version, which this reference does not cover, and says training was \
+tested on SD 2.1 base and SD 1.5; the SD 1.5 half-precision file is untested. The card warns it may still \
+ignore the control, and that adding details such as "looking right" to the prompt helps."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This one was trained for 200 \
+hours, four epochs, on one A6000, using faces from the LAION-Face dataset annotated with MediaPipe's face mesh \
+and a custom pupil drawing."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["openpose"]
@@ -11,12 +22,16 @@ trainer = "CrucibleAI"
 license = "openrail"
 homepage = "https://huggingface.co/CrucibleAI/ControlNetMediaPipeFace"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Follows gaze direction, from its pupil points"]
+weaknesses = ["May ignore the control, per its card", "The SD 1.5 fp16 file is untested, per its card"]
+good_for = ["copying a facial expression", "setting where a face looks"]
 
-sources = ["hf_crucibleai_controlnetmediapipeface"]
-research_status = "stub"
+sources = [
+    "hf_crucibleai_controlnetmediapipeface",
+    "paper_controlnet",
+    "comfyui_controlnet_aux_readme",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

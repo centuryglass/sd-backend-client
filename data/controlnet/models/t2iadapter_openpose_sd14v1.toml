@@ -1,29 +1,39 @@
 id = "t2iadapter_openpose_sd14v1"
 label = "T2I-Adapter OpenPose v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC's T2I-Adapter for OpenPose skeletons on SD 1.x, a small add-on trained on SD 1.4."
+description = """\
+A T2I-Adapter that steers SD 1.x generation to follow an OpenPose stick figure. It is a small add-on, about \
+309 MB at full precision, added to the T2I-Adapter release on 3 March 2023 together with the style, color and \
+canny adapters.\n\n\
+It was trained on SD 1.4. TencentARC's README recommends SD 1.5 as the base and says the adapters should work on \
+other models fine-tuned from SD 1.4 or 1.5. comfyui_controlnet_aux pairs it with its OpenPose and DWPose \
+preprocessors."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. This adapter takes OpenPose skeletons."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["openpose"]
-preprocessors = ["openpose"]
+preprocessors = ["openpose", "dw_openpose_full"]
 trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
+strengths = ["Small and fast compared with a ControlNet"]
 weaknesses = []
-good_for = []
+good_for = ["copying a pose from a photo"]
 
 sources = [
     "hf_tencentarc_t2i_adapter",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "t2i_adapter_readme_sd",
+    "paper_t2i_adapter",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "stub"
-open_questions = [
-    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
-]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "t2iadapter_openpose_sd14v1.pth"
