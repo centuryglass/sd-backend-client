@@ -1,27 +1,66 @@
 id = "recolor_luminance"
 label = "Recolor Luminance"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Turns the image into a grayscale lightness map, which recolor models paint new colors onto."
+description = """\
+Recolor Luminance removes an image's color and keeps its lightness, giving a grayscale picture that a recolor \
+model colorizes to the prompt. It is the default Recolor preprocessor, and sd-webui-controlnet's examples use it \
+with both the SD 1.5 and SDXL recolor models. Gamma Correction brightens or darkens the map first.\n\n\
+The conversion treats the image's red and blue channels as swapped, so reds come out darker and blues lighter \
+than their true lightness. In Forge and reForge the default recolor preprocessors also shift each result's \
+brightness, pixel by pixel, to match the map after generation."""
+how_it_works = """\
+No network is involved. The image is converted to the Lab color space, which separates lightness, L, from two \
+color axes, and only L is kept. That is raised to the power of the gamma value and copied into all three \
+channels. The OpenCV conversion used expects blue-green-red channel order and is given red-green-blue, which is \
+why red and blue trade weights. sd-webui-controlnet ignores the resolution setting here; ComfyUI resizes to it \
+first."""
 control_types = ["recolor"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Removes all color, keeping a grayscale lightness map; gamma below 1 brightens it, above 1 darkens it."
+output = "Grayscale image of the source's lightness."
+best_input = "Black-and-white photos to colorize, or color images to recolor."
 weak_input = ""
-models = ["sai_control_lora_recolor_sdxl", "ioclab_recolor_sd15"]
+models = ["sai_control_lora_recolor_sdxl", "latentcat_brightness_sd15"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
     "forge_preprocessors",
     "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_1_1_400_discussion",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["recolor_luminance"]
 forge = ["recolor_luminance", "recolor_luminance_variant"]
 comfyui = ["ImageLuminanceDetector"]
+
+[hardware]
+device = "none"
+speed = "fast: a color conversion with no network"
+
+[[parameters]]
+id = "gamma_correction"
+label = "Gamma Correction"
+summary = "Brightens the map below 1 and darkens it above 1."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "gamma_correction" }
+type = "float"
+default = 1.0
+range = [0.1, 2.0]
+effect = "Each lightness value, from 0 to 1, is raised to this power: midtones move most, black and white stay."
+when_to_adjust = "Lower it to lift dark images before recoloring. Raise it to deepen washed-out ones."
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while ComfyUI converts it."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 16384]
+effect = "ComfyUI resizes the image to this short side and pads it to a multiple of 64. The WebUI backends don't resize."
+when_to_adjust = "Match it to the generation's short side."

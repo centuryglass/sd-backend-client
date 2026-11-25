@@ -1,19 +1,45 @@
 id = "t2i_adapter"
 label = "T2I-Adapter"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "The WebUI's group for TencentARC's T2I-Adapter models, including the color palette and style adapters."
+description = """\
+T2I-Adapter is the WebUI's grouping for TencentARC's adapters, small add-ons that steer Stable Diffusion much \
+like ControlNets but cost less to run. It mostly holds the adapter-only kinds: the color adapter, which follows a \
+spatial palette made by Color Grid, and the style adapter, which carries a reference's look through T2I Style \
+CLIP Vision. The T2I sketch preprocessor is here too.\n\n\
+sd-webui-controlnet lists every installed T2I-Adapter under this type, including those for canny, depth or \
+pose. Forge and Forge Neo have no style preprocessor."""
+how_it_works = """\
+A T2I-Adapter is a small network that reads a control image once per generation and adds its features into a \
+frozen Stable Diffusion U-Net, which makes it far cheaper than a ControlNet, which runs at every step. The style \
+adapter works differently: it turns CLIP image features into extra prompt tokens."""
 base_models = ["sd15", "sdxl"]
-control_image = ""
+control_image = "Depends on the adapter: a coarse color grid, a sketch, or a style reference image."
 
-sources = ["recorded_fixtures", "sdwebui_cn_supported_preprocessor", "forge_preprocessors"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "sdwebui_cn_supported_preprocessor",
+    "forge_preprocessors",
+    "t2i_adapter_zoo",
+    "t2i_adapter_adapter_code",
+    "paper_t2i_adapter",
+]
+research_status = "drafted"
 open_questions = []
 
 [names]
 webui = ["T2I-Adapter"]
 forge = ["T2I-Adapter"]
 comfyui = []
+
+[[uses]]
+kind = "standard"
+title = "Set a picture's color scheme"
+description = "Make a color grid from an image, or paint one, and use the color adapter to place those colors in a new image."
+
+[[uses]]
+kind = "creative"
+title = "Carry a reference's style"
+description = "Use the style adapter with T2I Style CLIP Vision and a style image, and prompt for the subject."
 
 [choosing]
 guide = ""

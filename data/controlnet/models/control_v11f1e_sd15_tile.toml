@@ -1,8 +1,21 @@
 id = "control_v11f1e_sd15_tile"
 label = "ControlNet 1.1 Tile"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ControlNet 1.1 Tile for SD 1.5: regenerates detail while keeping an image's layout, for upscaling, detail fixes and tiled diffusion."
+description = """\
+ControlNet 1.1 Tile keeps an image's composition and colors and redraws its detail. Its README describes two \
+behaviors: it ignores the details in the control image and generates new ones, and when a tile's content doesn't \
+match the prompt it follows the tile's own content. A tile of leaves stays leaves even when the prompt asks for a \
+man.\n\n\
+That makes it useful for upscaling with tiled scripts such as Ultimate SD Upscale, for fixing blur or bad detail \
+left by other upscalers, for changing detail at denoising strength 1, and, its release notes add, for finishing \
+drafts painted in color blocks. Its quality flag is experimental. It can shift colors, most often on anime \
+images; Tile Color Fix addresses that."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads the \
+image itself, at reduced detail, so it learns what the content of each region is and steers generation toward \
+it rather than toward the prompt where they disagree."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["tile"]
@@ -11,16 +24,33 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Keeps structure while replacing detail, even at denoising strength 1, per its README",
+    "Follows each tile's content over a mismatched global prompt, per its README",
+    "Handles 768 and 1024 resolutions well, per its release notes",
+]
+weaknesses = [
+    "Experimental quality flag",
+    "Can shift colors, most often with anime images and models",
+]
+good_for = [
+    "tiled upscaling",
+    "fixing blurred or broken upscaler detail",
+    "regenerating detail",
+    "finishing color-block drafts",
+]
 
 sources = [
     "hf_lllyasviel_controlnet_v1_1",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "cn11_readme",
+    "paper_controlnet",
+    "sdwebui_cn_tile_discussion",
+    "sdwebui_cn_tile_color_offset_discussion",
+    "sdwebui_cn_tile_colorfix_discussion",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

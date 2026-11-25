@@ -1,27 +1,46 @@
 id = "inpaint_global_harmonious"
 label = "Inpaint Global Harmonious"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Gives an inpaint model the image with the masked area blanked out; the rest of the image may shift to match."
+description = """\
+Inpaint Global Harmonious marks the area to repaint and gives the rest of the image to an inpainting ControlNet \
+as context. The model fills the masked area to fit its surroundings. Nothing pins the unmasked area in place, so \
+across the whole image the result can drift slightly toward a consistent whole. Inpaint Only adds that pin.\n\n\
+sd-webui-controlnet's inpaint guide pairs it with ControlNet 1.1 Inpaint in A1111's img2img inpaint tab, where \
+A1111's own inpainting keeps unmasked pixels, and it works with any SD 1.5 base model. It needs a mask. ComfyUI's \
+Inpaint Preprocessor node produces the same control image."""
+how_it_works = """\
+No network is involved. The control image is the source with every masked pixel set to -1, a value below black \
+that no real pixel has, so the model can tell missing pixels from dark ones. The inpainting ControlNet was \
+trained to read such images and guide the generation to fill the holes consistently with the visible parts. In \
+sd-webui-controlnet the WebUI module is named inpaint and shown as inpaint_global_harmonious."""
 control_types = ["inpaint"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Blanks out the masked area of the image, marking it for the model to fill; the visible area is context."
+output = "The source image with masked pixels set below black, -1 in the model's value range."
+best_input = "Any image and a mask over the area to repaint."
 weak_input = ""
-models = ["control_v11p_sd15_inpaint"]
+models = ["control_v11p_sd15_inpaint", "ecomxl_inpaint_sdxl"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_hook",
     "forge_preprocessors",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_inpaint_discussion",
+    "sdwebui_cn_inpaint_only_discussion",
+    "hf_alimama_creative_ecomxl_controlnet_inpaint",
 ]
-research_status = "stub"
-open_questions = ["Confirm which WebUI inpaint module comfyui_controlnet_aux InpaintPreprocessor matches."]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["inpaint", "inpaint_global_harmonious"]
 forge = ["inpaint_global_harmonious", "inpaint_global_harmonious_variant"]
 comfyui = ["InpaintPreprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: no network"

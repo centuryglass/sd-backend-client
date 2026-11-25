@@ -1,26 +1,54 @@
 id = "t2ia_style_clipvision"
 label = "T2I Style CLIP Vision"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Encodes an image with CLIP ViT-L/14 so the T2I style adapter can carry its style into the generation."
+description = """\
+T2I Style CLIP Vision reads a style reference image and passes its CLIP features, not an image, to the T2I-Adapter \
+style model. The adapter turns them into a few extra prompt tokens that describe the image's look. TencentARC \
+calls that adapter a preliminary model.\n\n\
+sd-webui-controlnet lists it under T2I-Adapter as t2ia_style_clipvision, with clip_vision as its module name. \
+Its control mode setting is unavailable. Of the Forge family, only reForge has it, as \
+t2ia_style_clipvision_variant. It downloads OpenAI's CLIP ViT-L/14 image encoder, about 1.7 GB, on first use."""
+how_it_works = """\
+CLIP is a pair of networks trained so that matching images and captions land close together, which makes its \
+image features a summary of what an image shows and how it looks. The preprocessor squeezes the image to 224 by \
+224 pixels, ignoring its aspect ratio, runs the image side of CLIP ViT-L/14 and keeps the features of every \
+image patch. The style adapter, a small transformer, condenses those \
+features into eight tokens and appends them to the text prompt's tokens, so the U-Net attends to them as it \
+attends to words."""
 control_types = ["t2i_adapter"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Produces image features rather than a picture; nothing visible to preview."
+output = "CLIP ViT-L/14 image features."
+best_input = "An image whose overall style, palette and mood should carry over."
+weak_input = "Fine detail and layout: the image is reduced to 224 by 224 pixels and summarized."
 models = ["t2iadapter_style_sd14v1"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
-    "sdwebui_cn_preprocessors",
-    "forge_preprocessors",
+    "sdwebui_cn_annotators",
     "reforge_preprocessors",
+    "hf_openai_clip_vit_large_patch14",
+    "t2i_adapter_zoo",
+    "t2i_adapter_adapter_code",
+    "t2i_adapter_condition_code",
+    "paper_t2i_adapter",
+    "paper_clip",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["clip_vision", "t2ia_style_clipvision"]
 forge = ["t2ia_style_clipvision_variant"]
 comfyui = []
+
+[hardware]
+device = "gpu_preferred"
+vram = "CLIP ViT-L/14 image and text weights, about 1.7 GB on disk."
+speed = "fast: one pass of a CLIP image encoder"
+
+[[hardware.files]]
+filename = "pytorch_model.bin"
+size_bytes = 1710671599
+sha256 = "f1a17cdbe0f36fec524f5cafb1c261ea3bbbc13e346e0f74fc9eb0460dedd0d3"
+source_url = "https://huggingface.co/openai/clip-vit-large-patch14/resolve/32bd64288804d66eefd0ccbe215aa642df71cc41/pytorch_model.bin"

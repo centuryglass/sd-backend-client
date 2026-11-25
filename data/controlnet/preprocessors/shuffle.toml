@@ -1,26 +1,71 @@
 id = "shuffle"
-label = "Shuffle"
-summary = ""
-description = ""
-how_it_works = ""
+label = "Content Shuffle"
+summary = "Scrambles the image with a random warp, keeping its colors and textures but not its layout, for the Shuffle model."
+description = """\
+Content Shuffle swirls the source image into a random jumble. Colors, textures and style survive; objects and \
+composition don't. The ControlNet 1.1 Shuffle model was trained to recompose such jumbles into whole images, so \
+the pair transfers a reference image's look onto whatever the prompt describes.\n\n\
+Each run gives a different jumble. sd-webui-controlnet seeds it from the generation seed and fixes the \
+resolution at 512 pixels. ComfyUI's Content Shuffle node takes a resolution and its own seed, where 0 means a \
+fresh random warp each run. The ControlNet 1.1 README notes the model can also take an unshuffled image."""
+how_it_works = """\
+No network is involved. Two smooth random noise fields, made by enlarging a coarse grid of random values, give \
+each output pixel an x and a y position to copy its color from. Neighboring pixels copy from nearby places, so \
+local texture holds together, while the image as a whole is scrambled. ControlNet 1.1's notes say the method \
+comes from Two-stage Sketch Colorization, where it guides the style of image-to-image translation."""
 control_types = ["shuffle"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Warps the image randomly so its layout is lost while its colors and textures remain."
+output = "A swirled, scrambled copy of the source in its original colors."
+best_input = "Images whose colors, lighting and style should carry over: paintings, photos with a strong palette."
+weak_input = "Images whose subject or composition should carry over: shuffling destroys both."
 models = ["control_v11e_sd15_shuffle"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
+    "sdwebui_cn_script",
     "forge_preprocessors",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "cn11_readme",
+    "cn11_annotator_docs",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["shuffle"]
 forge = ["shuffle"]
 comfyui = ["ShufflePreprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: a random warp with no network"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while it is shuffled."
+names = { comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 16384]
+effect = """\
+The image is resized so its short side matches this value and shuffled at that size. The warp's features are a \
+fixed 256 pixels across, so higher resolutions shuffle in finer pieces relative to the image. \
+sd-webui-controlnet fixes this at 512 and hides it; the Forge family hides it too."""
+when_to_adjust = "Leave it at 512 to match sd-webui-controlnet."
+
+[[parameters]]
+id = "seed"
+label = "Seed"
+summary = "Picks the random warp. 0 draws a new one each run."
+names = { comfyui = "seed" }
+type = "int"
+default = 0
+effect = "The same nonzero seed gives the same shuffle. sd-webui-controlnet takes the shuffle from the generation seed."
+when_to_adjust = "Set a nonzero seed to reproduce a result, or change it to try a different jumble."

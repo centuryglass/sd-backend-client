@@ -1,8 +1,19 @@
 id = "control_v11e_sd15_ip2p"
 label = "ControlNet 1.1 Instruct Pix2Pix"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ControlNet 1.1 for SD 1.5 that edits an image by instruction, such as \"make it winter\", with any SD 1.5 base model."
+description = """\
+ControlNet 1.1 Instruct Pix2Pix edits the control image by following the prompt as an instruction, such as \
+"make it into winter", while keeping the picture recognizable. It was trained on the InstructPix2Pix dataset, \
+with half instruction prompts and half plain description prompts, so either kind works.\n\n\
+Its README notes two differences from the original InstructPix2Pix model: it applies to any SD 1.5 base model, \
+and it needs no separate image guidance scale. Instructions phrased "make it into X" work better than "make Y \
+into X". It takes the source image directly, with no preprocessor."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one was \
+trained on InstructPix2Pix's dataset: before-and-after image pairs, with edit instructions, generated with \
+GPT-3 and Stable Diffusion."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["ip2p"]
@@ -11,16 +22,22 @@ trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Works with any SD 1.5 base model, per its README",
+    "Accepts both instruction and description prompts, per its README",
+]
+weaknesses = ["Experimental quality flag"]
+good_for = ["editing an image by instruction", "changing season, weather or material"]
 
 sources = [
     "hf_lllyasviel_controlnet_v1_1",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "cn11_readme",
+    "paper_controlnet",
+    "paper_instruct_pix2pix",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

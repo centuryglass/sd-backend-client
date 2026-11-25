@@ -1,12 +1,25 @@
 id = "reference_only"
 label = "Reference Only"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Lets the generation look at a reference image through its own attention layers; no control model needed."
+description = """\
+Reference Only makes a new image resemble a reference image's subject and style without any control model. Its \
+announcement shows a prompt for a dog running on grassland producing the reference's dog. It compares it to an \
+older trick, pasting the reference beside a blank canvas and inpainting the blank half, which often left \
+distortions.\n\n\
+Style Fidelity sets how much the reference outweighs the prompt. It applies in Balanced mode: "ControlNet is \
+more important" sets it to 1 and "My prompt is more important" to 0. On SDXL the value is cubed, so the default \
+0.5 acts as 0.125; the code notes that SDXL reacts strongly to the reference."""
+how_it_works = """\
+At every step the reference image is noised to the current noise level and run through the same U-Net, which \
+records the inputs to its self-attention layers. When the actual image is denoised, each of those layers attends \
+to its own features and the reference's together, so it can borrow from the reference: shapes, textures, \
+colors. Weight chooses how many layers take part, widest and deepest first. Style Fidelity sets how far the \
+negative prompt's pass also sees the reference. The less it sees, the more guidance pulls the result toward the \
+reference."""
 control_types = ["reference"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Passes the image unchanged; during sampling, shares the reference's attention features with the generation."
+output = "The reference image, unchanged."
+best_input = "An image of the subject, character or style the result should resemble."
 weak_input = ""
 models = []
 
@@ -14,13 +27,36 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_hook",
     "forge_preprocessors",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "sdwebui_cn_reference_discussion",
+    "sdwebui_cn_reference_adain_discussion",
+    "sdwebui_cn_1_1_400_discussion",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["reference_only"]
 forge = ["reference_only", "reference_only_variant"]
 comfyui = []
+
+[hardware]
+device = "none"
+speed = "fast to prepare; each sampling step runs an extra U-Net pass on the reference"
+
+[[parameters]]
+id = "style_fidelity"
+label = "Style Fidelity"
+summary = "How strongly the reference outweighs the prompt, through guidance."
+names = { webui = "threshold_a", forge = "threshold_a" }
+type = "float"
+default = 0.5
+range = [0.0, 1.0]
+effect = """\
+At 0 both the prompt and negative passes see the reference, so it adds no extra pull. At 1 only the prompt pass \
+sees it, and classifier-free guidance amplifies the difference. sd-webui-controlnet uses it only in Balanced \
+mode, and cubes it on SDXL. Forge has no control mode for Reference."""
+when_to_adjust = "Raise it when the result strays from the reference. Lower it when the prompt should have more say."

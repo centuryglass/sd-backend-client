@@ -1,12 +1,20 @@
 id = "blur_gaussian"
 label = "Gaussian Blur"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Blurs the image evenly, the input kohya's LLLite blur models were trained on."
+description = """\
+Gaussian Blur softens the whole image by a set amount, keeping colors and broad shapes while removing detail. \
+kohya-ss trained its ControlNet-LLLite blur models on Gaussian-blurred images and recommends this preprocessing \
+for them. The model then redraws the missing detail, as a Tile model does.\n\n\
+sd-webui-controlnet files it under Tile. Forge, reForge and Forge Neo list it under both Tile and a separate \
+Blur type, which offers the same models as Tile. In ComfyUI the core Blur Image node does the same job."""
+how_it_works = """\
+No network is involved. Each output pixel is a weighted average of its neighbors, with weights falling off in a \
+bell curve whose width is Sigma. In the WebUI backends the image is first resized so its short side matches the \
+resolution. ComfyUI's node blurs at the image's own size, over a square window set by Blur Radius."""
 control_types = ["tile"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Softens the entire image evenly; colors and large shapes stay, fine detail and texture go."
+output = "A blurred copy of the source."
+best_input = "Any image whose composition and colors should stay while the model invents new detail."
 weak_input = ""
 models = [
     "kohya_lllite_blur_sdxl",
@@ -19,12 +27,54 @@ sources = [
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
     "comfyui_core_nodes",
+    "hf_kohya_ss_controlnet_lllite",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["blur_gaussian"]
 forge = ["blur_gaussian"]
 comfyui = ["ImageBlur"]
+
+[hardware]
+device = "none"
+speed = "fast: a blur with no network"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side before it is blurred."
+names = { webui = "processor_res", forge = "processor_res" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = "The image is resized so its short side matches this value, then blurred. Sigma is measured at this size."
+when_to_adjust = "Match it to the generation's short side, so Sigma means the same amount of blur in the output."
+
+[[parameters]]
+id = "sigma"
+label = "Sigma"
+summary = "How strongly the image is blurred."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "sigma" }
+type = "float"
+default = 9.0
+range = [0.01, 64.0]
+effect = """\
+Larger values blur over a wider area. ComfyUI's Blur Image node takes 0.1 to 10, default 1, and limits the blur \
+to its Blur Radius window."""
+when_to_adjust = "Raise it to give the model more freedom over detail. Lower it to stay closer to the source."
+
+[[parameters]]
+id = "blur_radius"
+label = "Blur Radius"
+summary = "Half-width of ComfyUI's blur window, in pixels."
+names = { comfyui = "blur_radius" }
+type = "int"
+default = 1
+range = [1, 31]
+effect = "The blur covers a square of twice this plus one pixels. A large Sigma needs a large radius to take effect."
+when_to_adjust = "Raise it along with Sigma for a stronger blur."

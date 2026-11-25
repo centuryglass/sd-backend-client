@@ -1,29 +1,58 @@
 id = "noobai_inpaint_sdxl"
 label = "NoobAI Inpainting"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Wenaka's SDXL inpainting and outpainting ControlNet, trained on NoobAI XL; masked areas go in as black."
+description = """\
+NoobAI Inpainting is an SDXL ControlNet for inpainting and outpainting, trained by Wenaka on NoobAI XL's \
+epsilon-prediction 1.0 release with a dataset of 110,000 images. Its control image is the masked image, and the \
+Forge family's Inpaint NoobAI preprocessor makes it by painting the masked area black. Acly's fp16 copy \
+describes it as an inpainting ControlNet for NoobAI, Illustrious and SDXL.\n\n\
+This is the full release. An earlier SFW release, trained on a 90% SFW dataset, is a separate network. Forge Neo \
+recommends a denoising strength of 0.9 or more with it."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads the \
+image with its masked area blacked out and guides generation to fill it consistently with the rest."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["inpaint"]
 preprocessors = ["inpaint_noobai"]
-trainer = ""
-license = ""
-homepage = ""
+trainer = "Wenaka"
+license = "apache-2.0"
+homepage = "https://huggingface.co/Wenaka/NoobAI_XL_Inpainting_ControlNet_Full"
 
-strengths = []
+strengths = ["Inpainting and outpainting on NoobAI-family models, per its card"]
 weaknesses = []
-good_for = []
+good_for = ["inpainting", "outpainting"]
 
-sources = ["recorded_fixtures"]
-research_status = "stub"
-open_questions = [
-    "NoobAI_Inpainting_ControlNet.safetensors appears in the recorded ComfyUI fixture, and Forge Neo and reForge ship an inpaint_noobai preprocessor for it. Find its upstream release, trainer and license.",
+sources = [
+    "hf_wenaka_noobai_inpainting_full",
+    "hf_wenaka_noobai_inpainting_sfw",
+    "hf_acly_noobai_inpainting",
+    "civitai_noobai_inpainting",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "recorded_fixtures",
+    "paper_controlnet",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "NoobAI_Inpainting_ControlNet.safetensors"
 format = "safetensors"
-sha256 = ""
-webui_hash = ""
-source_url = ""
+precision = "fp32"
+size_bytes = 5004167832
+sha256 = "bb5a79b7771c6dd75f967b8e9c31bfd26fbc6d7254462ba2c62e8e193d648e10"
+webui_hash = "0bc5f3a1"
+source_url = "https://huggingface.co/Wenaka/NoobAI_XL_Inpainting_ControlNet_Full/resolve/bb7e0e4e41bfdfac7b3ce935028e14bdcb594005/NoobAI_Inpainting_ControlNet.safetensors"
+
+[[files]]
+filename = "noobaiInpainting_v10.fp16.safetensors"
+also_seen_as = ["noobai_inpaint_controlnet_fp16.safetensors"]
+format = "safetensors"
+precision = "fp16"
+size_bytes = 2502139104
+sha256 = "8b3c2155ec8a49b43a8a32dac39a21b8c09ea60a7afaffe3c7a6fb51313a45d6"
+webui_hash = "32a1ca88"
+source_url = "https://huggingface.co/Acly/NoobAI-Inpainting/resolve/7341925b3346eb48dcac4dd4049cdb5bf2afd472/noobaiInpainting_v10.fp16.safetensors"

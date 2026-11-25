@@ -1,22 +1,49 @@
 id = "ttplanet_tile_realistic_v2_sdxl"
 label = "TTPlanet SDXL Tile Realistic V2"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TTPlanet's SDXL Tile ControlNet V2: realistic detail for upscaling and restyling, with less color shift than V1."
+description = """\
+TTPlanet's second SDXL Tile ControlNet. Its card lists a much larger training set and longer training, \
+recognition of more objects without prompting, less color shift than V1, and control strong enough to replace \
+canny plus openpose in some cases.\n\n\
+For Ultimate SD Upscale the card suggests denoising around 0.3 to 0.4, control weight 0.9 and tile_resample in \
+the WebUI. With no preprocessor and "My prompt is more important", it restyles a picture, changing clothes or \
+background while keeping the pose. A control image that is too sharp gives halos around edges; blur it more. It \
+was trained on realistic images only."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one reads the \
+image itself, softened, and was trained with the Hugging Face diffusers scripts for SDXL. The repo also offers a \
+rank 256 control-LoRA extraction, about 775 MB."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["tile"]
-preprocessors = ["ttplanet_tile_gf", "ttplanet_tile_simple"]
+preprocessors = ["ttplanet_tile_gf", "ttplanet_tile_simple", "tile_resample"]
 trainer = "TTPlanet"
 license = "openrail"
 homepage = "https://huggingface.co/TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = [
+    "Recognizes more objects without prompting than V1, per its card",
+    "Less color shift than V1, per its card",
+    "Control strong enough to stand in for canny plus openpose in some cases, per its card",
+]
+weaknesses = [
+    "Trained on realistic images only; no promise for comics or animation, per its card",
+    "Too sharp a control image gives halos around edges, per its card",
+]
+good_for = [
+    "tiled upscaling of photos and realistic images",
+    "restyling clothes or background while keeping a pose",
+]
 
-sources = ["hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic", "recorded_fixtures"]
-research_status = "stub"
+sources = [
+    "hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic",
+    "hf_ttplanet_tile_preprocessor_v5",
+    "recorded_fixtures",
+    "paper_controlnet",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]

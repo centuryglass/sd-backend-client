@@ -1,20 +1,87 @@
 id = "ttplanet_tile_gf"
 label = "TTPlanet Tile Guided Filter"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Softens an image with blur, an edge-preserving filter and a resize, preparing it for SDXL Tile models."
+description = """\
+TTPlanet Tile Guided Filter turns a source image into a soft version for an SDXL Tile model to redraw. It blurs \
+the image, smooths it with a guided filter that keeps strong edges while flattening texture, then shrinks and \
+re-enlarges it. comfyui_controlnet_aux ports it from the script TTPlanet publishes with its SDXL Tile models, \
+and the xinsir Tile SDXL card cites the same script for its blur preprocessing.\n\n\
+TTPlanet's card explains why blur matters: a control image that is too sharp gives a halo, a pronounced \
+high-contrast shape around edges, while one that is too blurry gives a blurry result. It is a ComfyUI node; \
+the WebUI backends don't have it."""
+how_it_works = """\
+No network is involved. A Gaussian blur comes first, sized by Blur Strength. Then a fast guided filter smooths \
+the image using the image itself as its guide: in flat areas it averages pixels together, and across strong \
+edges it keeps the edge. The fast variant computes the filter at a reduced size, set here by Scale Factor. \
+Last, the image is shrunk by Scale Factor with area averaging and enlarged back with cubic interpolation."""
 control_types = ["tile"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Blurs texture and fine detail while keeping major edges, colors and layout."
+output = "A softened copy of the source at its original size."
+best_input = "Photos and realistic images for SDXL Tile upscaling, the kind TTPlanet's models were trained on."
 weak_input = ""
-models = ["ttplanet_tile_realistic_v1_sdxl", "ttplanet_tile_realistic_v2_sdxl"]
+models = ["ttplanet_tile_realistic_v1_sdxl", "ttplanet_tile_realistic_v2_sdxl", "xinsir_tile_sdxl"]
 
-sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "hf_ttplanet_tile_preprocessor_v5",
+    "hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic",
+    "hf_xinsir_controlnet_tile_sdxl_1_0",
+    "paper_fast_guided_filter",
+]
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = []
 forge = []
 comfyui = ["TTPlanet_TileGF_Preprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: image filters with no network"
+
+[[parameters]]
+id = "scale_factor"
+label = "Scale Factor"
+summary = "How many times smaller the image is made before being enlarged back, and the guided filter's subsampling."
+names = { comfyui = "scale_factor" }
+type = "float"
+default = 1.0
+range = [1.0, 8.0]
+effect = "1 keeps the resolution. Higher values throw away more detail, like a smaller source image would."
+when_to_adjust = "Raise it when the Tile model copies too much of the source's texture or noise."
+
+[[parameters]]
+id = "blur_strength"
+label = "Blur Strength"
+summary = "Size of the Gaussian blur applied first."
+names = { comfyui = "blur_strength" }
+type = "float"
+default = 2.0
+range = [1.0, 10.0]
+effect = "The blur kernel is this many pixels wide, rounded down and made odd, with a spread of half that."
+when_to_adjust = "Raise it when the result shows halos around edges. Lower it when the result is too blurry."
+
+[[parameters]]
+id = "radius"
+label = "Radius"
+summary = "Neighborhood size of the guided filter."
+names = { comfyui = "radius" }
+type = "int"
+default = 7
+range = [1, 20]
+effect = "Larger radii smooth over wider areas."
+when_to_adjust = "Raise it to flatten more texture. Lower it to keep more small structure."
+
+[[parameters]]
+id = "eps"
+label = "Epsilon"
+summary = "How strong an edge must be for the guided filter to keep it."
+names = { comfyui = "eps" }
+type = "float"
+default = 0.01
+range = [0.001, 0.1]
+effect = "Larger values smooth across more edges; smaller values keep weaker edges sharp."
+when_to_adjust = "Raise it for a softer control image, lower it to keep more edges."

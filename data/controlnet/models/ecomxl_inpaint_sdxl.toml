@@ -1,27 +1,43 @@
 id = "ecomxl_inpaint_sdxl"
 label = "EcomXL Inpaint"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Alibaba's SDXL inpainting ControlNet for product photos, trained to fill backgrounds without growing the product."
+description = """\
+EcomXL Inpaint is an SDXL inpainting ControlNet from Alibaba's alimama-creative team, made for e-commerce: it \
+generates a new background around a product. Unlike general inpainting ControlNets, its second training stage \
+used instance masks, which keeps it from extending the foreground object into the filled area. Its card shows \
+the difference side by side.\n\n\
+The card's example marks masked pixels as -1, as Inpaint Global Harmonious does, uses a weight of 0.5, which it \
+says performs well, and pastes the product back over the result."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one was \
+trained first on 12 million LAION and internal images with random masks, then on 3 million e-commerce images \
+with instance masks, 20,000 steps each."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["inpaint"]
-preprocessors = []
+preprocessors = ["inpaint_global_harmonious"]
 trainer = "alimama-creative"
 license = "apache-2.0"
 homepage = "https://huggingface.co/alimama-creative/EcomXL_controlnet_inpaint"
 
-strengths = []
+strengths = ["Doesn't extend the foreground object into the masked area, per its card"]
 weaknesses = []
-good_for = []
+good_for = ["product photo backgrounds", "replacing the background around an object"]
 
-sources = ["hf_alimama_creative_ecomxl_controlnet_inpaint", "recorded_fixtures"]
-research_status = "stub"
+sources = [
+    "hf_alimama_creative_ecomxl_controlnet_inpaint",
+    "civitai_controlnetxl_cnxl",
+    "recorded_fixtures",
+    "paper_controlnet",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model.safetensors"
-also_seen_as = ["EcomXL_controlnet_inpaint.safetensors"]
+also_seen_as = ["EcomXL_controlnet_inpaint.safetensors", "EcomXL_inpaint.safetensors"]
 format = "safetensors"
 size_bytes = 2502139136
 sha256 = "fa14b93d5d35340d114834468b45a6069ddb0a445964af8838fee4c447d9a4f6"

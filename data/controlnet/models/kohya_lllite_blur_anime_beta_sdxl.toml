@@ -1,8 +1,16 @@
 id = "kohya_lllite_blur_anime_beta_sdxl"
 label = "LLLite SDXL Blur Anime Beta"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Beta of kohya-ss's ControlNet-LLLite blur model for anime SDXL, which redraws a blurred image with new detail."
+description = """\
+The beta release of kohya-ss's ControlNet-LLLite blur model for anime images. Like the finished blur models, it \
+takes a blurred image and generates a sharp one with the same layout and colors, as a Tile model does. Its card \
+lists it under the models trained on kohya-ss's custom anime SDXL model and says only that it is a beta.\n\n\
+Its file, about 22 MB, is half the size of the later blur models', with the smaller conditioning and module \
+dimensions its name encodes. The card recommends Gaussian blur for the blur models."""
+how_it_works = """\
+ControlNet-LLLite is kohya-ss's lightweight alternative to ControlNet: small conditioning modules attached to \
+the SDXL U-Net. Its model card calls the structure highly experimental and subject to change. This model's training \
+data is not described."""
 base_models = ["sdxl"]
 adapter = "controlnet_lllite"
 control_types = ["tile"]
@@ -11,19 +19,22 @@ trainer = "kohya-ss"
 license = "apache-2.0"
 homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Very small"]
+weaknesses = ["Experimental architecture"]
+good_for = ["regenerating detail in a blurred or low-detail image"]
 
-sources = ["hf_kohya_ss_controlnet_lllite", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "The sd_control_collection copy is matched to the kohya-ss file by name only, and their sizes differ slightly. Confirm they hold the same network.",
+sources = [
+    "hf_kohya_ss_controlnet_lllite",
+    "hf_lllyasviel_sd_control_collection",
+    "recorded_fixtures",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "controllllite_v01016032e_sdxl_blur_anime_beta.safetensors"
 format = "safetensors"
+precision = "bf16"
 size_bytes = 22514784
 sha256 = "884dd509a0f835d21fcbac8d531a30a6894db275458bc079f8637847c4edbdda"
 webui_hash = "691a455a"
@@ -32,6 +43,7 @@ source_url = "https://huggingface.co/kohya-ss/controlnet-lllite/resolve/d14d1353
 [[files]]
 filename = "kohya_controllllite_xl_blur_anime_beta.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 22512816
 sha256 = "5a6c9daa8a05a9b355c34e5fff96f36e140c2610e7e83840d4c60d63fbdd9f5c"
 webui_hash = "b4e34bbc"

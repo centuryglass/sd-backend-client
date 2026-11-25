@@ -1,8 +1,15 @@
 id = "kohya_lllite_blur_sdxl"
 label = "LLLite SDXL Blur"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "kohya-ss ControlNet-LLLite for SDXL that redraws a Gaussian-blurred image with new detail; trained on SDXL base."
+description = """\
+A ControlNet-LLLite model from kohya-ss that takes a Gaussian-blurred image and generates a sharp one with the \
+same layout and colors, as a Tile model does. It was trained on SDXL base with 3,919 generated images and Gaussian blur \
+preprocessing, and the card recommends Gaussian blur as its preprocessor.\n\n\
+Trained only on the first half of the noise schedule, timesteps 500 to 1000, so the card advises applying it to the first half of the steps."""
+how_it_works = """\
+ControlNet-LLLite is kohya-ss's lightweight alternative to ControlNet: small conditioning modules attached to \
+the SDXL U-Net. Its model card calls the structure highly experimental and subject to change. This model was \
+trained on Gaussian-blurred images."""
 base_models = ["sdxl"]
 adapter = "controlnet_lllite"
 control_types = ["tile"]
@@ -11,19 +18,22 @@ trainer = "kohya-ss"
 license = "apache-2.0"
 homepage = "https://huggingface.co/kohya-ss/controlnet-lllite"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Very small"]
+weaknesses = ["Experimental architecture"]
+good_for = ["regenerating detail in a blurred or low-detail image"]
 
-sources = ["hf_kohya_ss_controlnet_lllite", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
-open_questions = [
-    "The sd_control_collection copy is matched to the kohya-ss file by name only, and their sizes differ slightly. Confirm they hold the same network.",
+sources = [
+    "hf_kohya_ss_controlnet_lllite",
+    "hf_lllyasviel_sd_control_collection",
+    "recorded_fixtures",
 ]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "controllllite_v01032064e_sdxl_blur-500-1000.safetensors"
 format = "safetensors"
+precision = "bf16"
 size_bytes = 46174136
 sha256 = "c1045601f957a4de3c6eaa7dc5e81298ab23bc97f06f5c86378c4b2e57f5698b"
 webui_hash = "ef7e1b13"
@@ -32,6 +42,7 @@ source_url = "https://huggingface.co/kohya-ss/controlnet-lllite/resolve/d14d1353
 [[files]]
 filename = "kohya_controllllite_xl_blur.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 46172168
 sha256 = "d2087bef714d97ca9e9a066a6351c9ec636a3618f2553fc468bec03d74535393"
 webui_hash = "22117d11"

@@ -1,25 +1,40 @@
 id = "latentcat_brightness_sd15"
 label = "Brightness"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ioclab's SD 1.5 ControlNet that follows a grayscale brightness map, to colorize grayscale images or recolor others."
+description = """\
+ioclab's Brightness ControlNet, now hosted by latentcat, makes a generated image follow a grayscale image's \
+brightness. Its card names two uses: colorizing grayscale images and recoloring generated ones. It was trained \
+on ioclab's grayscale_image_aesthetic_3M dataset.\n\n\
+sd_control_collection mirrors it in fp16 as ioclab_sd15_recolor, and sd-webui-controlnet's SD 1.5 recolor \
+example pairs that copy with Recolor Luminance."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. It learns to read \
+one kind of control image and adds its signal into the main network at every denoising step. This one was \
+trained on images paired with their grayscale versions, so it learns to keep a given brightness pattern while \
+the prompt sets the colors."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["recolor", "qr_code"]
-preprocessors = []
+preprocessors = ["recolor_luminance", "recolor_intensity"]
 trainer = "ioclab (latentcat)"
 license = "creativeml-openrail-m"
 homepage = "https://huggingface.co/latentcat/control_v1p_sd15_brightness"
 
 strengths = []
 weaknesses = []
-good_for = []
+good_for = ["colorizing grayscale images", "recoloring images"]
 
-sources = ["hf_latentcat_control_v1p_sd15_brightness", "hf_latentcat_latentcat_controlnet"]
-research_status = "stub"
-open_questions = [
-    "The ioclab Hugging Face repos redirect to latentcat. Confirm the two brightness files are one network, and which control types the model card names.",
+sources = [
+    "hf_latentcat_control_v1p_sd15_brightness",
+    "hf_latentcat_latentcat_controlnet",
+    "hf_lllyasviel_sd_control_collection",
+    "sdwebui_cn_1_1_400_discussion",
+    "comfyui_controlnet_aux_readme",
+    "paper_controlnet",
 ]
+research_status = "drafted"
+open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model.safetensors"
@@ -36,3 +51,12 @@ size_bytes = 1445154814
 sha256 = "9161c3825216e6baa45806fe9763df13ee7c60f0e12e693b7d4a00f039b1ba86"
 webui_hash = "5f6aa6ed"
 source_url = "https://huggingface.co/latentcat/latentcat-controlnet/resolve/e4f51c7df7c42514faeb600345d287c27f305086/models/control_v1p_sd15_brightness.safetensors"
+
+[[files]]
+filename = "ioclab_sd15_recolor.safetensors"
+format = "safetensors"
+precision = "fp16"
+size_bytes = 722598616
+sha256 = "a3fc5d9f6601d0636b5f45f07f31ec3b81a13e195c55ef0b89985d84ffa77a64"
+webui_hash = "6641f3c6"
+source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7cf256327b341fedc82e00b0d7fb5481ad693210/ioclab_sd15_recolor.safetensors"

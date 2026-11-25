@@ -1,26 +1,59 @@
 id = "tile_colorfix"
 label = "Tile Color Fix"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Tile control that also locks the result's colors to the source image, fixing Tile's color shifts."
+description = """\
+Tile Color Fix passes the source image to a Tile model unchanged and also holds the generation's broad colors to \
+the source's while it denoises. It was added for a known Tile 1.1 problem: colors drifting from the source, \
+which its author reported mostly with anime images and models.\n\n\
+The lock is strict. Its announcement shows that a prompt asking for a different color, even in "My prompt is \
+more important" mode, produces a collapsed image instead of a recolor. Use Tile Resample when colors should be \
+free to change. sd-webui-controlnet, Forge, reForge and Forge Neo all have it; ComfyUI's ControlNet nodes don't."""
+how_it_works = """\
+The source image is encoded into latent space once. At every denoising step the backend takes the model's \
+predicted clean image, removes its low-frequency part with a box blur, and puts back the blurred source \
+instead: fine detail comes from the generation, while broad color and shading come from the source. The blur \
+radius is the Variation setting, counted in latent pixels, eight image pixels each, and doubled in a hires-fix \
+pass. In sd-webui-controlnet the unit's weight, capped at 1, blends this corrected prediction with the \
+uncorrected one."""
 control_types = ["tile"]
-effect = ""
-output = ""
-best_input = ""
-weak_input = ""
+effect = "Passes the image unchanged; during sampling, keeps the result's broad colors equal to the source's."
+output = "The source image, unchanged."
+best_input = "Images whose colors must survive Tile upscaling or detail regeneration."
+weak_input = "Any image where the prompt should change colors: the lock overrides it."
 models = ["control_v11f1e_sd15_tile"]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_hook",
     "forge_preprocessors",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "sdwebui_cn_tile_colorfix_discussion",
+    "sdwebui_cn_tile_color_offset_discussion",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["tile_colorfix"]
 forge = ["tile_colorfix", "tile_colorfix_variant"]
 comfyui = []
+
+[hardware]
+device = "none"
+speed = "fast to prepare; adds one VAE encode and a blur per step during sampling"
+
+[[parameters]]
+id = "variation"
+label = "Variation"
+summary = "Blur radius, in latent pixels, that separates the locked broad colors from the regenerated detail."
+names = { webui = "threshold_a", forge = "threshold_a" }
+type = "int"
+default = 8
+range = [3, 32]
+effect = """\
+The color lock applies to everything coarser than this radius. Larger values lock only the broadest color areas \
+and leave more freedom in between; smaller values hold colors closer to the source at a finer scale."""
+when_to_adjust = "Lower it when local colors still drift. Raise it when the result looks too close to a blurred copy of the source."

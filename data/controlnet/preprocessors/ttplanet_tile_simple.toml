@@ -1,20 +1,61 @@
 id = "ttplanet_tile_simple"
 label = "TTPlanet Tile Simple"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Shrinks, re-enlarges and blurs an image, preparing it for SDXL Tile models."
+description = """\
+TTPlanet Tile Simple is the plain version of TTPlanet's tile preprocessing: it lowers the image's resolution and \
+blurs it, without the edge-preserving filter of TTPlanet Tile Guided Filter. comfyui_controlnet_aux ports it from \
+the script TTPlanet publishes with its SDXL Tile models.\n\n\
+TTPlanet's card recommends giving the Tile model a sufficiently blurred image: too sharp gives halos around \
+edges, too blurry gives a blurry result. It is a ComfyUI node; the WebUI backends don't have it."""
+how_it_works = """\
+No network is involved. The image is shrunk by Scale Factor with area averaging, enlarged back with Lanczos \
+interpolation, and then blurred with a Gaussian blur sized by Blur Strength."""
 control_types = ["tile"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Removes fine detail and softens edges evenly, keeping colors and layout."
+output = "A softened copy of the source at its original size."
+best_input = "Photos and realistic images for SDXL Tile upscaling."
 weak_input = ""
 models = ["ttplanet_tile_realistic_v1_sdxl", "ttplanet_tile_realistic_v2_sdxl"]
 
-sources = ["recorded_fixtures", "comfyui_controlnet_aux_nodes"]
-research_status = "stub"
+sources = [
+    "recorded_fixtures",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "hf_ttplanet_tile_preprocessor_v5",
+    "hf_ttplanet_ttplanet_sdxl_controlnet_tile_realistic",
+]
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = []
 forge = []
 comfyui = ["TTPlanet_TileSimple_Preprocessor"]
+
+[hardware]
+device = "none"
+speed = "fast: a resize and a blur with no network"
+
+[[parameters]]
+id = "scale_factor"
+label = "Scale Factor"
+summary = "How many times smaller the image is made before being enlarged back."
+names = { comfyui = "scale_factor" }
+type = "float"
+default = 1.0
+range = [1.0, 8.0]
+effect = """\
+1 keeps the resolution. Higher values throw away more detail. TTPlanet's own script defaults to 2; the \
+comfyui_controlnet_aux port defaults to 1."""
+when_to_adjust = "Raise it when the Tile model copies too much of the source's texture or noise."
+
+[[parameters]]
+id = "blur_strength"
+label = "Blur Strength"
+summary = "Size of the Gaussian blur applied last."
+names = { comfyui = "blur_strength" }
+type = "float"
+default = 2.0
+range = [1.0, 10.0]
+effect = "The blur kernel is this many pixels wide, rounded down and made odd, with a spread of half that."
+when_to_adjust = "Raise it when the result shows halos around edges. Lower it when the result is too blurry."

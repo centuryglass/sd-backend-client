@@ -1,12 +1,23 @@
 id = "inpaint_only"
 label = "Inpaint Only"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Inpaints the masked area with an inpaint model and keeps everything outside the mask unchanged, even in txt2img."
+description = """\
+Inpaint Only gives an inpainting ControlNet the same blanked-out image as Inpaint Global Harmonious, and also \
+holds the unmasked area to the source at every step, so only the masked area changes. Its announcement says this \
+works even in txt2img, and sd-webui-controlnet makes it the default Inpaint preprocessor.\n\n\
+Working in txt2img opens up hires fix as a second, refining pass. sd-webui-controlnet's prompt-free inpainting \
+guide uses this with "ControlNet is more important" mode, a base resolution near 512 and hires fix at 2x, and \
+recommends a CFG scale below 5. It needs a mask."""
+how_it_works = """\
+The control image is built as in Inpaint Global Harmonious, with masked pixels set to -1. The source is also \
+encoded into latent space, and the mask is shrunk to latent size. After each denoising step the model's \
+predicted image is replaced outside the mask with the source's latent, so only the masked area evolves. Forge \
+and its forks also mix a noised copy of the source into the unmasked area before each step, and after decoding \
+paste the original pixels back outside a slightly grown, feathered mask."""
 control_types = ["inpaint"]
-effect = ""
-output = ""
-best_input = ""
+effect = "Blanks out the masked area for the model to fill; during sampling, keeps the unmasked area identical to the source."
+output = "The source image with masked pixels set below black, -1 in the model's value range."
+best_input = "Any image and a mask over the area to repaint, in img2img or txt2img."
 weak_input = ""
 models = ["control_v11p_sd15_inpaint"]
 
@@ -14,13 +25,21 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
+    "sdwebui_cn_hook",
     "forge_preprocessors",
     "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "sdwebui_cn_inpaint_only_discussion",
+    "sdwebui_cn_inpaint_firefly_discussion",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["inpaint_only"]
 forge = ["inpaint_only", "inpaint_only_variant"]
 comfyui = []
+
+[hardware]
+device = "none"
+speed = "fast to prepare; adds one VAE encode and a latent blend per step during sampling"
