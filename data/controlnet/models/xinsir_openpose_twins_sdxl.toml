@@ -1,23 +1,37 @@
 id = "xinsir_openpose_twins_sdxl"
 label = "Xinsir SDXL OpenPose Twins"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "An alternate xinsir SDXL OpenPose ControlNet that follows the pose more precisely, with lower aesthetic scores."
+description = """\
+A second SDXL OpenPose ControlNet in xinsir's repo, uploaded as diffusion_pytorch_model_twins.safetensors. The \
+card does not mention it. Asked what it is, xinsir answered that it performs about the same with a different \
+style: the pose is more precise and the aesthetic score lower, while the default model looks better.\n\n\
+It shares the main model's input. The skeletons should be drawn with thick lines, as the card describes, which \
+ComfyUI's Scale Sticks for Xinsir switch does."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. xinsir has not described how its \
+training differs from the main model's."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["openpose"]
-preprocessors = ["dw_openpose_full"]
+preprocessors = ["openpose"]
 trainer = "xinsir"
 license = "apache-2.0"
 homepage = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Follows the pose more precisely than xinsir's default model, per its author"]
+weaknesses = ["Lower aesthetic score than xinsir's default model, per its author"]
+good_for = ["poses that must be matched closely"]
 
-sources = ["hf_xinsir_controlnet_openpose_sdxl_1_0"]
-research_status = "stub"
-open_questions = ["Find what distinguishes the \"twins\" OpenPose file from the main one."]
+sources = [
+    "hf_xinsir_controlnet_openpose_sdxl_1_0",
+    "hf_xinsir_openpose_discussion_3",
+    "paper_controlnet",
+    "comfyui_controlnet_aux_src",
+]
+research_status = "verified"
+open_questions = []
 
 [[files]]
 filename = "diffusion_pytorch_model_twins.safetensors"

@@ -1,13 +1,22 @@
 id = "mediapipe_face"
 label = "MediaPipe Face"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Traces each face's outline, eyes, brows, lips and pupils with MediaPipe, to copy expression and gaze."
+description = """\
+MediaPipe Face traces the features of each face on black: the face outline, eyes, eyebrows and lips as thin \
+colored lines, with a dot for each pupil. It carries expression, head angle and where the eyes look, and \
+leaves out the body.\n\n\
+It pairs with CrucibleAI's MediaPipe Face ControlNet, whose training data used the same drawing. Faces less \
+than 64 pixels across at the processing resolution are dropped, and an image with no face found gives an \
+empty map. WebUI and Forge find one face by default, ComfyUI up to ten."""
+how_it_works = """\
+Google's MediaPipe Face Mesh is a network built to run in real time. It places 478 points on the surface \
+of each face it finds, including points for the irises. The preprocessor draws only the lines along the face \
+outline, eyes, eyebrows and lips, each feature in its own color, and marks the pupils from the iris points."""
 control_types = ["openpose"]
-effect = ""
-output = ""
+effect = "Replaces the image with colored outlines of each face's features and pupils, on black."
+output = "Colored face-feature outlines and pupil dots on black."
 best_input = ""
-weak_input = ""
+weak_input = "Faces under 64 pixels across at the processing resolution, which are skipped."
 models = ["crucibleai_mediapipe_face_sd15"]
 
 sources = [
@@ -15,9 +24,15 @@ sources = [
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
+    "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "mediapipe_face_landmarker",
+    "hf_crucibleai_controlnetmediapipeface",
 ]
-research_status = "stub"
+research_status = "drafted"
 open_questions = [
     "No WebUI control type lists mediapipe_face. Filed under OpenPose as the nearest fit; decide whether face landmarks need their own control type.",
 ]
@@ -26,3 +41,45 @@ open_questions = [
 webui = ["mediapipe_face"]
 forge = ["mediapipe_face"]
 comfyui = ["MediaPipe-FaceMeshPreprocessor"]
+
+[hardware]
+device = "cpu"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and searched for faces \
+at that size. Faces must be at least 64 pixels across at this size to be drawn. ComfyUI accepts up to 16384."""
+when_to_adjust = "Raise it when small faces are missed."
+
+[[parameters]]
+id = "max_faces"
+label = "Max Faces"
+summary = "The most faces to find and draw."
+names = { webui = "threshold_a", forge = "threshold_a", comfyui = "max_faces" }
+type = "int"
+default = 1
+range = [1, 10]
+effect = """\
+Faces beyond this count are ignored. WebUI and Forge default to 1, with a range of 1 to 10. ComfyUI defaults to \
+10, with a range of 1 to 50."""
+when_to_adjust = "Raise it for group shots."
+
+[[parameters]]
+id = "min_confidence"
+label = "Min Face Confidence"
+summary = "How sure the face detector must be before a face counts."
+names = { webui = "threshold_b", forge = "threshold_b", comfyui = "min_confidence" }
+type = "float"
+default = 0.5
+range = [0.01, 1.0]
+effect = """\
+Faces the detector scores below this value are ignored. Lower values find more faces, including false ones. \
+ComfyUI's minimum is 0.1."""
+when_to_adjust = "Lower it when a real face is missed; raise it when stray shapes are drawn as faces."

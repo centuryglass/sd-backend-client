@@ -1,8 +1,18 @@
 id = "thibaud_openpose_xl2"
 label = "Thibaud OpenPose XL2"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "An early community SDXL OpenPose ControlNet by thibaud, trained on SDXL base with OpenPose conditioning."
+description = """\
+An SDXL ControlNet for OpenPose stick figures from thibaud. Its card describes OpenPose (v2) conditioning on \
+SDXL base and 15,000 steps on LAION images at up to 768 pixels on their short side, and its example uses \
+controlnet_aux's OpenPose detector. The card gives its license as OpenPose's, without naming it.\n\n\
+The repo also holds a rank 256 control-LoRA extraction. sd_control_collection's thibaud_xl_openpose files are \
+fp16 copies of both, matching tensor for tensor within fp16 rounding. xinsir's SDXL OpenPose card reports a \
+lower pose accuracy for it than for xinsir's own model, in xinsir's own test."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This one was trained on a single \
+A100 at batch size 2 with gradient accumulation over 8 steps, at a constant learning rate of 8e-5, in fp16."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["openpose"]
@@ -11,17 +21,24 @@ trainer = "thibaud"
 license = "other"
 homepage = "https://huggingface.co/thibaud/controlnet-openpose-sdxl-1.0"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Comes in a smaller control-LoRA form as well as a full ControlNet"]
+weaknesses = ["License deferred to OpenPose's without naming it"]
+good_for = ["copying a pose from a photo"]
 
-sources = ["hf_thibaud_controlnet_openpose_sdxl_1_0", "hf_lllyasviel_sd_control_collection"]
-research_status = "stub"
+sources = [
+    "hf_thibaud_controlnet_openpose_sdxl_1_0",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_xinsir_controlnet_openpose_sdxl_1_0",
+    "paper_controlnet",
+    "gh_openpose_readme",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
 filename = "OpenPoseXL2.safetensors"
 format = "safetensors"
+precision = "fp32"
 size_bytes = 5004167829
 sha256 = "5a4b928cb1e93748217900cb66d4135bf70d932d2924232f925910fad9e43a92"
 webui_hash = "f4251cb4"
@@ -30,6 +47,7 @@ source_url = "https://huggingface.co/thibaud/controlnet-openpose-sdxl-1.0/resolv
 [[files]]
 filename = "control-lora-openposeXL2-rank256.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 774423024
 sha256 = "8afa079285bf9384eaf8f6322884cb4f24bbe405da490f91f5540d3bff585e75"
 webui_hash = "72a4faf9"
@@ -39,6 +57,7 @@ variant = "rank 256 control-LoRA extraction"
 [[files]]
 filename = "thibaud_xl_openpose.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 2502139104
 sha256 = "9e070426568a3c60c128ffb98c66cdc7a0ea21d0d8abb86f73564aaf2e0c6f42"
 webui_hash = "c7b9cadd"
@@ -47,6 +66,7 @@ source_url = "https://huggingface.co/lllyasviel/sd_control_collection/resolve/7c
 [[files]]
 filename = "thibaud_xl_openpose_256lora.safetensors"
 format = "safetensors"
+precision = "fp16"
 size_bytes = 774423040
 sha256 = "4d9010a861e032629d2004211bf10a617ba1e93a1cc42fc280db3d0ad1d05303"
 webui_hash = "14288071"

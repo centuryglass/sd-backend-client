@@ -1,26 +1,162 @@
 id = "dw_openpose_full"
 label = "DWPose"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Finds body, hands and face with DWPose and draws them as an OpenPose stick figure; more accurate than OpenPose, especially on hands."
+description = """\
+DWPose draws the same picture as OpenPose Full, a body stick figure with hand and face points for each person, \
+but finds the points with a newer whole-body estimator. Its output works with any model trained on OpenPose \
+skeletons. The DWPose README says replacing OpenPose with it in ControlNet gives better images, and WebUI's \
+announcement says it improves detection accuracy, especially on hands.\n\n\
+WebUI and Forge always draw body, hands and face. ComfyUI's node has switches for each, and offers TorchScript \
+and ONNX versions of its two networks."""
+how_it_works = """\
+DWPose works top-down in two steps. A YOLOX detector first draws a box around each person. A pose network then \
+reads each box and places 133 points at once: body, feet, hands and face. That network is RTMPose-l, trained by \
+distillation: a larger teacher network guided its features and outputs, then a short second stage tuned its \
+final layer. The DWPose paper reports it beats its own teacher on the COCO-WholeBody benchmark. The \
+preprocessor adds a neck point between the shoulders, pads the 68 face points to OpenPose's 70, and draws \
+them in OpenPose's colors and layout."""
 control_types = ["openpose"]
-effect = ""
-output = ""
+effect = "Replaces the image with stick figures of each person's body, hands and face on black."
+output = "OpenPose-style colored stick figures on black: 18 body points, 21 per hand and 70 face points per person."
 best_input = ""
 weak_input = ""
-models = ["xinsir_openpose_sdxl", "xinsir_openpose_twins_sdxl"]
+models = [
+    "control_sd15_openpose",
+    "control_v11p_sd15_openpose",
+    "t2iadapter_openpose_sd14v1",
+]
 
 sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
+    "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "paper_dwpose",
+    "gh_dwpose_readme",
+    "sdwebui_cn_dwpose_discussion",
+    "hf_yzd_v_dwpose",
+    "hf_hr16_dwpose_torchscript_bs5",
+    "hf_hr16_yolox_onnx",
+    "hf_hr16_unjit_dwpose",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [names]
 webui = ["dw_openpose_full"]
 forge = ["dw_openpose_full"]
 comfyui = ["DWPreprocessor"]
+
+[hardware]
+device = "gpu_preferred"
+speed = """\
+WebUI and Forge always run it on the CPU through OpenCV. ComfyUI runs TorchScript files on the GPU, and ONNX \
+files on the GPU only when onnxruntime has a GPU provider; otherwise it falls back to the CPU, which its README \
+calls slow."""
+
+[[hardware.files]]
+filename = "yolox_l.onnx"
+size_bytes = 216746733
+sha256 = "7860ae79de6c89a3c1eb72ae9a2756c0ccfbe04b7791bb5880afabd97855a411"
+source_url = "https://huggingface.co/yzd-v/DWPose/resolve/1a7144101628d69ee7a3768d1ee3a094070dc388/yolox_l.onnx"
+variant = "person detector, ONNX (WebUI, Forge, ComfyUI default)"
+
+[[hardware.files]]
+filename = "dw-ll_ucoco_384.onnx"
+size_bytes = 134399116
+sha256 = "724f4ff2439ed61afb86fb8a1951ec39c6220682803b4a8bd4f598cd913b1843"
+source_url = "https://huggingface.co/yzd-v/DWPose/resolve/1a7144101628d69ee7a3768d1ee3a094070dc388/dw-ll_ucoco_384.onnx"
+variant = "pose estimator, ONNX (WebUI, Forge)"
+
+[[hardware.files]]
+filename = "dw-ll_ucoco_384_bs5.torchscript.pt"
+size_bytes = 135059124
+sha256 = "d86a0b2b59fddc0901a7076e9f59c9f8602602133ed72511c693fd11eea23d91"
+source_url = "https://huggingface.co/hr16/DWPose-TorchScript-BatchSize5/resolve/359d662a9b33b73f6d0f21732baf8845f17bb4be/dw-ll_ucoco_384_bs5.torchscript.pt"
+variant = "pose estimator, TorchScript (ComfyUI default)"
+
+[[hardware.files]]
+filename = "yolox_l.torchscript.pt"
+size_bytes = 217697649
+sha256 = "80bc14b13c260c24b3014cd42c02994bf52296ab8fa2d80a60b6afe08c93ef42"
+source_url = "https://huggingface.co/hr16/yolox-onnx/resolve/a124b32c3b7c5cebda1c7cd96178f0f9d2050125/yolox_l.torchscript.pt"
+variant = "person detector, TorchScript (ComfyUI option)"
+
+[[hardware.files]]
+filename = "dw-ll_ucoco.onnx"
+size_bytes = 133930533
+sha256 = "ed293847c4e50b37be905e3f2d6540b2c8fcfd1804deda98652053a4118f7254"
+source_url = "https://huggingface.co/hr16/UnJIT-DWPose/resolve/7a69fe1d5e7fa512798c2492dc7489c1a0e2ceee/dw-ll_ucoco.onnx"
+variant = "pose estimator, ONNX, 192 by 256 input (ComfyUI option)"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and searched for people \
+at that size. The skeleton is drawn at that size too, so its lines get thinner relative to the image as the \
+value rises. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it when small or distant people are missed, at the cost of a slower run. Lower it for thicker lines \
+relative to the image."""
+
+[[parameters]]
+id = "bbox_detector"
+label = "Person Detector"
+summary = "Which network finds each person before the pose network places their points."
+names = { comfyui = "bbox_detector" }
+type = "enum"
+default = "yolox_l.onnx"
+choices = [
+    "yolox_l.torchscript.pt",
+    "yolox_l.onnx",
+    "yolo_nas_l_fp16.onnx",
+    "yolo_nas_m_fp16.onnx",
+    "yolo_nas_s_fp16.onnx",
+]
+effect = """\
+The TorchScript file runs on the GPU without extra libraries. The ONNX files need onnxruntime with a GPU \
+provider to leave the CPU. The README notes that a TorchScript detector works with an ONNX pose estimator and \
+the reverse."""
+when_to_adjust = """\
+Pick the TorchScript file if DWPose is slow and onnxruntime is not set up for the GPU. The README suggests the \
+smaller detectors to cut detection time when the input images are clean."""
+
+[[parameters]]
+id = "pose_estimator"
+label = "Pose Estimator"
+summary = "Which file of the DWPose network to run: TorchScript or ONNX."
+names = { comfyui = "pose_estimator" }
+type = "enum"
+default = "dw-ll_ucoco_384_bs5.torchscript.pt"
+choices = ["dw-ll_ucoco_384_bs5.torchscript.pt", "dw-ll_ucoco_384.onnx", "dw-ll_ucoco.onnx"]
+effect = """\
+The 384 files are the DWPose model WebUI uses, in TorchScript or ONNX form. dw-ll_ucoco.onnx is a version with \
+a 192 by 256 pixel input, where the 384 files take 288 by 384. The README says TorchScript is a little slower than ONNX Runtime but needs no extra \
+library."""
+when_to_adjust = "Choose ONNX only when onnxruntime with a GPU provider is installed."
+
+[[parameters]]
+id = "scale_stick_for_xinsr_cn"
+label = "Scale Sticks for Xinsir"
+summary = "Draws thicker body lines on large images, as xinsir's SDXL OpenPose ControlNet expects."
+names = { comfyui = "scale_stick_for_xinsr_cn" }
+type = "enum"
+default = "disable"
+choices = ["disable", "enable"]
+effect = """\
+When enabled, body limbs are drawn wider as the image's long side grows: normal width below 500 pixels, then \
+two to seven times as wide. Hands and face are unchanged."""
+when_to_adjust = """\
+Enable it for xinsir's SDXL OpenPose model, whose card says its training labels used thicker lines and the \
+default lines may give unstable results. Leave it off for other models."""

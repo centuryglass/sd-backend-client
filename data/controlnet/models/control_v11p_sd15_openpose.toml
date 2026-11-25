@@ -1,26 +1,42 @@
 id = "control_v11p_sd15_openpose"
 label = "ControlNet 1.1 OpenPose"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "ControlNet 1.1 pose model for SD 1.5; reads body skeletons with or without hand and face points."
+description = """\
+The ControlNet 1.1 pose model. It was trained to accept any mix of body, hand and face points: body alone, \
+hands or face alone, any pair, or all three. Its README recommends offering users two choices, OpenPose for the \
+body and OpenPose Full for body, hands and face.\n\n\
+Compared with 1.0, its README credits an improved OpenPose implementation that is more accurate, especially \
+for hands, and a fixed training set without 1.0's duplicated grayscale people, low-quality images and wrong \
+captions. The README's tests show a single man in a suit and multiple people in the wild."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. This model was trained on pairs of \
+images and the OpenPose body, hand and face points detected in them, with a caption for each."""
 base_models = ["sd15"]
 adapter = "controlnet"
 control_types = ["openpose"]
-preprocessors = ["openpose", "openpose_full"]
+preprocessors = ["openpose", "openpose_full", "openpose_hand", "openpose_face", "openpose_faceonly", "dw_openpose_full"]
 trainer = "lllyasviel"
 license = "openrail"
 homepage = "https://huggingface.co/lllyasviel/ControlNet-v1-1"
 
-strengths = []
+strengths = [
+    "Accepts body, hand and face points in any combination, per its README",
+    "Handles several people at once, per its README's tests",
+]
 weaknesses = []
-good_for = []
+good_for = ["copying a pose from a photo", "posing hands and faces along with the body"]
 
 sources = [
     "hf_lllyasviel_controlnet_v1_1",
     "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
     "recorded_fixtures",
+    "cn11_readme",
+    "paper_controlnet",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "stub"
+research_status = "verified"
 open_questions = []
 
 [[files]]

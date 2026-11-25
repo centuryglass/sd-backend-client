@@ -1,11 +1,21 @@
 id = "openpose"
 label = "OpenPose"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "Finds each person's body joints and draws them as a colored stick figure, without hands or face."
+description = """\
+OpenPose finds the people in an image and draws each one as a stick figure on black: 18 body points, from \
+nose, eyes and ears down to ankles, joined by limbs in fixed colors. Hands and face are left out, so the \
+generated figure copies the stance but not the fingers or expression.\n\n\
+This is one of the two choices the ControlNet 1.1 README recommends showing users, with OpenPose Full. Pose \
+models for both SD 1.5 and SDXL accept it, and xinsir's SDXL card makes its examples with hands and face off."""
+how_it_works = """\
+OpenPose is a neural network from Carnegie Mellon that finds people bottom-up: it marks likely joints across \
+the whole image, plus part affinity fields, which point along each limb, and uses them to link joints into one \
+skeleton per person. The preprocessor uses a PyTorch port of it. Hands and face are a second pass: for each \
+body found, it crops around the wrists and head and runs a separate hand or face network on each crop. That \
+is why hand and face points only appear on a person whose body was detected."""
 control_types = ["openpose"]
-effect = ""
-output = ""
+effect = "Replaces the image with a stick figure of each detected person's body on black."
+output = "Colored stick figures on black, 18 body points per person."
 best_input = ""
 weak_input = ""
 models = [
@@ -13,8 +23,9 @@ models = [
     "control_v11p_sd15_openpose",
     "t2iadapter_openpose_sd14v1",
     "t2i_adapter_openpose_sdxl",
-    "t2i_adapter_xl_openpose",
     "thibaud_openpose_xl2",
+    "xinsir_openpose_sdxl",
+    "xinsir_openpose_twins_sdxl",
     "kohya_lllite_pose_anime_sdxl",
     "kohya_lllite_pose_anime_v2_sdxl",
 ]
@@ -24,10 +35,24 @@ sources = [
     "sdwebui_cn_legacy_preprocessors",
     "sdwebui_cn_preprocessors",
     "forge_preprocessors",
+    "reforge_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "hf_lllyasviel_annotators",
+    "paper_openpose",
+    "gh_openpose_readme",
+    "cn11_readme",
+    "cn10_readme",
+    "hf_xinsir_controlnet_openpose_sdxl_1_0",
+    "hf_thibaud_controlnet_openpose_sdxl_1_0",
+    "hf_tencentarc_t2i_adapter_openpose_sdxl_1_0",
 ]
-research_status = "stub"
-open_questions = []
+research_status = "drafted"
+open_questions = [
+    "Find whether CMU OpenPose's non-commercial license covers the converted body, hand and face weights in lllyasviel/Annotators.",
+]
 
 [names]
 webui = ["openpose"]
@@ -36,3 +61,44 @@ comfyui = ["OpenposePreprocessor"]
 
 [name_parameters]
 comfyui = { detect_body = "enable", detect_face = "disable", detect_hand = "disable" }
+
+[hardware]
+device = "gpu_preferred"
+
+[[hardware.files]]
+filename = "body_pose_model.pth"
+size_bytes = 209267595
+sha256 = "25a948c16078b0f08e236bda51a385d855ef4c153598947c28c0d47ed94bb746"
+source_url = "https://huggingface.co/lllyasviel/Annotators/resolve/982e7edaec38759d914a963c48c4726685de7d96/body_pose_model.pth"
+variant = "body"
+
+[[parameters]]
+id = "resolution"
+label = "Resolution"
+summary = "Size of the image's short side while the preprocessor runs."
+names = { webui = "processor_res", forge = "processor_res", comfyui = "resolution" }
+type = "int"
+default = 512
+range = [64, 2048]
+effect = """\
+The image is scaled so its short side matches this value, padded to a multiple of 64, and searched for people \
+at that size. The skeleton is drawn at that size too, so its lines get thinner relative to the image as the \
+value rises. ComfyUI accepts up to 16384."""
+when_to_adjust = """\
+Raise it when small or distant people are missed, at the cost of a slower run. Lower it for thicker lines \
+relative to the image."""
+
+[[parameters]]
+id = "scale_stick_for_xinsr_cn"
+label = "Scale Sticks for Xinsir"
+summary = "Draws thicker body lines on large images, as xinsir's SDXL OpenPose ControlNet expects."
+names = { comfyui = "scale_stick_for_xinsr_cn" }
+type = "enum"
+default = "disable"
+choices = ["disable", "enable"]
+effect = """\
+When enabled, body limbs are drawn wider as the image's long side grows: normal width below 500 pixels, then \
+two to seven times as wide. Hands and face are unchanged."""
+when_to_adjust = """\
+Enable it for xinsir's SDXL OpenPose model, whose card says its training labels used thicker lines and the \
+default lines may give unstable results. Leave it off for other models."""

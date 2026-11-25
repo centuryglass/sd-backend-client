@@ -1,8 +1,17 @@
 id = "t2iadapter_keypose_sd14v1"
 label = "T2I-Adapter Keypose v1"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "TencentARC's T2I-Adapter for MMPose keypoint skeletons on SD 1.x, trained on SD 1.4."
+description = """\
+A T2I-Adapter that steers SD 1.x generation to follow a human pose skeleton. Unlike the OpenPose adapter, its \
+training maps came from MMPose, a different pose toolkit, and TencentARC's README says full keypose-guided \
+generation needs MMPose with its person and pose detection models installed.\n\n\
+None of the WebUI, Forge or ComfyUI preprocessors makes MMPose keypose maps. It was trained on SD 1.4, and the \
+README recommends SD 1.5 as the base."""
+how_it_works = """\
+A T2I-Adapter is a small network, about 77 million parameters, that reads the control map and feeds features \
+into a frozen Stable Diffusion model. It runs once per image rather than at every denoising step, so it costs \
+far less than a ControlNet. The T2I-Adapter paper trained the keypose adapter on 600,000 LAION-Aesthetics \
+images, with keypose maps extracted by MMPose."""
 base_models = ["sd15"]
 adapter = "t2i_adapter"
 control_types = ["openpose"]
@@ -11,18 +20,22 @@ trainer = "TencentARC"
 license = ""
 homepage = "https://huggingface.co/TencentARC/T2I-Adapter"
 
-strengths = []
-weaknesses = []
+strengths = ["Small and fast compared with a ControlNet"]
+weaknesses = ["No backend preprocessor makes the MMPose maps it was trained on"]
 good_for = []
 
 sources = [
     "hf_tencentarc_t2i_adapter",
     "hf_webui_controlnet_modules_safetensors",
     "recorded_fixtures",
+    "t2i_adapter_readme_sd",
+    "paper_t2i_adapter",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_nodes",
 ]
-research_status = "stub"
+research_status = "drafted"
 open_questions = [
-    "The sd14v1 adapters were trained on SD 1.4; confirm the model card supports listing them under sd15.",
+    "Find whether OpenPose skeletons work as input. No source compares the MMPose keypose map with OpenPose's.",
 ]
 
 [[files]]

@@ -1,22 +1,39 @@
 id = "xinsir_openpose_sdxl"
 label = "Xinsir SDXL OpenPose"
-summary = ""
-description = ""
-how_it_works = ""
+summary = "xinsir's SDXL OpenPose ControlNet, trained on thick-lined body skeletons; it reports the highest pose accuracy in its own test."
+description = """\
+An SDXL ControlNet for OpenPose body skeletons from xinsir. Its card says the training skeletons were drawn \
+with thicker lines, which scale up with image size, and that the default thin lines may give unstable results. \
+ComfyUI's OpenPose and DWPose nodes have a Scale Sticks for Xinsir switch that draws them this way. The card's \
+example turns hands and face off, uses strength 1.0, and asks for 1024 by 1024 or another SDXL bucket \
+size.\n\n\
+On 2,000 HumanArt images the card reports a pose accuracy (mAP) of 0.357, against 0.326 for ControlNet 1.1 \
+OpenPose and 0.209 for thibaud's model. It is Apache-2.0 licensed."""
+how_it_works = """\
+A ControlNet is a trainable copy of the encoder layers of Stable Diffusion, joined to the frozen original by \
+convolution layers that start at zero, so training begins without disturbing the base model. The copy learns to \
+read one kind of control map and adds its signal into the main network at every denoising step. The card does not describe the \
+training data. Its pose test generates images from 2,000 annotated HumanArt poses and scores them with mAP, a \
+standard pose-accuracy measure."""
 base_models = ["sdxl"]
 adapter = "controlnet"
 control_types = ["openpose"]
-preprocessors = ["dw_openpose_full"]
+preprocessors = ["openpose"]
 trainer = "xinsir"
 license = "apache-2.0"
 homepage = "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0"
 
-strengths = []
-weaknesses = []
-good_for = []
+strengths = ["Highest pose accuracy among open models in its card's own test"]
+weaknesses = ["Expects thick skeleton lines; the default lines may give unstable results, per its card"]
+good_for = ["copying a pose from a photo"]
 
-sources = ["hf_xinsir_controlnet_openpose_sdxl_1_0"]
-research_status = "stub"
+sources = [
+    "hf_xinsir_controlnet_openpose_sdxl_1_0",
+    "hf_xinsir_openpose_discussion_3",
+    "paper_controlnet",
+    "comfyui_controlnet_aux_src",
+]
+research_status = "verified"
 open_questions = []
 
 [[files]]
