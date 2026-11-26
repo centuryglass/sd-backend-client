@@ -5,6 +5,9 @@ serializes them into its own form. `Backend.list_controlnet_models` and `Backend
 the models and preprocessors a server offers. Each preprocessor lists its settings as `ParameterDef`s (see
 Discovery).
 
+What each control type, preprocessor and model does, and which to pick, is in the
+[ControlNet guide](https://centuryglass.github.io/sd-backend-client/guide/controlnet/).
+
 ::: sd_backend_client.ControlNetUnit
 
 ::: sd_backend_client.ControlNetModel

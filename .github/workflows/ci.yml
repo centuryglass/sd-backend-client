@@ -182,10 +182,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-docs.txt
 
-      - name: Build the documentation site
+      - name: Build the API documentation site
         # --strict fails on any warning, such as a broken link or a docstring mkdocstrings can't parse. mkdocs.yml's
         # hook also fails it when docs/reference/ doesn't document the package root's __all__.
         run: mkdocs build --strict
+
+      - name: Build the guide
+        # guide/mkdocs.yml's hook also fails it when data/controlnet/ fails to load or a page links an unknown record.
+        run: mkdocs build --strict -f guide/mkdocs.yml
 
   # A single check to require for merging, so branch protection doesn't need updating whenever the matrix or the
   # set of jobs changes.

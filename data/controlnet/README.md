@@ -1,7 +1,9 @@
 # ControlNet reference data
 
 A sourced reference for SD1.5 and SDXL ControlNet control types, preprocessors and models. It feeds UI text (labels,
-tooltips), artist guides and explanations of how each tool works. This directory sits outside the package. Anything
+tooltips), artist guides and explanations of how each tool works. Every record is a page of the
+[Stable Diffusion guide](https://centuryglass.github.io/sd-backend-client/guide/controlnet/), generated at build time
+by `scripts/guide_pages.py` (see `guide/mkdocs.yml`), so a record change shows up there once it reaches `main`. This directory sits outside the package. Anything
 the package ships, such as #146's one-sentence descriptions, is derived from the `summary` of `verified` records here.
 
 Open questions on `drafted` records are tracked in [#176](https://github.com/centuryglass/sd-backend-client/issues/176).
