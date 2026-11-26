@@ -32,8 +32,38 @@ sources = [
     "sdwebui_cn_ipadapter_weighting_discussion",
     "hf_ostris_ip_composition_adapter",
     "paper_pulid",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_legacy_processor",
+    "sdwebui_cn_annotators",
+    "sdwebui_cn_preprocessors",
+    "forge_ipadapter",
+    "reforge_preprocessors",
+    "reforge_ipadapter_lib",
+    "forge_neo_ipadapter",
+    "paper_clip",
+    "paper_openclip_scaling",
+    "comfyui_ipadapter_plus_readme",
+    "hf_lllyasviel_annotators",
+    "sdwebui_cn_faceid_discussion",
+    "gh_insightface_v0_7",
+    "paper_arcface",
+    "sdwebui_cn_faceid_portrait_discussion",
+    "sdwebui_cn_pulid_discussion",
+    "sdwebui_cn_evaclip",
+    "paper_eva_clip",
+    "hf_quansun_eva_clip",
+    "hf_diamonik_antelopev2",
+    "gh_facexlib_releases",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_h94_ip_adapter_commits",
+    "sdwebui_cn_ipadapter_composition_discussion",
+    "sdwebui_cn_1_1_400_discussion",
+    "gh_photomaker",
+    "hf_guozinan_pulid",
+    "gh_pulid",
+    "hf_huchenlei_ipadapter_pulid",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -73,40 +103,51 @@ apply the image to some U-Net blocks only. Its style transfer presets carry the 
 ostris composition adapters carry the layout and pose, such as a raised hand, while ignoring style and content."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+Pick the model first, then the preprocessor for its image encoder. Most models read the image with CLIP ViT-H. \
+IP-Adapter SDXL and SD1.5 ViT-G read it with CLIP ViT-bigG, the FaceID and FaceID Portrait models with \
+InsightFace, and the FaceID Plus models with InsightFace and CLIP ViT-H. In sd-webui-controlnet, IP-Adapter Auto \
+picks the preprocessor from the model's file name, so it fails on renamed files. The CLIP encoders crop the \
+center, so center the subject or crop the reference square.\n\n\
+For a subject or style, the standard models carry the overall look, the Plus models stay closer to the reference, \
+and the Light models leave the prompt more say. For a face, Plus Face and Full Face need only a cropped face \
+photo. The FaceID models keep identity across styles but need InsightFace, are released for non-commercial use, \
+and most need their LoRA. PuLID changes the rest of the image the least, per its paper, and needs an EVA-CLIP \
+extension in sd-webui-controlnet. The IP Composition Adapters copy layout and pose, not content, and need a CFG \
+near 3. Superseded versions come last. PuLID V1.1 loads in no WebUI extension, and FaceID Portrait SDXL Unnorm is \
+not in sd-webui-controlnet's presets."""
 preprocessors = [
-    "ip_adapter_auto",
     "ip_adapter_clip_h",
     "ip_adapter_clip_g",
-    "ip_adapter_face_id",
     "ip_adapter_face_id_plus",
+    "ip_adapter_face_id",
     "ip_adapter_pulid",
     "facexlib",
+    "ip_adapter_auto",
 ]
 models = [
-    "ip_adapter_sd15",
-    "ip_adapter_sd15_light",
-    "ip_adapter_sd15_vit_g",
     "ip_adapter_plus_sd15",
+    "ip_adapter_sd15",
+    "ip_adapter_sd15_light_v11",
     "ip_adapter_plus_face_sd15",
     "ip_adapter_full_face_sd15",
-    "ip_adapter_sd15_light_v11",
-    "ip_adapter_plus_composition_sd15",
-    "ip_adapter_sdxl",
-    "ip_adapter_sdxl_vit_h",
-    "ip_adapter_plus_sdxl_vit_h",
-    "ip_adapter_plus_face_sdxl_vit_h",
-    "ip_adapter_plus_composition_sdxl",
-    "ip_adapter_faceid_sd15",
-    "ip_adapter_faceid_plus_sd15",
     "ip_adapter_faceid_plusv2_sd15",
-    "ip_adapter_faceid_portrait_sd15",
     "ip_adapter_faceid_portrait_v11_sd15",
-    "ip_adapter_faceid_sdxl",
+    "ip_adapter_faceid_sd15",
+    "ip_adapter_plus_composition_sd15",
+    "ip_adapter_sd15_vit_g",
+    "ip_adapter_faceid_plus_sd15",
+    "ip_adapter_faceid_portrait_sd15",
+    "ip_adapter_sd15_light",
+    "ip_adapter_plus_sdxl_vit_h",
+    "ip_adapter_sdxl_vit_h",
+    "ip_adapter_sdxl",
+    "ip_adapter_plus_face_sdxl_vit_h",
     "ip_adapter_faceid_plusv2_sdxl",
     "ip_adapter_faceid_portrait_sdxl",
-    "ip_adapter_faceid_portrait_sdxl_unnorm",
+    "ip_adapter_faceid_sdxl",
     "pulid_v1_sdxl",
+    "ip_adapter_plus_composition_sdxl",
+    "ip_adapter_faceid_portrait_sdxl_unnorm",
     "pulid_v1_1_sdxl",
 ]

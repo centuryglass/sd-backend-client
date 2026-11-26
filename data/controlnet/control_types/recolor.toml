@@ -24,8 +24,16 @@ sources = [
     "hf_stabilityai_control_lora",
     "hf_latentcat_control_v1p_sd15_brightness",
     "sdwebui_cn_1_1_400_discussion",
+    "reforge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "comfyui_controlnet_aux_readme",
+    "hf_latentcat_latentcat_controlnet",
+    "hf_lllyasviel_sd_control_collection",
+    "antfu_ai_qrcode_101",
+    "paper_controlnet",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -46,10 +54,9 @@ Keep an image's lighting and composition and give it a new palette by prompting 
 a red car instead of a blue one."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+Recolor Luminance makes a lightness map, the form for colorizing black-and-white photos. Recolor Intensity uses \
+each pixel's brightest channel, so saturated colors stay bright in the map. On SD 1.5, use Brightness. On SDXL, \
+use Stability's Recolor Control-LoRA, which is small next to a full ControlNet."""
 preprocessors = ["recolor_luminance", "recolor_intensity"]
-models = [
-    "sai_control_lora_recolor_sdxl",
-    "latentcat_brightness_sd15",
-]
+models = ["latentcat_brightness_sd15", "sai_control_lora_recolor_sdxl"]

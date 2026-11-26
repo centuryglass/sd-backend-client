@@ -14,7 +14,7 @@ drawing, a weak cue for where the face is. In place of the text prompt, its cros
 from the InstantID adapter, a strong cue for who it is. Its output joins the U-Net like any ControlNet's."""
 base_models = ["sdxl"]
 adapter = "controlnet"
-control_types = ["ip_adapter"]
+control_types = ["instant_id"]
 preprocessors = ["instant_id_face_keypoints"]
 trainer = "InstantX"
 license = "apache-2.0"

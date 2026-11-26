@@ -28,8 +28,19 @@ sources = [
     "ioclab_illumination_guide",
     "sdwebui_cn_global_state",
     "antfu_ai_qrcode_101",
+    "sdwebui_cn_preprocessors",
+    "comfyui_core_nodes",
+    "sdwebui_cn_legacy_preprocessors",
+    "forge_preprocessors",
+    "paper_controlnet",
+    "hf_latentcat_latentcat_controlnet",
+    "hf_lllyasviel_sd_control_collection",
+    "sdwebui_cn_1_1_400_discussion",
+    "comfyui_controlnet_aux_readme",
+    "hf_latentcat_control_v1u_sd15_illumination_webui",
+    "civitai_illumination",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -74,15 +85,22 @@ Gray areas leave the content free in QR Code Monster and QR Pattern V2. The QR C
 the full code at medium weight, and only its position markers and format areas at high weight for fewer steps."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+Feed the QR code, text or shape in directly, with no preprocessor; DionTimmer's model also accepts an inverted \
+code, which gives a different variation. Raising the control weight makes a code likelier to scan and less \
+creative, and not every result scans, so test each one.\n\n\
+On SD 1.5, QR Code Monster V2 improves scannability and creativity over version 1, per its card, and a gray \
+background blends the code into the image. QR Pattern V2 reads only the darkest and lightest areas, so gray leaves \
+an area free; one QR guide contributor found it changes the style more than QR Code Monster. Brightness and \
+Illumination steer light and dark rather than code patterns, and QR guides list them too. On SDXL, QR Code Monster \
+SDXL also makes optical illusions and ships only as a 5 GB full-precision file."""
 preprocessors = ["invert"]
 models = [
-    "qrcode_monster_sd15",
     "qrcode_monster_v2_sd15",
-    "qrcode_monster_sdxl",
-    "diontimmer_qrcode_sd15",
     "nacholmo_qr_pattern_v2_sd15",
+    "diontimmer_qrcode_sd15",
     "latentcat_brightness_sd15",
     "latentcat_illumination_sd15",
+    "qrcode_monster_sd15",
+    "qrcode_monster_sdxl",
 ]

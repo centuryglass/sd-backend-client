@@ -21,10 +21,8 @@ sources = [
     "recorded_fixtures",
     "comfyui_controlnet_aux_nodes",
 ]
-research_status = "drafted"
-open_questions = [
-    "comfyui_controlnet_aux maps this node to the scribble models, but its output keeps dark strokes dark on white. Confirm by running it whether ComfyUI users need an invert step.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = []

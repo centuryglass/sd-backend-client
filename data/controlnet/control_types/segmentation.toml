@@ -31,8 +31,49 @@ sources = [
     "paper_coco_stuff",
     "sdwebui_cn_annotators",
     "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_script",
+    "reforge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "hf_lllyasviel_annotators",
+    "paper_oneformer",
+    "gh_oneformer_readme",
+    "gh_uniformer_seg_readme",
+    "hf_lllyasviel_controlnet",
+    "paper_uniformer",
+    "paper_upernet",
+    "gh_xinsir_controlnetplus_scripts",
+    "gh_controlnet_aux_sam",
+    "hf_dhkim2810_mobilesam",
+    "paper_sam",
+    "paper_mobile_sam",
+    "gh_mobile_sam_readme",
+    "hf_bdsqlsz_qinglong_lllite",
+    "gh_anime_face_segmentation_readme",
+    "gh_anime_segmentation_readme",
+    "hf_skytnt_anime_seg",
+    "paper_dis",
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "paper_controlnet",
+    "hf_webui_controlnet_modules_safetensors",
+    "hf_tencentarc_t2i_adapter",
+    "t2i_adapter_readme_sd",
+    "t2i_adapter_zoo",
+    "t2i_adapter_seg_training",
+    "hf_tencentarc_t2i_seg_examples",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -63,13 +104,18 @@ README accepts manually created masks. Paint flat regions in the palette's class
 as the control image with no preprocessor."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = ["seg_ofade20k", "seg_ofcoco", "seg_ufade20k", "seg_anime_face", "mobile_sam"]
+guide = """\
+Segmentation models read a fixed palette, one color per class, so the preprocessor has to draw the palette the \
+model learned. OneFormer ADE20K and UniFormer ADE20K draw the ADE20K palette, which both ControlNet segmentation \
+models read. OneFormer COCO draws COCO colors, which ControlNet 1.1 Segmentation added. MobileSAM fills each \
+region with a random color, for the xinsir union models. Anime Face Segmentation pairs with no model here.\n\n\
+On SD 1.5, use ControlNet 1.1 Segmentation. The T2I-Adapter Segmentation model reads a palette no backend \
+preprocessor draws. On SDXL, the xinsir union models cover segmentation."""
+preprocessors = ["seg_ofade20k", "seg_ufade20k", "seg_ofcoco", "mobile_sam", "seg_anime_face"]
 models = [
-    "control_sd15_seg",
     "control_v11p_sd15_seg",
+    "control_sd15_seg",
     "t2iadapter_seg_sd14v1",
-    "xinsir_union_sdxl",
     "xinsir_union_promax_sdxl",
+    "xinsir_union_sdxl",
 ]

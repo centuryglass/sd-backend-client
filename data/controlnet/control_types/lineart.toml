@@ -25,8 +25,33 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_supported_preprocessor",
     "forge_preprocessors",
+    "sdwebui_cn_annotators",
+    "sdwebui_cn_legacy_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "comfyui_core_nodes",
+    "anyline_readme",
+    "hf_themistoai_mistoline",
+    "paper_diffusion_edge",
+    "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "hf_blog_t2i_sdxl_adapters",
+    "t2i_adapter_readme",
+    "paper_t2i_adapter",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "hf_xinsir_anime_painter",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -48,24 +73,32 @@ Extract lineart from a photo and generate with an illustration checkpoint, keepi
 style."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+Match the preprocessor to the image. Lineart Realistic redraws photos and renders as detailed line art, and \
+Lineart Coarse keeps only the main shapes. Lineart Anime and Lineart Anime Denoise are for anime and manga images \
+and pair with the anime lineart model. For a drawing that is already line art, Lineart Standard pulls out its dark \
+lines without a network, and Invert alone turns clean black-on-white lines into the white-on-black lines the \
+models read. AnyLine was made for MistoLine. DiffusionEdge pairs with no model here.\n\n\
+On SD 1.5, use ControlNet 1.1 Lineart for realistic images and ControlNet 1.1 Anime Lineart with anime \
+checkpoints; the anime model needs long prompts and clip skip 2. On SDXL, MistoLine takes many line styles and \
+pairs with AnyLine, the T2I-Adapter is far smaller, and the union models cover lineart beside their other types. \
+xinsir's Anime Painter turns rough doodles into anime illustrations, given an anime checkpoint and tag prompts."""
 preprocessors = [
-    "invert",
     "lineart_realistic",
-    "lineart_coarse",
-    "lineart_standard",
     "lineart_anime",
+    "lineart_coarse",
     "lineart_anime_denoise",
+    "lineart_standard",
+    "invert",
     "anyline",
     "diffusion_edge",
 ]
 models = [
     "control_v11p_sd15_lineart",
     "control_v11p_sd15s2_lineart_anime",
-    "t2i_adapter_lineart_sdxl",
-    "xinsir_union_sdxl",
-    "xinsir_union_promax_sdxl",
-    "xinsir_anime_painter_sdxl",
     "mistoline_sdxl",
+    "t2i_adapter_lineart_sdxl",
+    "xinsir_union_promax_sdxl",
+    "xinsir_union_sdxl",
+    "xinsir_anime_painter_sdxl",
 ]

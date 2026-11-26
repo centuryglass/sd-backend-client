@@ -4,7 +4,8 @@ summary = "Estimates relative depth with Depth Anything V2, which gives finer an
 description = """\
 Depth Anything V2 draws a grayscale depth map, white near and black far. Its paper reports finer and more robust \
 depth than V1, and models more than 10 times faster than estimators built on Stable Diffusion. WebUI and Forge \
-run the large model; ComfyUI also offers small and base.\n\n\
+run the large model; ComfyUI also offers small and base, and lists a giant model that the V2 README still marks as \
+coming soon.\n\n\
 Check the license before commercial use. The small model is Apache-2.0, but the base and large models are \
 CC-BY-NC-4.0, which excludes commercial use. The WebUI download is a third-party safetensors copy of the large \
 model."""
@@ -12,7 +13,8 @@ how_it_works = """\
 V2 changes how the training labels are made. The authors replace all labeled real photos with synthetic images, \
 whose depth labels are exact. A large teacher model is trained on those, and it then labels a big set of real \
 photos. The smaller student models, the ones people run, learn from those pseudo-labels. The paper credits these \
-three changes, synthetic labels, a larger teacher and pseudo-labeled real images, for the finer detail."""
+three changes, synthetic labels, a larger teacher and pseudo-labeled real images, for the finer detail. Like V1, \
+the models predict inverse depth, larger for nearer points, which the preprocessor stretches to white near."""
 control_types = ["depth"]
 effect = "Replaces color and texture with a detailed grayscale map of relative distance."
 output = "Grayscale depth map, white near and black far, stretched to the full 0-255 range."
@@ -35,11 +37,8 @@ sources = [
     "comfyui_controlnet_aux_src",
     "sdwebui_cn_annotators",
 ]
-research_status = "drafted"
-open_questions = [
-    "Confirm that brighter means nearer in the output, from a run or a source that says so.",
-    "The Giant checkpoint listed in ComfyUI is marked coming soon by the V2 README; check whether the file ever shipped.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["depth_anything_v2"]

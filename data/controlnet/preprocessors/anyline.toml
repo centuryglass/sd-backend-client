@@ -11,7 +11,9 @@ softedge_anyline; ComfyUI ships it in comfyui_controlnet_aux."""
 how_it_works = """\
 AnyLine runs the TEED edge network with its own weights, MTEED, and merges in a detail layer from Lineart \
 Standard after removing specks smaller than 36 pixels. ComfyUI runs that Lineart Standard pass with a narrower \
-blur, sigma 2, and can take the detail layer from another lineart preprocessor instead."""
+blur, sigma 2, and can take the detail layer from another lineart preprocessor instead. sd-webui-controlnet keeps \
+only detail pixels valued 0 to 1 but reads them on a 0 to 255 scale, so almost none survive and its output is \
+close to MTEED alone."""
 control_types = ["lineart", "softedge"]
 effect = "Keeps edges, fine detail and text as crisp lines; removes small specks."
 output = "Black image with white lines."
@@ -27,11 +29,10 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_legacy_preprocessors",
     "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
 ]
-research_status = "drafted"
-open_questions = [
-    "WebUI keeps detail-layer pixels between 0 and 1 on a 0 to 255 scale, where ComfyUI uses the same bounds on a 0 to 1 scale. Check by running both whether WebUI drops the Lineart Standard layer.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["softedge_anyline"]

@@ -105,6 +105,20 @@ def test_references_resolve(data):
     assert controlnet_data.reference_errors(data) == []
 
 
+def test_links_are_recorded_on_both_sides(data):
+    """Control types and their records, and preprocessors and their models, list each other."""
+    assert controlnet_data.link_errors(data) == []
+
+
+def test_link_errors_name_one_sided_links(data):
+    """A model dropped from its preprocessor's `models` is reported, naming both records."""
+    broken = data.preprocessors['canny'].model_copy(update={'models': []})
+    errors = controlnet_data.link_errors(
+        controlnet_data.ControlNetData(data.control_types, {**data.preprocessors, 'canny': broken}, data.models,
+                                       data.sources))
+    assert any('models/control_v11p_sd15_canny' in error and '"canny"' in error for error in errors)
+
+
 def test_verified_records_are_sourced(data):
     """A verified record has a non-tutorial source and no open questions."""
     assert controlnet_data.status_errors(data) == []

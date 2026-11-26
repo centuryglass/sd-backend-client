@@ -7,7 +7,8 @@ colored lines, with a dot for each pupil. It carries expression, head angle and 
 leaves out the body.\n\n\
 It pairs with CrucibleAI's MediaPipe Face ControlNet, whose training data used the same drawing. Faces less \
 than 64 pixels across at the processing resolution are dropped, and an image with no face found gives an \
-empty map. WebUI and Forge find one face by default, ComfyUI up to ten."""
+empty map. WebUI and Forge find one face by default, ComfyUI up to ten. No backend files it under a control \
+type, so this reference lists it under OpenPose."""
 how_it_works = """\
 Google's MediaPipe Face Mesh is a network built to run in real time. It places 478 points on the surface \
 of each face it finds, including points for the irises. The preprocessor draws only the lines along the face \
@@ -32,10 +33,8 @@ sources = [
     "mediapipe_face_landmarker",
     "hf_crucibleai_controlnetmediapipeface",
 ]
-research_status = "drafted"
-open_questions = [
-    "No WebUI control type lists mediapipe_face. Filed under OpenPose as the nearest fit; decide whether face landmarks need their own control type.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["mediapipe_face"]

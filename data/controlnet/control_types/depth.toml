@@ -31,8 +31,65 @@ sources = [
     "hf_tencentarc_t2i_adapter_depth_midas_sdxl_1_0",
     "hf_xinsir_controlnet_depth_sdxl_1_0",
     "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "paper_dpt",
+    "paper_boosting_depth",
+    "hf_lllyasviel_annotators",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
+    "paper_zoedepth",
+    "hf_diffusers_controlnet_zoe_depth_sdxl_1_0",
+    "hf_tencentarc_t2i_adapter_depth_zoe_sdxl_1_0",
+    "hf_sargezt_controlnet_v1e_sdxl_depth",
+    "paper_depth_anything_v2",
+    "gh_depth_anything_v2_readme",
+    "hf_depth_anything_v2_small",
+    "hf_depth_anything_v2_base",
+    "hf_depth_anything_v2_large",
+    "gh_depth_anything_readme",
+    "gh_depth_anything_controlnet_readme",
+    "hf_liheyoung_depth_anything_space",
+    "paper_leres",
+    "paper_metric3d",
+    "paper_metric3dv2",
+    "gh_metric3d_readme",
+    "hf_jugghm_metric3d",
+    "paper_marigold",
+    "hf_bingxin_marigold",
+    "paper_handrefiner",
+    "paper_mesh_graphormer",
+    "gh_handrefiner_readme",
+    "hf_hr16_handrefiner_pruned",
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "hf_tencentarc_t2i_adapter",
+    "hf_tencentarc_t2i_adapter_v2_commit",
+    "paper_t2i_adapter",
+    "hf_webui_controlnet_modules_safetensors",
+    "t2i_adapter_zoo",
+    "hf_lllyasviel_controlnet",
+    "hf_diffusers_controlnet_depth_sdxl_1_0",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "hf_stabilityai_control_lora",
+    "hf_blog_t2i_sdxl_adapters",
+    "hf_diffusers_controlnet_depth_sdxl_1_0_mid",
+    "hf_diffusers_controlnet_depth_sdxl_1_0_small",
+    "hf_kohya_ss_controlnet_lllite",
+    "hf_sargezt_controlnet_sd_xl_1_0_depth_faid_vidit",
+    "hf_sargezt_controlnet_sd_xl_1_0_depth_zeed",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -55,41 +112,50 @@ Render a depth pass from a simple 3D scene and use it as the control image with 
 1.1 card says its depth model works on real depth maps from rendering engines."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+Pick the estimator a model was trained on. MiDaS pairs with the most depth models here, and it is the safe \
+default. ZoeDepth pairs with the Zoe models: the Zoe T2I-Adapters, Diffusers SDXL Zoe Depth and SargeZT's depth \
+model. The Depth Anything ControlNet was trained on Depth Anything maps, and the V2 paper reports finer detail \
+than V1. LeReS++ merges estimates at several scales for more detail and runs slower than LeReS. Marigold runs a \
+diffusion model for 20 steps, so it is slow. Depth Hand Refiner only serves the HandRefiner model, for fixing \
+hands.\n\n\
+On SD 1.5, ControlNet 1.1 Depth accepts MiDaS, LeReS and Zoe maps and depth rendered by 3D software. On SDXL, \
+xinsir's depth model handles both Zoe and MiDaS maps, per its card, and the Stability Control-LoRA was fine-tuned \
+for portrait depth. The SDXL T2I-Adapters each expect the estimator in their name. SargeZT's Faid Vidit and Zeed \
+models expect an undocumented conditioning and come last."""
 preprocessors = [
     "depth_midas",
-    "depth_leres",
-    "depth_leres_plus",
     "depth_zoe",
-    "depth_anything",
     "depth_anything_v2",
+    "depth_anything",
     "depth_zoe_anything",
-    "depth_marigold",
+    "depth_leres_plus",
+    "depth_leres",
     "depth_metric3d",
+    "depth_marigold",
     "depth_hand_refiner",
 ]
 models = [
-    "control_sd15_depth",
     "control_v11f1p_sd15_depth",
-    "t2iadapter_depth_sd14v1",
+    "depth_anything_controlnet_sd15",
     "t2iadapter_depth_sd15v2",
     "t2iadapter_zoedepth_sd15v1",
+    "t2iadapter_depth_sd14v1",
+    "control_sd15_depth",
+    "handrefiner_inpaint_depth_hand_sd15",
+    "xinsir_depth_sdxl",
+    "diffusers_depth_sdxl",
+    "diffusers_zoe_depth_sdxl",
+    "xinsir_union_promax_sdxl",
+    "xinsir_union_sdxl",
+    "sai_control_lora_depth_sdxl",
     "t2i_adapter_depth_midas_sdxl",
     "t2i_adapter_depth_zoe_sdxl",
-    "diffusers_depth_sdxl",
     "diffusers_depth_sdxl_mid",
     "diffusers_depth_sdxl_small",
-    "diffusers_zoe_depth_sdxl",
     "sargezt_xl_depth",
-    "sargezt_xl_depth_faid_vidit",
-    "sargezt_xl_depth_zeed",
-    "xinsir_depth_sdxl",
-    "xinsir_union_sdxl",
-    "xinsir_union_promax_sdxl",
-    "sai_control_lora_depth_sdxl",
     "kohya_lllite_depth_sdxl",
     "kohya_lllite_depth_anime_sdxl",
-    "depth_anything_controlnet_sd15",
-    "handrefiner_inpaint_depth_hand_sd15",
+    "sargezt_xl_depth_faid_vidit",
+    "sargezt_xl_depth_zeed",
 ]

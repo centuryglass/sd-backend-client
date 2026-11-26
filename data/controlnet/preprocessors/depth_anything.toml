@@ -11,8 +11,9 @@ how_it_works = """\
 Depth Anything trains one depth network on labeled images plus about 62 million unlabeled ones, using a data \
 engine that labels the unlabeled images automatically. Two choices make that extra data useful. The network \
 trains on strongly augmented versions of each image, which is a harder task, and an auxiliary objective makes it \
-inherit the scene knowledge of a pre-trained vision encoder. The output is relative depth, which the \
-preprocessor stretches to the full gray range."""
+inherit the scene knowledge of a pre-trained vision encoder. Training converts each depth label to disparity, \
+the inverse of distance, so the output is larger for nearer points; the preprocessor stretches it to the full \
+gray range, white near."""
 control_types = ["depth"]
 effect = "Replaces color and texture with a grayscale map of relative distance."
 output = "Grayscale depth map, white near and black far, stretched to the full 0-255 range."
@@ -34,10 +35,8 @@ sources = [
     "comfyui_controlnet_aux_src",
     "sdwebui_cn_annotators",
 ]
-research_status = "drafted"
-open_questions = [
-    "Confirm that brighter means nearer in the output, from a run or a source that says so.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = ["depth_anything"]

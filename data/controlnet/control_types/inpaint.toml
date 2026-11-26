@@ -29,8 +29,36 @@ sources = [
     "hf_alimama_creative_ecomxl_controlnet_inpaint",
     "hf_destitech_controlnet_inpaint_dreamer_sdxl",
     "hf_wenaka_noobai_inpainting_sfw",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "sdwebui_cn_inpaint_firefly_discussion",
+    "sdwebui_cn_annotators",
+    "hf_lllyasviel_annotators",
+    "paper_lama",
+    "comfyui_controlnet_aux_nodes",
+    "hf_acly_noobai_inpainting",
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "paper_controlnet",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "hf_wenaka_noobai_inpainting_full",
+    "civitai_noobai_inpainting",
+    "civitai_controlnetxl_cnxl",
+    "paper_handrefiner",
+    "gh_handrefiner_readme",
+    "hf_hr16_handrefiner_pruned",
+    "comfyui_controlnet_aux_readme",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -67,14 +95,25 @@ EcomXL Inpaint was trained to fill around a masked product without growing the p
 but the product and prompt for a new setting."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = ["inpaint_global_harmonious", "inpaint_only", "inpaint_only_lama", "inpaint_noobai"]
+guide = """\
+On SD 1.5, use ControlNet 1.1 Inpaint, which works with any SD 1.5 base model. Inpaint Only keeps everything \
+outside the mask unchanged, even in txt2img. Inpaint Only + LaMa first fills the hole with the LaMa network, which \
+suits removing objects and outpainting, where the hole should become background; it is weaker when the mask should \
+receive a new object. Inpaint Global Harmonious lets the whole image shift to match the new content. The \
+HandRefiner model also counts as inpainting, but it repairs hands from Depth Hand Refiner maps under Depth.\n\n\
+On SDXL, xinsir's Union ProMax inpaints and outpaints with its repaint type and expects the mask filled with \
+black, which Inpaint NoobAI and ComfyUI's Inpaint Preprocessor with its xinsir option produce; \
+sd-webui-controlnet's inpaint preprocessors fill it with -1 instead. NoobAI Inpainting was trained on NoobAI XL \
+and suits that model family. EcomXL Inpaint is for product photos: it fills the background without growing the \
+product. The Inpaint Dreamer models need a hand-made control image with white fill areas, and V1 is an early \
+alpha."""
+preprocessors = ["inpaint_only", "inpaint_only_lama", "inpaint_global_harmonious", "inpaint_noobai"]
 models = [
     "control_v11p_sd15_inpaint",
+    "handrefiner_inpaint_depth_hand_sd15",
     "xinsir_union_promax_sdxl",
-    "ecomxl_inpaint_sdxl",
-    "destitech_inpaint_dreamer_sdxl",
-    "destitech_inpaint_dreamer_v2_sdxl",
     "noobai_inpaint_sdxl",
+    "ecomxl_inpaint_sdxl",
+    "destitech_inpaint_dreamer_v2_sdxl",
+    "destitech_inpaint_dreamer_sdxl",
 ]

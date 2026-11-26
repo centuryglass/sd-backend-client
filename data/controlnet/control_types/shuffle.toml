@@ -22,8 +22,20 @@ sources = [
     "forge_preprocessors",
     "cn11_readme",
     "cn11_annotator_docs",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "sdwebui_cn_annotators",
+    "sdwebui_cn_script",
+    "reforge_preprocessors",
+    "forge_neo_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "paper_controlnet",
+    "sdwebui_cn_hook",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -44,7 +56,9 @@ Run two units: Canny or another structure control on one image, Shuffle on anoth
 shows this pairing."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+Content Shuffle feeds ControlNet 1.1 Shuffle, the only model for this type, on SD 1.5. Shuffling keeps colors, \
+textures and style and destroys layout, so pair it with a structural unit such as Canny or Depth to set the \
+content, as its README suggests."""
 preprocessors = ["shuffle"]
 models = ["control_v11e_sd15_shuffle"]

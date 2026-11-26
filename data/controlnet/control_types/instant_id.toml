@@ -29,8 +29,17 @@ sources = [
     "sdwebui_cn_ipadapter",
     "sdwebui_cn_script",
     "reforge_ipadapter_lib",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "forge_ipadapter",
+    "reforge_preprocessors",
+    "forge_neo_ipadapter",
+    "hf_diamonik_antelopev2",
+    "paper_arcface",
+    "forge_neo_preprocessors",
+    "sdwebui_cn_model_guess",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -53,7 +62,12 @@ Give the ControlNet unit a photo of someone else. Its keypoints set where the fa
 while the adapter unit supplies who it is. sd-webui-controlnet's announcement shows this."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+InstantID needs two SDXL units together. The first pairs InstantID Face Embedding with the InstantID IP-Adapter \
+and reads who the person is. The second pairs InstantID Face Keypoints with the InstantID ControlNet and places \
+the face by five keypoints. The keypoint photo can differ from the identity photo, which sets the head's position \
+and angle apart from the likeness. Both preprocessors fail on an image with no detectable face. The WebUI \
+extensions need both model files renamed, and sd-webui-controlnet notes a higher chance of a watermark or logo at \
+1024 by 1024."""
 preprocessors = ["instant_id_face_embedding", "instant_id_face_keypoints"]
 models = ["instantid_ip_adapter_sdxl", "instantid_controlnet_sdxl"]

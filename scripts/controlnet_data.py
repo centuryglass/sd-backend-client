@@ -305,6 +305,36 @@ def reference_errors(data: ControlNetData) -> list[str]:
     return errors
 
 
+def link_errors(data: ControlNetData) -> list[str]:
+    """Every link between records that only one side records.
+
+    A control type's `choosing` lists and each listed record's `control_types` name each other, and so do a
+    preprocessor's `models` and a model's `preprocessors`. A model may still list a preprocessor from another control
+    type, such as a scribble model reading PiDiNet soft edges.
+    """
+    errors: list[str] = []
+    for type_id, control_type in data.control_types.items():
+        for kind, ids, records in (('preprocessors', control_type.choosing.preprocessors, data.preprocessors),
+                                   ('models', control_type.choosing.models, data.models)):
+            errors.extend(f'control_types/{type_id}: choosing.{kind} lists "{ref}", whose control_types lack it'
+                          for ref in ids if ref in records and type_id not in records[ref].control_types)
+    for kind, records in (('preprocessors', data.preprocessors), ('models', data.models)):
+        for record_id, record in records.items():
+            errors.extend(f'{kind}/{record_id}: control type "{type_id}" lacks it in choosing.{kind}'
+                          for type_id in record.control_types
+                          if type_id in data.control_types
+                          and record_id not in getattr(data.control_types[type_id].choosing, kind))
+    for preprocessor_id, preprocessor in data.preprocessors.items():
+        errors.extend(f'preprocessors/{preprocessor_id}: lists model "{ref}", whose preprocessors lack it'
+                      for ref in preprocessor.models
+                      if ref in data.models and preprocessor_id not in data.models[ref].preprocessors)
+    for model_id, model in data.models.items():
+        errors.extend(f'models/{model_id}: lists preprocessor "{ref}", whose models lack it'
+                      for ref in model.preprocessors
+                      if ref in data.preprocessors and model_id not in data.preprocessors[ref].models)
+    return errors
+
+
 def status_errors(data: ControlNetData) -> list[str]:
     """Every `verified` record without a non-tutorial source, or with open questions left."""
     errors: list[str] = []
@@ -355,7 +385,8 @@ def name_collision_errors(data: ControlNetData) -> list[str]:
 
 def all_errors(data: ControlNetData) -> list[str]:
     """Every cross-record check's errors."""
-    return reference_errors(data) + status_errors(data) + text_errors(data) + name_collision_errors(data)
+    return (reference_errors(data) + link_errors(data) + status_errors(data) + text_errors(data)
+            + name_collision_errors(data))
 
 
 def main() -> int:

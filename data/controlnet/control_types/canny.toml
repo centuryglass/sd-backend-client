@@ -25,8 +25,43 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_supported_preprocessor",
     "forge_preprocessors",
+    "comfyui_controlnet_aux_src",
+    "comfyui_core_nodes",
+    "sdwebui_cn_legacy_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "hf_tencentarc_t2i_adapter_v2_commit",
+    "hf_tencentarc_t2i_adapter",
+    "paper_t2i_adapter",
+    "hf_blog_t2i_sdxl_adapters",
+    "t2i_adapter_zoo",
+    "t2i_adapter_readme_sd",
+    "hf_webui_controlnet_modules_safetensors",
+    "hf_lllyasviel_controlnet",
+    "cn10_readme",
+    "hf_xinsir_controlnet_canny_sdxl_1_0",
+    "hf_xinsir_scribble_discussion_2",
+    "hf_diffusers_controlnet_canny_sdxl_1_0",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "hf_stabilityai_control_lora",
+    "t2i_adapter_readme",
+    "hf_diffusers_controlnet_canny_sdxl_1_0_mid",
+    "hf_diffusers_controlnet_canny_sdxl_1_0_small",
+    "hf_kohya_ss_controlnet_lllite",
+    "hf_xinsir_controlnet_scribble_sdxl_1_0",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -49,24 +84,33 @@ Invert a black-on-white drawing so its lines become the white edges a Canny mode
 finished picture in the prompt."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
+guide = """\
+Start with the Canny preprocessor: every Canny model here was trained on its maps. Lower its thresholds to keep \
+more edges, or raise them to drop texture and noise. PyraCanny blends edges found at several scales into graded \
+lines, and Stability's Canny Control-LoRA is the model it pairs with. A clean black-on-white drawing needs only \
+Invert.\n\n\
+On SD 1.5, use ControlNet 1.1 Canny, which fixes the training-set flaws of 1.0. The T2I-Adapters are smaller and \
+faster. On SDXL, xinsir's Canny reports higher aesthetic and control scores than Diffusers SDXL Canny and \
+MistoLine on its card, and the union models cover Canny beside their other types. Where memory is short, the \
+Control-LoRA, the T2I-Adapter, the mid and small Diffusers checkpoints and the LLLite models are smaller; the mid \
+and small cards say complex images may need a bigger checkpoint. The first SDXL T2I-Adapter was replaced and comes \
+last."""
 preprocessors = ["canny", "pyracanny", "invert"]
 models = [
-    "control_sd15_canny",
     "control_v11p_sd15_canny",
-    "t2iadapter_canny_sd14v1",
     "t2iadapter_canny_sd15v2",
-    "t2i_adapter_canny_sdxl",
-    "t2i_adapter_xl_canny",
+    "t2iadapter_canny_sd14v1",
+    "control_sd15_canny",
+    "xinsir_canny_sdxl",
     "diffusers_canny_sdxl",
+    "xinsir_union_promax_sdxl",
+    "xinsir_union_sdxl",
+    "sai_control_lora_canny_sdxl",
+    "t2i_adapter_canny_sdxl",
     "diffusers_canny_sdxl_mid",
     "diffusers_canny_sdxl_small",
-    "xinsir_canny_sdxl",
-    "xinsir_scribble_sdxl",
-    "xinsir_union_sdxl",
-    "xinsir_union_promax_sdxl",
-    "sai_control_lora_canny_sdxl",
     "kohya_lllite_canny_sdxl",
     "kohya_lllite_canny_anime_sdxl",
+    "xinsir_scribble_sdxl",
+    "t2i_adapter_xl_canny",
 ]

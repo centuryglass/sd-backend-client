@@ -1461,3 +1461,18 @@ title = "Anthony Fu et al., Stable Diffusion QR Code 101"
 url = "https://antfu.me/posts/ai-qrcode-101"
 kind = "tutorial"
 accessed = "2026-11-25"
+
+[forge_neo_readme]
+title = "Forge Neo README, feature list"
+url = "https://github.com/Haoming02/sd-webui-forge-classic/blob/46af880c003d31846bbea984ce00fc7be247ce5b/README.md"
+kind = "local_code"
+accessed = "2026-11-25"
+project = "sd-webui-forge-classic (Forge Neo)"
+commit = "46af880c003d31846bbea984ce00fc7be247ce5b"
+path = "README.md"
+
+[hf_sen_sou_anima_lllite_regional_controlnet]
+title = "Sen-sou/Anima-LLLite-Regional-Controlnet model card"
+url = "https://huggingface.co/Sen-sou/Anima-LLLite-Regional-Controlnet/blob/f1b7beeddb4175d2d20b14e10538db62bbb441a6/README.md"
+kind = "model_card"
+accessed = "2026-11-25"

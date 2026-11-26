@@ -27,7 +27,6 @@ sources = [
 research_status = "drafted"
 open_questions = [
     "Find which datasets the indoor, urban and natural checkpoints were trained on, and whether any control model was trained on DiffusionEdge maps.",
-    "Confirm from comfyui_controlnet_aux code that patch_batch_size leaves the output unchanged.",
 ]
 
 [names]

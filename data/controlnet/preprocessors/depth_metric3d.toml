@@ -4,7 +4,9 @@ summary = "Estimates depth with Metric3D, a model built to predict real-world di
 description = """\
 Metric3D Depth predicts metric depth, meaning real distances, from a single image, and the ComfyUI node turns it \
 into a grayscale control map. Three model sizes are available, from 150 MB to 5.5 GB. The node takes the \
-camera's focal length in pixels, which the model needs to judge scale; both values default to 1000.\n\n\
+camera's focal length in pixels, which the model needs to judge scale; both values default to 1000. The node \
+divides the map by its farthest point, so focal length scales real distances but leaves the returned image \
+unchanged.\n\n\
 The comfyui_controlnet_aux table pairs it with the standard depth ControlNets. It is not available in WebUI or \
 Forge."""
 how_it_works = """\
@@ -15,7 +17,7 @@ cameras at once. At inference the known focal length converts the output back to
 predicts surface normals."""
 control_types = ["depth"]
 effect = "Replaces color and texture with a grayscale map of distance."
-output = "Grayscale depth map."
+output = "Grayscale depth map, light near and dark far; the farthest point is dark gray, not black."
 best_input = ""
 weak_input = ""
 models = ["control_v11f1p_sd15_depth"]
@@ -30,11 +32,8 @@ sources = [
     "comfyui_controlnet_aux_src",
     "comfyui_controlnet_aux_readme",
 ]
-research_status = "drafted"
-open_questions = [
-    "Confirm which end of the gray range is near in the output.",
-    "Confirm how focal length changes the normalized 8-bit map the node returns.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = []

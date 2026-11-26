@@ -28,8 +28,35 @@ sources = [
     "paper_bae",
     "hf_xinsir_controlnet_union_sdxl_1_0",
     "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_legacy_preprocessors",
+    "sdwebui_cn_preprocessors",
+    "reforge_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "hf_lllyasviel_annotators",
+    "comfyui_controlnet_aux_src",
+    "sdwebui_cn_annotators",
+    "paper_metric3d",
+    "paper_metric3dv2",
+    "gh_metric3d_readme",
+    "hf_jugghm_metric3d",
+    "paper_dsine",
+    "gh_dsine_readme",
+    "hf_bdsqlsz_qinglong_lllite",
+    "paper_midas",
+    "hf_lllyasviel_controlnet_v1_1",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "hf_lllyasviel_controlnet",
+    "hf_webui_controlnet_modules_safetensors",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -52,12 +79,14 @@ Export a camera-space normal pass from a 3D program and use it as the control im
 says its normal model reads real normal maps when their colors follow the ScanNet protocol."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = ["normal_midas", "normal_bae", "normal_dsine", "normal_metric3d"]
-models = [
-    "control_sd15_normal",
-    "control_v11p_sd15_normalbae",
-    "xinsir_union_sdxl",
-    "xinsir_union_promax_sdxl",
-]
+guide = """\
+Normal BAE is the estimator ControlNet 1.1 Normal BAE was trained on. Metric3D Normal draws the same color \
+convention: blue front, red left, green top. Normal DSINE draws red for right-facing and green for down-facing \
+surfaces, the opposite in both channels, and neither sd-webui-controlnet nor comfyui_controlnet_aux converts it, so \
+its maps reach the 1.1 model with those two colors reversed. Normal MiDaS derives normals from a depth map, the method ControlNet 1.0 Normal was trained \
+on.\n\n\
+On SD 1.5, use ControlNet 1.1 Normal BAE, which also reads normal maps from rendering engines that follow \
+ScanNet's convention; ControlNet 1.0 Normal can't read real normal maps. On SDXL, the xinsir union models cover \
+normal maps."""
+preprocessors = ["normal_bae", "normal_metric3d", "normal_dsine", "normal_midas"]
+models = ["control_v11p_sd15_normalbae", "control_sd15_normal", "xinsir_union_promax_sdxl", "xinsir_union_sdxl"]

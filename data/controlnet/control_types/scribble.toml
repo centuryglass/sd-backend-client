@@ -25,8 +25,44 @@ sources = [
     "recorded_fixtures",
     "sdwebui_cn_supported_preprocessor",
     "forge_preprocessors",
+    "sdwebui_cn_annotators",
+    "comfyui_controlnet_aux_readme",
+    "sdwebui_cn_legacy_preprocessors",
+    "comfyui_controlnet_aux_nodes",
+    "comfyui_controlnet_aux_src",
+    "comfyui_core_nodes",
+    "hf_lllyasviel_controlnet_v1_1",
+    "paper_controlnet",
+    "hf_comfyanonymous_controlnet_v1_1_fp16_safetensors",
+    "hf_tencentarc_t2i_adapter_v2_commit",
+    "hf_tencentarc_t2i_adapter",
+    "paper_t2i_adapter",
+    "hf_blog_t2i_sdxl_adapters",
+    "t2i_adapter_zoo",
+    "t2i_adapter_readme_sd",
+    "hf_webui_controlnet_modules_safetensors",
+    "hf_xinsir_controlnet_scribble_sdxl_1_0",
+    "hf_xinsir_scribble_discussion_2",
+    "hf_xinsir_controlnet_canny_sdxl_1_0",
+    "hf_xinsir_anime_painter",
+    "hf_themistoai_mistoline",
+    "anyline_readme",
+    "hf_xinsir_controlnet_union_sdxl_1_0",
+    "gh_xinsir_controlnetplus_readme",
+    "gh_xinsir_controlnetplus_scripts",
+    "sdwebui_cn_union",
+    "sdwebui_cn_hook",
+    "forge_controlnet_loader",
+    "reforge_union",
+    "forge_neo_union",
+    "comfyui_union_node",
+    "hf_tencentarc_t2i_adapter_sketch_sdxl_1_0",
+    "t2i_adapter_readme",
+    "hf_lllyasviel_sd_control_collection",
+    "hf_stabilityai_control_lora",
+    "hf_kohya_ss_controlnet_lllite",
 ]
-research_status = "drafted"
+research_status = "verified"
 open_questions = []
 
 [names]
@@ -49,28 +85,28 @@ Run a photo through scribble_hed or scribble_pidinet to keep only its rough shap
 scene with the same layout."""
 
 [choosing]
-guide = ""
-# Unordered until a follow-up session ranks them.
-preprocessors = [
-    "invert",
-    "binary",
-    "scribble_hed",
-    "scribble_pidinet",
-    "scribble_xdog",
-    "scribble_threshold",
-]
+guide = """\
+For your own drawing, use no preprocessor if it is white lines on black, or Invert if it is black on white. To \
+make a scribble from a photo, Scribble HED and Scribble PiDiNet draw thick, rough strokes, and Scribble XDoG draws \
+lines whose detail its threshold sets. Binary and ComfyUI's Scribble Threshold cut the image to flat black and \
+white at a brightness level and keep dark strokes dark, so they suit light shapes on a dark ground.\n\n\
+On SD 1.5, ControlNet 1.1 Scribble handles thin and thick strokes, and the T2I-Adapter Sketch models are smaller. \
+On SDXL, xinsir's Scribble accepts any line type and width, Anime Painter turns very rough doodles into anime \
+illustrations, and MistoLine takes many line styles. The SDXL T2I-Adapter Sketch, the Stability Sketch \
+Control-LoRA and the LLLite model are smaller. The first SDXL T2I-Adapter Sketch was replaced and comes last."""
+preprocessors = ["scribble_hed", "scribble_pidinet", "scribble_xdog", "invert", "binary", "scribble_threshold"]
 models = [
-    "control_sd15_scribble",
     "control_v11p_sd15_scribble",
-    "t2iadapter_sketch_sd14v1",
     "t2iadapter_sketch_sd15v2",
-    "t2i_adapter_sketch_sdxl",
-    "t2i_adapter_xl_sketch",
+    "t2iadapter_sketch_sd14v1",
+    "control_sd15_scribble",
     "xinsir_scribble_sdxl",
-    "xinsir_union_sdxl",
-    "xinsir_union_promax_sdxl",
     "xinsir_anime_painter_sdxl",
+    "mistoline_sdxl",
+    "xinsir_union_promax_sdxl",
+    "xinsir_union_sdxl",
+    "t2i_adapter_sketch_sdxl",
     "sai_control_lora_sketch_sdxl",
     "kohya_lllite_fake_scribble_anime_sdxl",
-    "mistoline_sdxl",
+    "t2i_adapter_xl_sketch",
 ]

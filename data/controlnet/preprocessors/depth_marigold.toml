@@ -12,10 +12,12 @@ how_it_works = """\
 Marigold starts from Stable Diffusion 2, a model that already knows what scenes look like. Its authors fine-tune \
 it on small synthetic datasets so that, instead of painting a picture, it denoises its way to a depth map \
 conditioned on the input photo. Forge runs one prediction with 20 denoising steps on the DDIM scheduler. The \
-model card says Marigold works best near 768 pixels and returns depth known only up to scale and shift."""
+model card says Marigold works best near 768 pixels and returns depth known only up to scale and shift. Training \
+scales each depth map so its nearest points sit at -1 and its farthest at 1, and Forge maps that range to white \
+near and black far."""
 control_types = ["depth"]
 effect = "Replaces color and texture with a grayscale map of relative distance."
-output = "Grayscale depth map."
+output = "Grayscale depth map, white near and black far."
 best_input = "Images around 768 pixels on the long side, where the model works best."
 weak_input = ""
 models = []
@@ -27,10 +29,8 @@ sources = [
     "hf_bingxin_marigold",
     "paper_depth_anything_v2",
 ]
-research_status = "drafted"
-open_questions = [
-    "Confirm which end of the gray range is near in Forge's output; the code maps the pipeline's values with 0.5 - 0.5 * depth.",
-]
+research_status = "verified"
+open_questions = []
 
 [names]
 webui = []
