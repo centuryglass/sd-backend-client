@@ -13,12 +13,7 @@ from typing_extensions import TypedDict
 NONE_VALUE = 'None'
 
 class ControlTypeDef(TypedDict):
-    """Defines one of the ControlNet Type options returned by the /controlnet/control_types endpoint.
-
-    TODO: I moved this here to resolve some circular import issues, but that's not an ideal fix. The best solution would
-          be to completely decouple STATIC_CONTROL_TYPE_DEFS from the WebUI definitions and just handle the difference
-          in ControlNetCategoryBuilder.
-    """
+    """Defines one of the ControlNet Type options returned by the /controlnet/control_types endpoint."""
     module_list: list[str]
     model_list: list[str]
     default_option: str

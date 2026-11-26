@@ -1,5 +1,6 @@
 """The package root's `__all__` is the supported API: every name imports, and the types it uses are exported too."""
 import dataclasses
+import importlib.metadata
 import inspect
 import typing
 
@@ -71,3 +72,9 @@ def test_interface_types_are_exported() -> None:
     exported = {getattr(sd_backend_client, name) for name in sd_backend_client.__all__}
     missing = {f'{cls.__module__}.{cls.__qualname__}' for cls in _interface_classes() - exported}
     assert not missing, f'add these to sd_backend_client.__all__: {sorted(missing)}'
+
+
+def test_version_matches_installed_distribution() -> None:
+    """`__version__` is exported and reports the installed distribution's version."""
+    assert '__version__' in sd_backend_client.__all__
+    assert sd_backend_client.__version__ == importlib.metadata.version('sd-backend-client')

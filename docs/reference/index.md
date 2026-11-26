@@ -13,7 +13,7 @@ only the public names.
 
 | Page | Names |
 | --- | --- |
-| [Clients](clients.md) | `Backend`, `connect_to_backend`, `A1111Webservice`, `ComfyUiWebservice` |
+| [Clients](clients.md) | `__version__`, `Backend`, `connect_to_backend`, `A1111Webservice`, `ComfyUiWebservice` |
 | [Generation parameters](parameters.md) | `DiffusionParams`, `DiffusionRequestBody`, `ResizeMode`, `InpaintFillOption`, `ScriptRequestData`, `ComfyUIDiffusionParams`, `DiffusionUpscalingParams` |
 | [ControlNet](controlnet.md) | `ControlNetUnit`, `ControlNetModel`, `ControlNetPreprocessor`, `PreprocessorParams`, `ParameterDef`, `ControlTypeDef` |
 | [Discovery](discovery.md) | `BackendOption`, `BackendCapabilities` |

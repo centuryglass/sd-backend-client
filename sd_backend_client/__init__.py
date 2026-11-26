@@ -11,6 +11,8 @@ outside `Backend` may use internal types.
 Each name in `__all__` needs a directive on a `docs/reference/` page, or the docs build fails (AGENTS.md,
 "Documentation site").
 """
+import importlib.metadata
+
 from sd_backend_client.api.a1111_webservice import A1111Webservice
 from sd_backend_client.api.comfyui.comfyui_diffusion_params import ComfyUIDiffusionParams
 from sd_backend_client.api.comfyui_webservice import ComfyUiWebservice
@@ -40,7 +42,10 @@ from sd_backend_client.errors import AuthError, BackendConnectionError, BackendL
     WorkflowValidationError
 from sd_backend_client.launch.managed_comfyui import ManagedComfyUI, ManagedState
 
+__version__ = importlib.metadata.version('sd-backend-client')
+
 __all__ = [
+    '__version__',
     # Clients
     'Backend',
     'connect_to_backend',
