@@ -61,7 +61,7 @@ In priority order:
 ```bash
 pip install -e .                    # the package and its runtime dependencies
 pip install -r requirements-dev.txt # for development: adds pytest and pylint
-pip install -r requirements-docs.txt # for the documentation site: `mkdocs serve` previews it
+pip install -r requirements-docs.txt # for the documentation sites: `mkdocs serve` previews the API site, `-f guide/mkdocs.yml` the guide
 
 # Offline pure-logic unit tests: no server, no GPU, deterministic (use these by default):
 pytest tests/unit/
@@ -271,6 +271,19 @@ CI's `docs` job runs `mkdocs build --strict`, which fails on any warning.
   `docs/reference/` page is missing a public name or documents one that isn't public.
 - **Pydantic field limits render from `Field(...)`.** `docs/templates/python/material/attribute.html.jinja` shows
   `ge`, `gt`, `le`, `lt` and length limits above each field's docstring.
+
+### The guide
+
+`guide/mkdocs.yml` is a second site, the Stable Diffusion guide for artists, published under `/guide/`. It builds
+into `site/guide/`, so `docs.yml` uploads both sites as one Pages artifact, and it runs after the API build, which
+empties `site/`. CI's `docs` job builds it with `--strict` too: `mkdocs build --strict -f guide/mkdocs.yml`.
+
+- **Its ControlNet record pages are generated from `data/controlnet/`** by `scripts/guide_pages.py`, through the
+  `scripts/guide_hooks.py` hook. They aren't committed; fix a page by editing its record.
+- **Pages link to records with `[[type:id]]`, `[[pre:id]]`, `[[model:id]]` and `[[source:id]]` tokens.** An unknown id
+  fails the build, so renaming a record means fixing the hand-written pages in `guide/docs/` that cite it.
+- **Hand-written guide pages make claims only the linked records support,** like the records' own writing rules in
+  `data/controlnet/README.md`.
 
 ## Lint
 

@@ -41,6 +41,8 @@ nav:
       - Running a local install: reference/launch.md
       - Generation handles: reference/generation.md
       - Errors: reference/errors.md
+  # The guide is a separate MkDocs site (guide/mkdocs.yml), published under /guide/.
+  - Guide: https://centuryglass.github.io/sd-backend-client/guide/
 
 markdown_extensions:
   - admonition

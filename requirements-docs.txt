@@ -1,6 +1,7 @@
-# Documentation site tools: `pip install -r requirements-docs.txt`, then `mkdocs serve` to preview the site or
-# `mkdocs build --strict` for CI's docs check (mkdocs.yml). Pinned exactly, like requirements-dev.txt. The build reads
-# the package's source statically, so it needs neither the package nor its runtime dependencies.
+# Documentation site tools: `pip install -r requirements-docs.txt`, then `mkdocs serve` to preview the API site or
+# `mkdocs build --strict` for CI's docs check (mkdocs.yml); add `-f guide/mkdocs.yml` for the guide site. Pinned
+# exactly, like requirements-dev.txt. The build reads the package's source statically, so it needs neither the package
+# nor its runtime dependencies.
 
 # MkDocs 2.0 removes the plugin system that mkdocstrings and Material depend on; .github/dependabot.yml ignores 2.x.
 mkdocs==1.6.1
@@ -17,3 +18,7 @@ pymdown-extensions==13.1
 
 # mkdocstrings formats long signatures with ruff when it is installed.
 ruff==0.17.5
+
+# The guide site (guide/mkdocs.yml) loads data/controlnet/ through scripts/controlnet_data.py, whose schema is pydantic.
+# A docs-build dependency only; the package's own pydantic floor is in pyproject.toml.
+pydantic==2.14.4

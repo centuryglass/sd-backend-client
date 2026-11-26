@@ -1,8 +1,9 @@
 name: docs
 
-# Builds the documentation site (mkdocs.yml) from main and publishes it to GitHub Pages at
-# https://centuryglass.github.io/sd-backend-client/. The site tracks main, so it can describe changes that are not
-# released yet. ci.yml's docs job builds the same site on pull requests.
+# Builds the API documentation site (mkdocs.yml) and the guide (guide/mkdocs.yml) from main and publishes them to
+# GitHub Pages as one artifact: the API site at https://centuryglass.github.io/sd-backend-client/ and the guide under
+# /guide/. The sites track main, so they can describe changes that are not released yet. ci.yml's docs job builds both
+# on pull requests.
 #
 # The repository's Pages source must be set to "GitHub Actions" (Settings > Pages > Build and deployment) for the
 # deploy job to publish.
@@ -37,8 +38,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-docs.txt
 
-      - name: Build the documentation site
+      - name: Build the API documentation site
         run: mkdocs build --strict
+
+      # guide/mkdocs.yml builds into site/guide/. It runs second, since the API build empties site/.
+      - name: Build the guide
+        run: mkdocs build --strict -f guide/mkdocs.yml
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:

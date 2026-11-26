@@ -1,0 +1,74 @@
+# The Stable Diffusion guide: a site for artists, separate from the API reference in the root mkdocs.yml, published
+# at https://centuryglass.github.io/sd-backend-client/guide/. `mkdocs serve -f guide/mkdocs.yml` previews it and
+# `mkdocs build --strict -f guide/mkdocs.yml` is CI's check. Its ControlNet record pages are generated from
+# data/controlnet/ by scripts/guide_hooks.py.
+#
+# site_dir puts the build inside the API site's, so .github/workflows/docs.yml uploads both as one Pages artifact.
+# Build the API site first: its build empties site/, guide included.
+site_name: Stable Diffusion guide
+site_description: What Stable Diffusion's ControlNet types, preprocessors and models do, and which one to use
+site_url: https://centuryglass.github.io/sd-backend-client/guide/
+repo_url: https://github.com/centuryglass/sd-backend-client
+repo_name: centuryglass/sd-backend-client
+edit_uri: edit/main/guide/docs/
+site_dir: ../site/guide
+
+# Keep the theme and palette in step with the root mkdocs.yml.
+theme:
+  name: material
+  features:
+    - navigation.indexes
+    - navigation.sections
+    - navigation.top
+    - toc.follow
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+# A value ending in "/" names a generated directory; scripts/guide_hooks.py replaces it with that directory's pages.
+nav:
+  - Home: index.md
+  - ControlNet:
+      - controlnet/index.md
+      - Which one do I use?: controlnet/choosing.md
+      - Copying an image: controlnet/copying-an-image.md
+      - Control types: controlnet/types/
+      - Preprocessors: controlnet/preprocessors/
+      - Models: controlnet/models/
+      - Name lookup: controlnet/names.md
+      - Sources: controlnet/sources.md
+  - API reference: https://centuryglass.github.io/sd-backend-client/
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - javascripts/table-filter.js
+
+validation:
+  anchors: warn
+
+hooks:
+  - ../scripts/guide_hooks.py
+
+watch:
+  - ../data/controlnet
+  - ../scripts/controlnet_data.py
+  - ../scripts/guide_pages.py
+
+plugins:
+  - search
