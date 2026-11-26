@@ -18,6 +18,16 @@ WINDOWS = 'win32'
 CUDA_TORCH = '2.3.1+cu121'
 
 
+def _link_directory(target: Path, link: Path) -> None:
+    """Create the fixture link, or skip when Windows denies symlink creation."""
+    try:
+        os.symlink(target, link, target_is_directory=True)
+    except OSError as exc:
+        if getattr(exc, 'winerror', None) == 1314:
+            raise unittest.SkipTest('Creating symlinks requires Windows Developer Mode or symlink privileges') from exc
+        raise
+
+
 def _write(path: Path, text: str = '') -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding='utf-8')
@@ -408,13 +418,27 @@ class BackendDetectorTest(unittest.TestCase):
         _write(comfyui / 'models' / 'checkpoints' / 'a' / 'b' / 'c' / 'model.safetensors')
         self.assertEqual(self._codes(self._only_install(self._detect())), {FindingCode.NO_MODELS})
 
+    def test_symlink_fixture_skips_missing_windows_privilege(self) -> None:
+        """Only Windows' missing symlink privilege is treated as a skipped fixture."""
+        error = OSError()
+        error.winerror = 1314
+        with mock.patch.object(os, 'symlink', side_effect=error):
+            with self.assertRaises(unittest.SkipTest):
+                _link_directory(self.root, self.root / 'link')
+
+    def test_symlink_fixture_reraises_other_errors(self) -> None:
+        """A broken symlink fixture still fails normally."""
+        with mock.patch.object(os, 'symlink', side_effect=FileExistsError):
+            with self.assertRaises(FileExistsError):
+                _link_directory(self.root, self.root / 'link')
+
     def test_models_through_symlinked_folder(self) -> None:
         """A models folder that is itself a link is followed."""
         comfyui = _make_comfyui(self.root / 'ComfyUI', models=False)
         _make_environment(comfyui / 'venv', 'posix')
         _write(self.root / 'shared' / 'model.gguf')
         (comfyui / 'models').mkdir()
-        os.symlink(self.root / 'shared', comfyui / 'models' / 'unet', target_is_directory=True)
+        _link_directory(self.root / 'shared', comfyui / 'models' / 'unet')
         self.assertEqual(self._codes(self._only_install(self._detect(roots=[comfyui]))), set())
 
     def test_models_through_linked_subfolder(self) -> None:
@@ -423,9 +447,8 @@ class BackendDetectorTest(unittest.TestCase):
         _make_environment(webui / 'venv', 'posix')
         _write(self.root / 'shared' / 'StableDiffusion' / 'SDXL' / 'model.safetensors')
         (webui / 'models' / 'Stable-diffusion').mkdir(parents=True)
-        os.symlink(self.root / 'shared' / 'StableDiffusion', webui / 'models' / 'Stable-diffusion' / 'sd',
-                   target_is_directory=True)
-        os.symlink(webui / 'models', webui / 'models' / 'Stable-diffusion' / 'loop', target_is_directory=True)
+        _link_directory(self.root / 'shared' / 'StableDiffusion', webui / 'models' / 'Stable-diffusion' / 'sd')
+        _link_directory(webui / 'models', webui / 'models' / 'Stable-diffusion' / 'loop')
         self.assertEqual(self._codes(self._only_install(self._detect(roots=[webui]))), set())
 
     def test_models_through_extra_model_paths(self) -> None:
@@ -468,9 +491,9 @@ class BackendDetectorTest(unittest.TestCase):
         """Linked folders aren't descended into, so a loop ends and an install reached only through a link isn't
         found."""
         (self.root / 'a').mkdir()
-        os.symlink(self.root, self.root / 'a' / 'loop', target_is_directory=True)
+        _link_directory(self.root, self.root / 'a' / 'loop')
         _make_comfyui(self.root / 'outside' / 'ComfyUI')
-        os.symlink(self.root / 'outside', self.root / 'a' / 'link', target_is_directory=True)
+        _link_directory(self.root / 'outside', self.root / 'a' / 'link')
         self.assertEqual(self._detect(roots=[self.root / 'a']).installs, [])
 
     def test_skipped_folders(self) -> None:
@@ -539,9 +562,11 @@ class BackendDetectorTest(unittest.TestCase):
     def test_comfyui_server_unlinked(self) -> None:
         """A ComfyUI server running from somewhere else stays in `servers`."""
         _make_comfyui(self.root / 'ComfyUI')
-        result = self._detect(connect=_servers({DEFAULT_COMFYUI_URL: _comfyui_backend(['/other/main.py'])}))
+        elsewhere = self.root / 'other'
+        connect = _servers({DEFAULT_COMFYUI_URL: _comfyui_backend([str(elsewhere / 'main.py')])})
+        result = self._detect(connect=connect)
         self.assertIsNone(self._only_install(result).server)
-        self.assertEqual([server.install_path for server in result.servers], [Path('/other')])
+        self.assertEqual([server.install_path for server in result.servers], [elsewhere])
 
     def test_webui_server_linked_by_port(self) -> None:
         """A WebUI server links to the one install whose `--port` matches, or that uses the default port."""
