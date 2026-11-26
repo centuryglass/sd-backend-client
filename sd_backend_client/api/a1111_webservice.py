@@ -23,6 +23,7 @@ from sd_backend_client.api.shared_data.backend_options import BackendCapabilitie
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
+from sd_backend_client.api.shared_data.generation_handle import GenerationHandle
 from sd_backend_client.api.shared_data.parameter_def import ParameterDef
 from sd_backend_client.api.shared_data.sampler_names import comfyui_sampler_name, comfyui_scheduler_name
 from sd_backend_client.api.webservice import WebService, DEFAULT_REQUEST_TIMEOUT
@@ -90,7 +91,9 @@ class A1111Webservice(WebService, Backend):
     A1111Webservice provides access to the a1111/stable-diffusion-webui through the REST API.
 
     Its `submit_*`, `list_*` and `get_capabilities` methods implement `Backend`. The blocking `txt2img`, `img2img`,
-    `upscale` and `controlnet_preprocessor_preview` methods are WebUI-specific.
+    `upscale` and `controlnet_preprocessor_preview` methods are WebUI-specific. Those methods, and the other
+    methods outside `Backend`, return internal types such as `ImageResponse` and `LoraInfo` that may change in any
+    release.
     """
 
     # noinspection SpellCheckingInspection
@@ -194,7 +197,7 @@ class A1111Webservice(WebService, Backend):
         from sd_backend_client.api.webui.webui_generation_handle import create_task_id
         return create_task_id(task_type)
 
-    def submit_txt2img(self, diffusion_params: Optional[DiffusionParams] = None) -> 'WebUIGenerationHandle':
+    def submit_txt2img(self, diffusion_params: Optional[DiffusionParams] = None) -> GenerationHandle:
         """Enqueue a txt2img job and return a handle immediately, implementing `Backend.submit_txt2img`.
 
         The blocking POST is deferred to the client-side dispatcher (see ``webui_generation_handle``), so
@@ -209,7 +212,7 @@ class A1111Webservice(WebService, Backend):
         snapshot.soft_inpainting = False
         return self._submit(A1111Webservice.Endpoints.TXT2IMG, 'txt2img', snapshot)
 
-    def submit_img2img(self, diffusion_params: DiffusionParams) -> 'WebUIGenerationHandle':
+    def submit_img2img(self, diffusion_params: DiffusionParams) -> GenerationHandle:
         """Enqueue an img2img job and return a handle immediately, implementing `Backend.submit_img2img`.
 
         See `submit_txt2img` for the dispatch, cancel and copy semantics.
@@ -219,7 +222,7 @@ class A1111Webservice(WebService, Backend):
         return self._submit(A1111Webservice.Endpoints.IMG2IMG, 'img2img',
                             DiffusionRequestBody.from_params(diffusion_params))
 
-    def submit_inpaint(self, diffusion_params: DiffusionParams) -> 'WebUIGenerationHandle':
+    def submit_inpaint(self, diffusion_params: DiffusionParams) -> GenerationHandle:
         """Enqueue an inpainting job and return a handle immediately, implementing `Backend.submit_inpaint`.
 
         WebUI inpaints through its img2img endpoint. See `submit_txt2img` for the dispatch, cancel and copy semantics.
@@ -234,7 +237,7 @@ class A1111Webservice(WebService, Backend):
         return self._submit(A1111Webservice.Endpoints.IMG2IMG, 'img2img', body, paste_back)
 
     def submit_upscale(self, image: Image.Image, width: int, height: int,
-                       upscale_params: Optional[DiffusionUpscalingParams] = None) -> 'WebUIGenerationHandle':
+                       upscale_params: Optional[DiffusionUpscalingParams] = None) -> GenerationHandle:
         """Enqueue an `upscale` call and return a handle immediately, implementing `Backend.submit_upscale`.
 
         The job uses copies of `image` and `upscale_params` taken at submit time. Once dispatched, a basic upscale
@@ -249,7 +252,7 @@ class A1111Webservice(WebService, Backend):
 
     def submit_preprocessor_preview(self, image: Image.Image,
                                     preprocessor: ControlNetPreprocessor | PreprocessorParams,
-                                    mask: Optional[Image.Image] = None) -> 'WebUIGenerationHandle':
+                                    mask: Optional[Image.Image] = None) -> GenerationHandle:
         """Enqueue a `controlnet_preprocessor_preview` call and return a handle immediately.
 
         Implements `Backend.submit_preprocessor_preview`. The job uses copies of its arguments taken at submit time.

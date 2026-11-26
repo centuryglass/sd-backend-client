@@ -6,8 +6,13 @@ from pydantic import BaseModel
 
 
 class ScriptRequestData(TypedDict):
-    """Object format to use when invoking a script in a txt2img/img2img request body. Built and sent by us, so it
-       stays a plain TypedDict."""
+    """The entry that invokes one WebUI script in a txt2img/img2img request body.
+
+    Attributes
+    ----------
+    args: list
+        The positional arguments passed to the script, in the order the script defines them.
+    """
     args: list[Any]
 
 

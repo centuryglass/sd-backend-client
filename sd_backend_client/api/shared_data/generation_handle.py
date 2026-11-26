@@ -128,6 +128,9 @@ class GenerationResult:
 
 
 ProgressCallback = Callable[[GenerationProgress], None]
+"""Called with a `GenerationProgress` snapshot each time `GenerationHandle.wait` polls the job.
+
+The return value is ignored."""
 
 
 class GenerationHandle(ABC):

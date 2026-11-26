@@ -46,6 +46,7 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import
     PreprocessorParams
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
+from sd_backend_client.api.shared_data.generation_handle import GenerationHandle
 from sd_backend_client.api.shared_data.parameter_def import ParameterDef
 from sd_backend_client.api.shared_data.sampler_names import SAMPLER_WEBUI_NAMES
 from sd_backend_client.api.webservice import WebService, MULTIPART_FORM_DATA_TYPE, DEFAULT_REQUEST_TIMEOUT
@@ -149,7 +150,8 @@ class ComfyUiWebservice(WebService, Backend):
 
     Its `submit_*`, `list_*` and `get_capabilities` methods implement `Backend`. The `txt2img`, `img2img`, `inpaint`,
     `upscale` and `controlnet_preprocessor_preview` methods queue the same jobs but return the raw
-    `QueueAdditionResponse`.
+    `QueueAdditionResponse`. Those methods, and the other methods outside `Backend`, return internal types such as
+    `QueueAdditionResponse` that may change in any release.
     """
 
     def __init__(self, url: str, request_timeout: Optional[float] = DEFAULT_REQUEST_TIMEOUT,
@@ -892,15 +894,15 @@ class ComfyUiWebservice(WebService, Backend):
         from sd_backend_client.api.comfyui.comfyui_generation_handle import ComfyGenerationHandle
         return ComfyGenerationHandle.from_queue_response(self, response, paste_back, run_plan)
 
-    def submit_txt2img(self, diffusion_params: DiffusionParams) -> 'ComfyGenerationHandle':
+    def submit_txt2img(self, diffusion_params: DiffusionParams) -> GenerationHandle:
         """Queue a txt2img job and return its handle, implementing `Backend.submit_txt2img`."""
         return self._handle(self.txt2img(diffusion_params))
 
-    def submit_img2img(self, diffusion_params: DiffusionParams) -> 'ComfyGenerationHandle':
+    def submit_img2img(self, diffusion_params: DiffusionParams) -> GenerationHandle:
         """Queue an img2img job and return its handle, implementing `Backend.submit_img2img`."""
         return self._handle(self.img2img(diffusion_params))
 
-    def submit_inpaint(self, diffusion_params: DiffusionParams) -> 'ComfyGenerationHandle':
+    def submit_inpaint(self, diffusion_params: DiffusionParams) -> GenerationHandle:
         """Queue an inpaint job and return its handle, implementing `Backend.submit_inpaint`.
 
         The handle's result images are composited onto the source image through the blurred mask, as the WebUI does.
@@ -912,7 +914,7 @@ class ComfyUiWebservice(WebService, Backend):
         return self._handle(response, paste_back)
 
     def submit_upscale(self, image: Image.Image, width: int, height: int,
-                       upscale_params: Optional[DiffusionUpscalingParams] = None) -> 'ComfyGenerationHandle':
+                       upscale_params: Optional[DiffusionUpscalingParams] = None) -> GenerationHandle:
         """Queue an upscaling job and return its handle, implementing `Backend.submit_upscale`.
 
         An Ultimate SD Upscale job's progress reports `overall_progress` across all of its tiles.
@@ -922,7 +924,7 @@ class ComfyUiWebservice(WebService, Backend):
 
     def submit_preprocessor_preview(self, image: Image.Image,
                                     preprocessor: ControlNetPreprocessor | PreprocessorParams,
-                                    mask: Optional[Image.Image] = None) -> 'ComfyGenerationHandle':
+                                    mask: Optional[Image.Image] = None) -> GenerationHandle:
         """Queue a preprocessor preview job and return its handle, implementing `Backend.submit_preprocessor_preview`.
         """
         return self._handle(self.controlnet_preprocessor_preview(image, mask, preprocessor))
