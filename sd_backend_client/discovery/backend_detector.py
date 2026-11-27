@@ -686,11 +686,16 @@ def parse_extra_model_paths(text: str, base_dir: Path) -> Optional[list[Path]]:
     keys, whose value is a path or a `|` block of paths. Only `COMFYUI_EXTRA_MODEL_KEYS` are returned. Relative paths
     resolve against `base_path`, which resolves against `base_dir`.
     """
+    if text.strip() == '{}':
+        return []
     sections: list[dict[str, list[str]]] = []
     block_key: Optional[str] = None
     block_indent = 0
     for raw_line in text.splitlines():
-        line = re.sub(r'(^|\s)#.*$', '', raw_line).rstrip()
+        # Preserve comment markers inside a quoted YAML path.
+        _, colon, scalar = raw_line.partition(':')
+        quoted = re.fullmatch(r"\s*'((?:[^']|'')*)'\s*(?:#.*)?", scalar) if colon and raw_line[:1].isspace() else None
+        line = (raw_line if quoted else re.sub(r'(^|\s)#.*$', '', raw_line)).rstrip()
         if not line.strip():
             continue
         indent = len(line) - len(line.lstrip())
@@ -710,6 +715,9 @@ def parse_extra_model_paths(text: str, base_dir: Path) -> Optional[list[Path]]:
             continue
         if not sections:
             return None
+        if quoted is not None:
+            sections[-1][key.strip()] = [quoted[1].replace("''", "'")]
+            continue
         value = value.strip().strip('\'"')
         if value in ('|', '|-', '>'):
             block_key, block_indent = key.strip(), indent

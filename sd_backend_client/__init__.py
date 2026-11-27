@@ -41,6 +41,8 @@ from sd_backend_client.errors import AuthError, BackendConnectionError, BackendL
     GenerationError, LaunchCancelledError, SDBackendError, ServerError, UnexpectedResponseError, \
     WorkflowValidationError
 from sd_backend_client.launch.managed_comfyui import ManagedComfyUI, ManagedState
+from sd_backend_client.launch.model_paths import ModelLayout, ModelSource, model_sources_from_detection, \
+    render_model_paths, write_model_paths
 
 __version__ = importlib.metadata.version('sd-backend-client')
 
@@ -89,6 +91,11 @@ __all__ = [
     # Running a local install
     'ManagedComfyUI',
     'ManagedState',
+    'ModelLayout',
+    'ModelSource',
+    'model_sources_from_detection',
+    'render_model_paths',
+    'write_model_paths',
     # Generation handles
     'GenerationHandle',
     'GenerationStatus',

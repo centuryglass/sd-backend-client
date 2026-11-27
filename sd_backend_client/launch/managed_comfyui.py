@@ -145,6 +145,7 @@ class ManagedComfyUI:
     def __init__(self, launch_command: Sequence[str | os.PathLike[str]], cwd: str | os.PathLike[str], port: int,
                  host: str = DEFAULT_HOST, env: Optional[Mapping[str, str]] = None,
                  on_log: Optional[LogCallback] = None, on_state: Optional[StateCallback] = None, *,
+                 model_paths_config: str | os.PathLike[str] | None = None,
                  process_factory: ProcessFactory = _popen, health_check: HealthCheck = comfyui_argv,
                  clock: Callable[[], float] = time.monotonic,
                  sleep: Optional[Callable[[float], None]] = None) -> None:
@@ -169,6 +170,8 @@ class ManagedComfyUI:
             Called with each line of output, without the line break or terminal escape sequences.
         on_state: Callable[[ManagedState], None], optional
             Called with each new state.
+        model_paths_config: str | os.PathLike[str], optional
+            An additional, caller-managed extra model paths file. Existing ComfyUI configurations are still loaded.
         process_factory, health_check, clock, sleep
             Replace the process launcher, the readiness check, `time.monotonic` and the wait between readiness polls.
             Tests use these to run without a server. The default wait ends early when the process exits.
@@ -183,7 +186,10 @@ class ManagedComfyUI:
         if not 0 < port < 65536:
             raise ValueError(f'port must be between 1 and 65535, got {port}')
         self._program = os.fspath(launch_command[0])
-        self._arguments = server_arguments([os.fspath(arg) for arg in launch_command[1:]], host, port)
+        arguments = [os.fspath(arg) for arg in launch_command[1:]]
+        if model_paths_config is not None:
+            arguments.extend(('--extra-model-paths-config', os.fspath(model_paths_config)))
+        self._arguments = server_arguments(arguments, host, port)
         self._expected_argv_tail = _script_arguments(self._arguments)
         self._cwd = os.fspath(cwd)
         self._env = dict(os.environ if env is None else env)
@@ -241,6 +247,14 @@ class ManagedComfyUI:
     def connect(self, **kwargs: Any) -> ComfyUiWebservice:
         """Return a `ComfyUiWebservice` for `url`. Keyword arguments go to its constructor."""
         return ComfyUiWebservice(self.url, **kwargs)
+
+    def checkpoints_available(self) -> bool:
+        """Check whether the running ComfyUI lists a checkpoint, without loading a model."""
+        webservice = self.connect(live_progress=False, request_timeout=HEALTH_CHECK_REQUEST_TIMEOUT)
+        try:
+            return bool(webservice.list_checkpoints())
+        finally:
+            webservice.disconnect()
 
     def start(self) -> None:
         """Launch the process in the `STARTING` state and return without waiting for it to serve.
