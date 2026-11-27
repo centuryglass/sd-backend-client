@@ -81,10 +81,23 @@ def test_version_matches_installed_distribution() -> None:
     assert sd_backend_client.__version__ == importlib.metadata.version('sd-backend-client')
 
 
-@pytest.mark.parametrize('model', [
+_EXPORTED_MODELS = [
     candidate for name in sd_backend_client.__all__
     if isinstance(candidate := getattr(sd_backend_client, name), type) and issubclass(candidate, BaseModel)
-])
+]
+
+
+@pytest.mark.parametrize('model', _EXPORTED_MODELS)
+def test_exported_model_fields_have_descriptions(model: type[BaseModel]) -> None:
+    """Every field of an exported model carries its attribute docstring as its runtime `description`.
+
+    This needs `use_attribute_docstrings` in the model's config, and pydantic 2.7 or later, the pyproject.toml floor.
+    """
+    missing = [name for name, field in model.model_fields.items() if not (field.description or '').strip()]
+    assert not missing, f'{model.__name__} fields without a docstring: {missing}'
+
+
+@pytest.mark.parametrize('model', _EXPORTED_MODELS)
 def test_exported_models_generate_json_schema(model: type[BaseModel]) -> None:
     """Every exported Pydantic model exposes a JSON schema."""
     schema = model.model_json_schema()

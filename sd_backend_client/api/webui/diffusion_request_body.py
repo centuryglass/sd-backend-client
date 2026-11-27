@@ -30,7 +30,11 @@ class InpaintFillOption(Enum):
 
 
 class DiffusionRequestBody(DiffusionParams):
-    """Request body format for WebUI image generation (all types)"""
+    """`DiffusionParams` plus the fields only Forge/A1111 WebUI supports, for txt2img, img2img and inpainting.
+
+    `A1111Webservice` converts any `DiffusionParams` it receives with `from_params`, and `to_dict` builds the WebUI
+    request body. `ComfyUiWebservice` ignores the WebUI-only fields.
+    """
 
     ### Basic image generation:
     n_iter: int = Field(default=1, ge=1)  # number of batches

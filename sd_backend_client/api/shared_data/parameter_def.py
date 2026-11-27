@@ -5,7 +5,7 @@ values back as a dict keyed by `ParameterDef.key`, which `validate_parameter_val
 """
 from typing import Any, Mapping, Optional, Sequence
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 def _value_type_matches(value: Any, default: Any) -> bool:
@@ -22,8 +22,17 @@ def _value_type_matches(value: Any, default: Any) -> bool:
 
 
 class ParameterDef(BaseModel):
-    """Defines one setting a backend accepts: a ControlNet preprocessor parameter or a soft inpainting setting."""
+    """Defines one setting a backend accepts: a ControlNet preprocessor parameter or a soft inpainting setting.
+
+    `ControlNetPreprocessor.parameters` and `Backend.get_soft_inpainting_parameters` return these. Each describes a
+    value's type, default and allowed range, enough to build a UI control for it.
+    """
+    # use_attribute_docstrings copies each field's docstring into its FieldInfo.description.
+    model_config = ConfigDict(use_attribute_docstrings=True)
+
     key: str
+    """The setting's name, used as its key in `PreprocessorParams.parameter_values` or
+       `DiffusionParams.soft_inpainting_params`."""
     default_value: str|int|float|bool
     """Default for the parameter, sent whenever the caller leaves it unset (see `required`). Every parameter carries
        one so there's always a type to validate provided values against, too."""

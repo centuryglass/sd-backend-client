@@ -11,10 +11,16 @@ __all__ = ['ControlNetPreprocessor', 'ParameterDef', 'PreprocessorParams']
 
 
 class ControlNetPreprocessor(BaseModel):
-    """Defines a ControlNet preprocessor's name and parameters for use with a Stable Diffusion API."""
-    model_config = ConfigDict(protected_namespaces=('model_validate', 'model_dump'))
+    """A ControlNet preprocessor a server offers, with the parameters it accepts.
+
+    `Backend.get_controlnet_preprocessors` lists them for either backend. To use one, wrap it in a
+    `PreprocessorParams` with the chosen parameter values and attach that to a `ControlNetUnit`.
+    """
+    # use_attribute_docstrings copies each field's docstring into its FieldInfo.description.
+    model_config = ConfigDict(protected_namespaces=('model_validate', 'model_dump'), use_attribute_docstrings=True)
 
     name: str
+    """The server's identifier for the preprocessor: a WebUI module name, or a ComfyUI node class type."""
 
     category_name: str = ""
     """Category label for grouping with similar preprocessors."""
@@ -35,9 +41,22 @@ class ControlNetPreprocessor(BaseModel):
     """Definitions for all additional parameter types the preprocessor accepts."""
 
 class PreprocessorParams(BaseModel):
-    """Selected ControlNet Preprocessor and parameter values."""
+    """A chosen ControlNet preprocessor and the parameter values to run it with, for `ControlNetUnit.preprocessor`.
+
+    Construction fills every parameter the caller leaves out with its default, then raises `ValueError` for an
+    unknown key or a value that doesn't fit its `ParameterDef`.
+    """
+    # use_attribute_docstrings copies each field's docstring into its FieldInfo.description.
+    model_config = ConfigDict(use_attribute_docstrings=True)
+
     typedef: ControlNetPreprocessor
+    """The preprocessor to run, as listed by `Backend.get_controlnet_preprocessors`."""
+
     parameter_values: dict[str, Any]
+    """Values for the preprocessor's settings, keyed by `ParameterDef.key` from `typedef.parameters`.
+
+    May be omitted or partial: each missing key gets its `ParameterDef.default_value`.
+    """
 
     @model_validator(mode='before')
     @classmethod
