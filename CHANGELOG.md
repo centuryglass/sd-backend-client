@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.8.0](https://github.com/centuryglass/sd-backend-client/compare/v0.7.0...v0.8.0) (2026-11-27)
+
+
+### Features
+
+* **discovery:** find installed and running backends on the local machine ([#160](https://github.com/centuryglass/sd-backend-client/issues/160)) ([6bc27d3](https://github.com/centuryglass/sd-backend-client/commit/6bc27d311c4b46f5ca09029ab1c5dad614d6eda7)), closes [#156](https://github.com/centuryglass/sd-backend-client/issues/156)
+* **launch:** run a local ComfyUI install as a managed child process ([#162](https://github.com/centuryglass/sd-backend-client/issues/162)) ([ed006ae](https://github.com/centuryglass/sd-backend-client/commit/ed006ae495b21bdcc77c6a2c03aadb30e222422f))
+* port OpenCode issue-cache plugin ([#154](https://github.com/centuryglass/sd-backend-client/issues/154)) ([c6ff3b9](https://github.com/centuryglass/sd-backend-client/commit/c6ff3b91c5ced8df53a6700a827f38f1c4ad37b6))
+
+
+### Bug Fixes
+
+* **controlnet:** sort ComfyUI's HED, PiDiNet and TEED options into SoftEdge ([#153](https://github.com/centuryglass/sd-backend-client/issues/153)) ([20be17a](https://github.com/centuryglass/sd-backend-client/commit/20be17a61191caf80c820bd3088125fa3b286b49)), closes [#150](https://github.com/centuryglass/sd-backend-client/issues/150)
+* **controlnet:** sort pose preprocessors into OpenPose and drop shuffle from SoftEdge ([#151](https://github.com/centuryglass/sd-backend-client/issues/151)) ([afc44da](https://github.com/centuryglass/sd-backend-client/commit/afc44dad06408f784f8cb08ec76ff00425b5f460)), closes [#148](https://github.com/centuryglass/sd-backend-client/issues/148)
+* polish the public API surface ([#179](https://github.com/centuryglass/sd-backend-client/issues/179)) ([f02e233](https://github.com/centuryglass/sd-backend-client/commit/f02e233a9bd3ac0b9fa2f3ef6bdecae7d078deba))
+* support JSON schemas for diffusion request models ([#187](https://github.com/centuryglass/sd-backend-client/issues/187)) ([d51361c](https://github.com/centuryglass/sd-backend-client/commit/d51361c22cb5080a8c3238d1f9323ee7c38932b1))
+
+
+### Documentation
+
+* add a ControlNet guide site built from data/controlnet ([#186](https://github.com/centuryglass/sd-backend-client/issues/186)) ([8a2cdb2](https://github.com/centuryglass/sd-backend-client/commit/8a2cdb25760546fd16e1193e1db09e4909a65c0f)), closes [#180](https://github.com/centuryglass/sd-backend-client/issues/180)
+* attach field docstrings to pydantic models at runtime ([#190](https://github.com/centuryglass/sd-backend-client/issues/190)) ([b251e81](https://github.com/centuryglass/sd-backend-client/commit/b251e81caa15c12f315ea39785d48677a854dfed)), closes [#169](https://github.com/centuryglass/sd-backend-client/issues/169)
+* **controlnet:** add the ControlNet reference data schema and inventory ([#159](https://github.com/centuryglass/sd-backend-client/issues/159)) ([e1326db](https://github.com/centuryglass/sd-backend-client/commit/e1326db0e6b2dda797d093abc1d05a28b70e19b0))
+* **controlnet:** research the depth and normals group ([#164](https://github.com/centuryglass/sd-backend-client/issues/164)) ([590cc5f](https://github.com/centuryglass/sd-backend-client/commit/590cc5fac28b9f7200daa2a9cca00f17da7f3627))
+* **controlnet:** research the edges and lines group ([#161](https://github.com/centuryglass/sd-backend-client/issues/161)) ([4a6aa91](https://github.com/centuryglass/sd-backend-client/commit/4a6aa91a14e697dedc98e2bf33c6f1c5c44b8bc2))
+* **controlnet:** research the image prompting and identity group ([#173](https://github.com/centuryglass/sd-backend-client/issues/173)) ([54ad873](https://github.com/centuryglass/sd-backend-client/commit/54ad873244ee0ddfddb67a9ffc22302d0617f68a))
+* **controlnet:** research the image-guided types group ([#168](https://github.com/centuryglass/sd-backend-client/issues/168)) ([05ccb67](https://github.com/centuryglass/sd-backend-client/commit/05ccb67345cd66aa324b1abc3b2a60c90f6010a7))
+* **controlnet:** research the pose and faces group ([#166](https://github.com/centuryglass/sd-backend-client/issues/166)) ([2093398](https://github.com/centuryglass/sd-backend-client/commit/2093398e488b1f8c4b9ea1a5dcbd3ec1871a2254))
+* **controlnet:** research the SDXL union and QR/illusion group ([#175](https://github.com/centuryglass/sd-backend-client/issues/175)) ([fc6d955](https://github.com/centuryglass/sd-backend-client/commit/fc6d9556a4534b0a6494f0c3bbe0e6328cd6ee18))
+* **controlnet:** research the segmentation group ([#167](https://github.com/centuryglass/sd-backend-client/issues/167)) ([3f9b911](https://github.com/centuryglass/sd-backend-client/commit/3f9b91158985cea0f73521999664d349fb3f0faa))
+* **controlnet:** write the choosing guides and settle the final open questions ([#177](https://github.com/centuryglass/sd-backend-client/issues/177)) ([1374333](https://github.com/centuryglass/sd-backend-client/commit/1374333523f8ec41f443e227113900e76cc5994d))
+* restructure the README as an introduction that links into the API reference ([#172](https://github.com/centuryglass/sd-backend-client/issues/172)) ([f1441a9](https://github.com/centuryglass/sd-backend-client/commit/f1441a927caa4426e7e76e6ef43e9e1669bf15bd))
+* say what agents do when the issue-cache hook didn't run ([#163](https://github.com/centuryglass/sd-backend-client/issues/163)) ([c38dd80](https://github.com/centuryglass/sd-backend-client/commit/c38dd80db3b97287c52e980f2e73577091a62954))
+
 ## [0.7.0](https://github.com/centuryglass/sd-backend-client/compare/v0.6.1...v0.7.0) (2026-11-07)
 
 
