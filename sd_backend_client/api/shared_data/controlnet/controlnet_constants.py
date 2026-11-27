@@ -13,17 +13,20 @@ from typing_extensions import TypedDict
 NONE_VALUE = 'None'
 
 class ControlTypeDef(TypedDict):
-    """Defines one of the ControlNet Type options returned by the /controlnet/control_types endpoint."""
+    """A ControlNet category and its available options and defaults, on either backend."""
     module_list: list[str]
     model_list: list[str]
     default_option: str
     default_model: str
 
 
-class StaticControlTypeDef(ControlTypeDef):
-    """Extended from the WebUI API definitions to include regex, hopefully catching any renamed or augmented models or
-       preprocessors that should be in the list.  Also has the benefit of letting me avoid manually listing all the
-       options that match the pattern."""
+class StaticControlTypeDef(TypedDict):
+    """A built-in category definition with optional patterns for additional available options."""
+
+    module_list: list[str]
+    model_list: list[str]
+    default_option: str
+    default_model: str
     preprocessor_pattern: NotRequired[str]
     model_pattern: NotRequired[str]
 
