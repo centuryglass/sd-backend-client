@@ -12,7 +12,8 @@ __all__ = ['BackendOption', 'BackendCapabilities']
 
 class BackendOption(BaseModel):
     """One option a server offers, such as a checkpoint or a sampler."""
-    model_config = ConfigDict(frozen=True)
+    # use_attribute_docstrings copies each field's docstring into its FieldInfo.description.
+    model_config = ConfigDict(frozen=True, use_attribute_docstrings=True)
 
     name: str
     """The value to pass back to the server that listed it, in the parameter field the listing method names."""
@@ -23,7 +24,8 @@ class BackendOption(BaseModel):
 
 class BackendCapabilities(BaseModel):
     """Optional features a server has, so callers can check before submitting a job that needs one."""
-    model_config = ConfigDict(frozen=True)
+    # use_attribute_docstrings copies each field's docstring into its FieldInfo.description.
+    model_config = ConfigDict(frozen=True, use_attribute_docstrings=True)
 
     controlnet: bool
     """Whether `DiffusionParams.controlnet_units` and ControlNet preprocessor previews work.

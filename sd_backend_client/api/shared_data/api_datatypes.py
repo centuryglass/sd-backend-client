@@ -20,13 +20,17 @@ SeamFixMode = Literal['None', 'Band Pass', 'Half Tile', 'Half Tile + Intersectio
 
 
 class DiffusionUpscalingParams(BaseModel):
-    """Dataclass defining parameters for Stable Diffusion upscaling.
+    """Parameters for upscaling an image, optionally refining it with tiled Stable Diffusion, on either backend.
+
+    Pass an instance to `Backend.submit_upscale`.
 
     Covers the "Ultimate SD Upscale" workflow on both backends (ComfyUI's UltimateSDUpscale node and the WebUI script of
     the same name) plus the optional ControlNet tile pass. The diffusion pass itself (prompt, seed, cfg, sampler, model,
     ...) is carried by `diffusion_params`; the fields here are the upscale-specific tunables layered on top of it.
     """
-    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True, extra='forbid')
+    # use_attribute_docstrings copies each field's docstring into its FieldInfo.description.
+    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True, extra='forbid',
+                              use_attribute_docstrings=True)
 
     upscaling_mode: str = ""
     """Optional basic upscaler to use for basic upscaling or preprocessing before enhancing details via diffusion."""

@@ -1,5 +1,5 @@
 pillow>=10.1
 requests>=2.20
 websocket-client>=1.0
-pydantic>=2.1
+pydantic>=2.7
 typing-extensions>=4.6.1

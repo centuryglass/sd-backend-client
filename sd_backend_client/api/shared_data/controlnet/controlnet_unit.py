@@ -17,13 +17,29 @@ class ControlNetUnit(BaseModel):
 
        Pass `image` as a Pillow image from Python. This field is omitted from the JSON schema.
     """
-    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True, extra='forbid')
+    # use_attribute_docstrings copies each field's docstring into its FieldInfo.description.
+    model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True, extra='forbid',
+                              use_attribute_docstrings=True)
 
     image: SkipJsonSchema[Optional[Image.Image]] = None
+    """Control image the preprocessor reads, or the model reads directly when there is no preprocessor.
+
+    None uses the generation's source image (`DiffusionParams.init_images`), as the WebUI ControlNet extension does.
+    On ComfyUI, a unit with no image raises `ValueError` when there is no source image either.
+    """
 
     preprocessor: Optional[PreprocessorParams] = None
+    """Preprocessor that turns `image` into a control map, with its parameter values.
+
+    None passes `image` to the model unchanged, for an image that is already a control map.
+    """
 
     model: Optional[ControlNetModel] = None
+    """ControlNet model that applies the control map to generation, as listed by `Backend.list_controlnet_models`.
+
+    None works only on WebUI, with a model-free preprocessor (see `ControlNetPreprocessor.model_free`). ComfyUI skips
+    and logs a unit with no model.
+    """
 
     control_strength: float = Field(default=1.0, ge=0.0, le=2.0)
     """ControlNet strength, from 0.0 to 2.0."""
@@ -42,10 +58,13 @@ class ControlNetUnit(BaseModel):
     """
 
     low_vram: bool = False
-    """WebUI-specific low VRAM toggle"""
+    """Whether the WebUI ControlNet extension trades speed for lower VRAM use on this unit. ComfyUI ignores it."""
 
     pixel_perfect: bool = True
-    """WebUI-specific toggle for exact image resolution matching."""
+    """Whether the WebUI ControlNet extension picks the preprocessor resolution from the control image and output sizes.
+
+    When on, it overrides the preprocessor's resolution parameter (`PREPROCESSOR_RES_PARAM_KEY`). ComfyUI ignores it.
+    """
 
     @model_validator(mode='after')
     def _check_control_range(self) -> Self:

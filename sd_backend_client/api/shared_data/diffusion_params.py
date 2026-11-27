@@ -23,7 +23,10 @@ It matches WebUI's own img2img default.
 
 
 class DiffusionParams(BaseModel):
-    """Request body format for image generation (all types).
+    """Parameters for txt2img, img2img and inpainting that mean the same thing on both backends.
+
+    Pass an instance to any `Backend.submit_*` generation method. `DiffusionRequestBody` (WebUI) and
+    `ComfyUIDiffusionParams` (ComfyUI) subclass it to add fields only one backend supports.
 
     Pass Pillow images for `init_images` and `mask` from Python. These fields are omitted from the JSON schema.
     """
@@ -33,8 +36,9 @@ class DiffusionParams(BaseModel):
     # validate_assignment applies the field constraints to attribute assignment too, so `params.steps = 0` raises.
     # extra='forbid' makes a misspelled field raise instead of being dropped. Converting between subclasses must pass
     # only fields the target defines (see `DiffusionRequestBody.from_params`).
+    # use_attribute_docstrings copies each field's docstring into its FieldInfo.description.
     model_config = ConfigDict(arbitrary_types_allowed=True, use_enum_values=True, validate_default=True,
-                              validate_assignment=True, extra='forbid')
+                              validate_assignment=True, extra='forbid', use_attribute_docstrings=True)
 
     ### Basic image generation:
     sd_model_name: str = ''
