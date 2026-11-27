@@ -5,6 +5,7 @@ from typing import Optional, Self
 
 from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic.json_schema import SkipJsonSchema
 
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
 from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import PreprocessorParams
@@ -12,10 +13,13 @@ from sd_backend_client.api.shared_data.controlnet.controlnet_preprocessor import
 class ControlNetUnit(BaseModel):
     """Represents everything needed to define a ControlNet layer, including a preprocessor module and/or a ControlNet
        model (usually both, but not always), and all associated settings. Values can be serialized and deserialized in
-       both WebUI and ComfyUI formats."""
+       both WebUI and ComfyUI formats.
+
+       Pass `image` as a Pillow image from Python. This field is omitted from the JSON schema.
+    """
     model_config = ConfigDict(arbitrary_types_allowed=True, validate_assignment=True, extra='forbid')
 
-    image: Optional[Image.Image] = None
+    image: SkipJsonSchema[Optional[Image.Image]] = None
 
     preprocessor: Optional[PreprocessorParams] = None
 

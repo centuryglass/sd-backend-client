@@ -5,6 +5,7 @@ import inspect
 import typing
 
 import pytest
+from PIL import Image
 from pydantic import BaseModel
 
 import sd_backend_client
@@ -78,3 +79,35 @@ def test_version_matches_installed_distribution() -> None:
     """`__version__` is exported and reports the installed distribution's version."""
     assert '__version__' in sd_backend_client.__all__
     assert sd_backend_client.__version__ == importlib.metadata.version('sd-backend-client')
+
+
+@pytest.mark.parametrize('model', [
+    candidate for name in sd_backend_client.__all__
+    if isinstance(candidate := getattr(sd_backend_client, name), type) and issubclass(candidate, BaseModel)
+])
+def test_exported_models_generate_json_schema(model: type[BaseModel]) -> None:
+    """Every exported Pydantic model exposes a JSON schema."""
+    schema = model.model_json_schema()
+    assert schema['title'] == model.__name__
+    assert schema['type'] == 'object'
+
+
+def test_diffusion_json_schema_omits_python_only_images() -> None:
+    """Schema consumers see scalar options, not runtime-only Pillow fields."""
+    properties = sd_backend_client.DiffusionParams.model_json_schema()['properties']
+    assert {'init_images', 'mask'}.isdisjoint(properties)
+    assert properties['steps']['type'] == 'integer'
+
+    properties = sd_backend_client.ControlNetUnit.model_json_schema()['properties']
+    assert 'image' not in properties
+    assert properties['control_strength']['type'] == 'number'
+
+
+def test_python_only_images_remain_in_runtime_model_dumps() -> None:
+    """Omitting a Pillow field from the JSON schema does not remove it from Python data."""
+    image = Image.new('RGB', (2, 2))
+    params = sd_backend_client.DiffusionParams(init_images=[image], mask=image)
+    dumped = params.model_dump()
+    assert dumped['init_images'] == [image]
+    assert dumped['mask'] is image
+    assert sd_backend_client.ControlNetUnit(image=image).model_dump()['image'] is image
