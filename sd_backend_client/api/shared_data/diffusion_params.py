@@ -8,6 +8,7 @@ from typing import Any, Optional
 
 from PIL import Image
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.util.api_defaults import MASK_BLUR_DEFAULT
@@ -22,7 +23,10 @@ It matches WebUI's own img2img default.
 
 
 class DiffusionParams(BaseModel):
-    """Request body format for image generation (all types)"""
+    """Request body format for image generation (all types).
+
+    Pass Pillow images for `init_images` and `mask` from Python. These fields are omitted from the JSON schema.
+    """
     # use_enum_values: store/serialize enum fields (e.g. WebUI ResizeMode, InpaintFillOption) as their underlying
     # values, so model_dump() produces the JSON-serializable ints the APIs expect. validate_default ensures enum
     # *defaults* (e.g. inpainting_fill=InpaintFillOption.ORIGINAL) are converted too, not just explicitly-set values.
@@ -94,7 +98,7 @@ class DiffusionParams(BaseModel):
 
 
     ### Img2img and inpainting only:
-    init_images: Optional[list[Image.Image]] = None
+    init_images: SkipJsonSchema[Optional[list[Image.Image]]] = None
     """
     List of Pil images for inpainting or image to image.
     """
@@ -108,7 +112,7 @@ class DiffusionParams(BaseModel):
 
 
     ### Inpainting only:
-    mask: Optional[Image.Image] = None
+    mask: SkipJsonSchema[Optional[Image.Image]] = None
     """Inpainting mask image on both backends: opaque or white pixels mark the region to change.
 
     Either an alpha mask or an opaque grayscale mask is accepted (see `mask_to_grayscale`). Each backend converts to
