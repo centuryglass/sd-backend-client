@@ -33,7 +33,7 @@
   },
   "sd_backend_client/api/shared_data/controlnet/controlnet_category_builder.py": {
     "fixme": 1,
-    "line-too-long": 3
+    "line-too-long": 1
   },
   "sd_backend_client/api/shared_data/controlnet/controlnet_model.py": {
     "line-too-long": 1

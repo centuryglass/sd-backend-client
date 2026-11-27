@@ -20,6 +20,7 @@ from sd_backend_client.api.shared_data.api_datatypes import DiffusionUpscalingPa
 from sd_backend_client.api.shared_data.backend import Backend, require_init_image, require_mask, \
     require_soft_inpainting, require_upscale_size
 from sd_backend_client.api.shared_data.backend_options import BackendCapabilities, BackendOption
+from sd_backend_client.api.shared_data.controlnet.controlnet_constants import ControlTypeDef
 from sd_backend_client.api.shared_data.controlnet.controlnet_model import ControlNetModel
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.api.shared_data.diffusion_params import DiffusionParams
@@ -28,7 +29,7 @@ from sd_backend_client.api.shared_data.parameter_def import ParameterDef
 from sd_backend_client.api.shared_data.sampler_names import comfyui_sampler_name, comfyui_scheduler_name
 from sd_backend_client.api.webservice import WebService, DEFAULT_REQUEST_TIMEOUT
 from sd_backend_client.api.webui.controlnet_webui_constants import (ControlNetModelResponse, ControlNetModuleResponse,
-                                                      ControlTypeDef, ControlTypeResponse,
+                                                      ControlTypeResponse,
                                                       FIRST_GENERIC_PARAMETER_KEY, SECOND_GENERIC_PARAMETER_KEY,
                                                       PREPROCESSOR_RES_PARAM_KEY)
 from sd_backend_client.api.webui.controlnet_webui_utils import get_all_preprocessors

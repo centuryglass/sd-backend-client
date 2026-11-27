@@ -254,6 +254,27 @@ def test_category_builder_prefers_api_type_definitions():
     assert builder.get_control_types()['Canny']['default_model'] == 'api_model'
 
 
+def test_category_builder_uses_patterns_only_from_the_static_table():
+    """Server categories contribute names and defaults, while static categories may supply patterns."""
+    api_types = {'control_types': {'Canny': {
+        'module_list': ['canny'],
+        'model_list': ['api_model'],
+        'default_option': 'canny',
+        'default_model': 'api_model',
+        'preprocessor_pattern': 'depth',
+        'model_pattern': 'depth',
+    }}}
+    builder = ControlNetCategoryBuilder(['canny', 'extra_canny', 'depth'],
+                                        ['api_model', 'extra_canny_model', 'depth_model'],
+                                        None, api_types)  # type: ignore[arg-type]
+    assert builder.get_control_types()['Canny'] == {
+        'module_list': ['None', 'canny', 'extra_canny'],
+        'model_list': ['None', 'api_model', 'extra_canny_model'],
+        'default_option': 'canny',
+        'default_model': 'api_model',
+    }
+
+
 def _forge_recording() -> dict[str, Any]:
     return json.loads((RECORDED_DIR / 'forge.json').read_text(encoding='utf-8'))
 

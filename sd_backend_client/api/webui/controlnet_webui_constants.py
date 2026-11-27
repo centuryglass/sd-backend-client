@@ -4,7 +4,6 @@ from typing_extensions import TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from sd_backend_client.api.shared_data.controlnet.controlnet_constants import ControlTypeDef
 from sd_backend_client.api.shared_data.controlnet.controlnet_unit import ControlNetUnit
 from sd_backend_client.util.visual.image_utils import image_to_base64
 
@@ -141,9 +140,18 @@ FIRST_GENERIC_PARAMETER_KEY = 'threshold_a'
 SECOND_GENERIC_PARAMETER_KEY = 'threshold_b'
 
 
+class WebUIControlTypeDef(TypedDict):
+    """One ControlNet category as sent by the WebUI."""
+
+    module_list: list[str]
+    model_list: list[str]
+    default_option: str
+    default_model: str
+
+
 class ControlTypeResponse(TypedDict):
     """Response format for the /controlnet/control_types endpoint, containing one entry per available control type."""
-    control_types: dict[str, ControlTypeDef]
+    control_types: dict[str, WebUIControlTypeDef]
 
 
 # PREPROCESSOR PARAMETER PRESETS:
